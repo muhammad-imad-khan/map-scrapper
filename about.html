@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About the Founder — Maps Lead Scraper</title>
+<meta name="description" content="Meet Imad Khan, founder of Maps Lead Scraper. Why he built a credit-based Google Maps scraper and what drives him.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2306060c'/%3E%3Cpath d='M16 5a9 9 0 00-9 9c0 7 9 13 9 13s9-6 9-13a9 9 0 00-9-9z' fill='%2322c55e'/%3E%3Ccircle cx='16' cy='14' r='3.5' fill='%2306060c'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06060c;--s1:#0a0a12;--s2:#0f0f1a;--s3:#161622;--s4:#1c1c2e;
+  --b:rgba(255,255,255,.06);--bhi:rgba(255,255,255,.11);--bact:rgba(255,255,255,.18);
+  --g:#22c55e;--g2:#16a34a;--gd:rgba(34,197,94,.1);--gb:rgba(34,197,94,.2);
+  --amber:#f59e0b;--ambd:rgba(245,158,11,.1);
+  --blue:#60a5fa;--bld:rgba(96,165,250,.1);--blb:rgba(96,165,250,.2);
+  --red:#f87171;--purple:#a78bfa;
+  --t:#d4d4e8;--t2:#9494b0;--t3:#52526a;
+  --display:'Syne',sans-serif;--body:'DM Sans',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{font-family:var(--body);background:var(--bg);color:var(--t);overflow-x:hidden}
+::selection{background:rgba(34,197,94,.22);color:#fff}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--s4);border-radius:3px}
+
+/* ── BG ── */
+.bg-grid{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(34,197,94,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(34,197,94,.022) 1px,transparent 1px);background-size:60px 60px}
+.bg-glow{position:fixed;top:0;left:50%;transform:translateX(-50%);width:900px;height:600px;background:radial-gradient(ellipse,rgba(34,197,94,.055) 0%,transparent 65%);pointer-events:none;z-index:0}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(6,6,12,.9);backdrop-filter:blur(18px);border-bottom:1px solid var(--b)}
+.nav-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;height:64px;gap:28px;padding:0 24px}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo-ic{width:32px;height:32px;background:var(--gd);border:1px solid var(--gb);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-logo-txt{font-family:var(--display);font-size:15px;font-weight:800;color:#fff}
+.nav-logo-txt em{color:var(--g);font-style:normal}
+.nav-links{margin-left:auto;display:flex;align-items:center;gap:24px}
+.nav-links a{text-decoration:none;color:var(--t2);font-size:14px;font-weight:500;transition:color .15s}
+.nav-links a:hover{color:#fff}
+.nav-links a.active{color:var(--g)}
+.nav-cta{padding:8px 18px;background:var(--g);color:#000!important;border-radius:8px;font-size:13px;font-weight:700!important;transition:background .15s!important}
+.nav-cta:hover{background:var(--g2)!important}
+@media(max-width:640px){.nav-links .hide-m{display:none}}
+
+/* ── HERO STRIP ── */
+.hero-strip{position:relative;z-index:1;padding:110px 0 0;text-align:center}
+.hero-strip .container{max-width:1100px;margin:0 auto;padding:0 24px}
+.breadcrumb{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--t3);margin-bottom:28px}
+.breadcrumb a{color:var(--t3);text-decoration:none;transition:color .15s}.breadcrumb a:hover{color:var(--t)}
+.breadcrumb span{color:var(--t3)}
+.page-kicker{font-family:var(--mono);font-size:11.5px;color:var(--g);letter-spacing:4px;text-transform:uppercase;margin-bottom:14px}
+.page-h{font-family:var(--display);font-size:clamp(42px,6vw,72px);font-weight:800;line-height:.92;color:#fff;letter-spacing:-2px;margin-bottom:0}
+.page-h em{color:var(--g);font-style:normal}
+
+/* ── MAIN LAYOUT ── */
+.main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px 100px}
+
+/* ── FOUNDER CARD ── */
+.founder-section{padding-top:64px}
+.founder-grid{display:grid;grid-template-columns:320px 1fr;gap:56px;align-items:start}
+@media(max-width:780px){.founder-grid{grid-template-columns:1fr;gap:36px}}
+
+/* Left column */
+.founder-left{display:flex;flex-direction:column;gap:0}
+.founder-photo-wrap{position:relative;margin-bottom:28px}
+.founder-photo{
+  width:220px;height:220px;border-radius:50%;
+  background:linear-gradient(135deg,var(--s3),var(--s4));
+  border:2px solid var(--gb);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;position:relative;margin:0 auto;
+  box-shadow:0 0 0 6px rgba(34,197,94,.07),0 0 0 12px rgba(34,197,94,.04),0 24px 80px rgba(0,0,0,.5)
+}
+.founder-photo img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.founder-photo-placeholder{
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--display);font-size:64px;font-weight:800;color:var(--g);
+  background:linear-gradient(135deg,var(--s2),var(--s3))
+}
+.founder-pulse{
+  position:absolute;bottom:10px;right:10px;
+  width:18px;height:18px;border-radius:50%;background:var(--g);
+  border:2.5px solid var(--bg);
+  box-shadow:0 0 0 0 rgba(34,197,94,.4);
+  animation:ping 2.5s ease-in-out infinite
+}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(34,197,94,.4)}70%{box-shadow:0 0 0 10px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+
+.founder-name{font-family:var(--display);font-size:28px;font-weight:800;color:#fff;text-align:center;margin-bottom:5px}
+.founder-title{font-size:14px;color:var(--g);font-weight:600;text-align:center;margin-bottom:6px}
+.founder-company{font-size:13px;color:var(--t3);text-align:center;margin-bottom:22px}
+
+/* Social links */
+.social-links{display:flex;justify-content:center;gap:10px;margin-bottom:26px}
+.social-btn{display:flex;align-items:center;gap:7px;padding:8px 16px;background:var(--s2);border:1px solid var(--b);border-radius:8px;font-size:13px;color:var(--t2);text-decoration:none;font-weight:500;transition:all .15s}
+.social-btn:hover{border-color:var(--bhi);color:#fff;background:var(--s3)}
+.social-btn svg{flex-shrink:0}
+
+/* Stat pills */
+.founder-stats{display:flex;flex-direction:column;gap:10px}
+.fstat{display:flex;align-items:center;justify-content:space-between;background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:12px 16px}
+.fstat-l{font-size:12.5px;color:var(--t3)}
+.fstat-r{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--t)}
+.fstat-r.g{color:var(--g)}
+
+/* Right column */
+.founder-right{}
+.bio-block{margin-bottom:28px}
+.bio-block p{font-size:16px;color:var(--t2);line-height:1.8;margin-bottom:16px}
+.bio-block p:last-child{margin-bottom:0}
+.bio-block p strong{color:var(--t)}
+.bio-block p em{color:var(--g);font-style:normal}
+
+/* Why I built it */
+.why-card{
+  background:linear-gradient(135deg,rgba(34,197,94,.07),rgba(34,197,94,.03));
+  border:1px solid var(--gb);border-radius:16px;padding:28px 30px;
+  margin-bottom:28px;position:relative;overflow:hidden
+}
+.why-card::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(34,197,94,.08) 0%,transparent 70%);pointer-events:none}
+.why-label{font-family:var(--mono);font-size:11px;color:var(--g);letter-spacing:3px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.why-label::before{content:'';width:16px;height:2px;background:var(--g);border-radius:1px}
+.why-text{font-size:15.5px;color:var(--t);line-height:1.8}
+.why-text strong{color:#fff}
+
+/* Skill tags */
+.skills-section{margin-bottom:28px}
+.skills-label{font-size:11px;font-family:var(--mono);color:var(--t3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px}
+.skill-tags{display:flex;flex-wrap:wrap;gap:8px}
+.stag{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 14px;border-radius:7px;font-size:13px;font-weight:500;border:1px solid;
+  transition:all .15s
+}
+.stag:hover{transform:translateY(-1px)}
+.st-g{background:var(--gd);border-color:var(--gb);color:var(--g)}
+.st-b{background:var(--bld);border-color:var(--blb);color:var(--blue)}
+.st-a{background:var(--ambd);border-color:rgba(245,158,11,.22);color:var(--amber)}
+.st-p{background:rgba(167,139,250,.1);border-color:rgba(167,139,250,.22);color:var(--purple)}
+.st-r{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.22);color:var(--red)}
+.st-n{background:var(--s3);border-color:var(--b);color:var(--t2)}
+
+/* ── TIMELINE — Build Story ── */
+.timeline-section{margin-top:72px}
+.ts-kicker{font-family:var(--mono);font-size:11.5px;color:var(--g);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px}
+.ts-h{font-family:var(--display);font-size:clamp(30px,4vw,46px);font-weight:800;color:#fff;margin-bottom:48px;line-height:.95}
+.ts-h em{color:var(--g);font-style:normal}
+.timeline{position:relative;display:flex;flex-direction:column;gap:0}
+.timeline::before{content:'';position:absolute;left:23px;top:0;bottom:0;width:1px;background:linear-gradient(180deg,var(--g),rgba(34,197,94,.1))}
+.tl-item{display:flex;gap:28px;padding-bottom:44px;position:relative}
+.tl-item:last-child{padding-bottom:0}
+.tl-node{
+  width:46px;height:46px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;z-index:1;
+  background:var(--s2);border:1px solid var(--b);
+  transition:border-color .2s
+}
+.tl-node.active{background:var(--gd);border-color:var(--gb)}
+.tl-node svg{transition:stroke .2s}
+.tl-node.active svg{stroke:var(--g)}
+.tl-body{padding-top:10px;flex:1}
+.tl-label{font-family:var(--mono);font-size:11px;color:var(--t3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px}
+.tl-title{font-size:18px;font-weight:700;color:#fff;margin-bottom:9px}
+.tl-desc{font-size:14.5px;color:var(--t2);line-height:1.75}
+
+/* ── CTA BAR ── */
+.about-cta{
+  position:relative;z-index:1;
+  background:linear-gradient(135deg,rgba(34,197,94,.09),rgba(34,197,94,.03));
+  border:1px solid var(--gb);border-radius:20px;padding:52px 48px;
+  display:flex;align-items:center;justify-content:space-between;gap:28px;
+  flex-wrap:wrap;margin:72px 24px 0;max-width:1100px;
+  margin-left:auto;margin-right:auto
+}
+.about-cta-l .ac-h{font-family:var(--display);font-size:32px;font-weight:800;color:#fff;margin-bottom:8px;line-height:1}
+.about-cta-l .ac-h em{color:var(--g);font-style:normal}
+.about-cta-l .ac-s{font-size:15px;color:var(--t2);line-height:1.6}
+.about-cta-r{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn-main{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;background:var(--g);color:#000;border:none;border-radius:10px;font-size:14.5px;font-weight:700;cursor:pointer;text-decoration:none;font-family:var(--body);transition:background .15s,box-shadow .2s;box-shadow:0 0 40px rgba(34,197,94,.18)}
+.btn-main:hover{background:var(--g2)}
+.btn-ghost{display:inline-flex;align-items:center;gap:7px;padding:13px 22px;background:transparent;color:var(--t);border:1px solid var(--bhi);border-radius:10px;font-size:14.5px;font-weight:600;cursor:pointer;text-decoration:none;font-family:var(--body);transition:all .15s}
+.btn-ghost:hover{background:var(--s3);border-color:var(--bact)}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-index:1;margin-top:72px}
+.footer-inner{max-width:1100px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--t3)}
+.f-logo-sm{display:flex;align-items:center;gap:8px;text-decoration:none}
+.f-logo-ic{width:26px;height:26px;background:var(--gd);border:1px solid var(--gb);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.f-logo-txt{font-family:var(--display);font-size:13px;font-weight:800;color:#fff}
+.f-logo-txt em{color:var(--g);font-style:normal}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap}
+.footer-links a{color:var(--t3);text-decoration:none;transition:color .15s}.footer-links a:hover{color:var(--t)}
+
+/* ── REVEAL ── */
+.rev{opacity:0;transform:translateY(22px);transition:opacity .65s ease,transform .65s ease}
+.rev.in{opacity:1;transform:none}
+.rev-l{opacity:0;transform:translateX(-18px);transition:opacity .65s ease,transform .65s ease}
+.rev-l.in{opacity:1;transform:none}
+@media(max-width:480px){.about-cta{padding:32px 24px}.social-links{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-ic">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      </div>
+      <span class="nav-logo-txt">Maps Lead <em>Scraper</em></span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html#how" class="hide-m">How it works</a>
+      <a href="index.html#pricing" class="hide-m">Pricing</a>
+      <a href="about.html" class="active">About</a>
+      <a href="index.html#install" class="nav-cta">Add to Browser</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO STRIP -->
+<div class="hero-strip">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="index.html">Home</a>
+      <span>›</span>
+      <span>About</span>
+    </div>
+    <div class="page-kicker">Meet the founder</div>
+    <h1 class="page-h">The person who<br>built <em>this tool</em></h1>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- FOUNDER SECTION -->
+  <div class="founder-section rev">
+    <div class="founder-grid">
+
+      <!-- LEFT: photo + identity + stats -->
+      <div class="founder-left rev-l">
+        <div class="founder-photo-wrap">
+          <div class="founder-photo">
+            <!-- Replace src with your actual photo path, e.g. src="imad.jpg" -->
+            <img src="F:\Companies\ElysianSoftSystems\Map-Scrapper\Web\founder.jpg" alt="Imad Khan" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div class="founder-photo-placeholder" style="display:none">IK</div>
+            <div class="founder-pulse"></div>
+          </div>
+        </div>
+        <div class="founder-name">Imad Khan</div>
+        <div class="founder-title">Founder &amp; Builder</div>
+        <div class="founder-company">Maps Lead Scraper</div>
+
+        <div class="social-links">
+          <a class="social-btn" href="https://www.linkedin.com/in/muhammad-imad-khan/" target="_blank" rel="noopener">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+            LinkedIn
+          </a>
+          <a class="social-btn" href="https://github.com/muhammad-imad-khan" target="_blank" rel="noopener">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+            GitHub
+          </a>
+        </div>
+
+        <div class="founder-stats">
+          <div class="fstat">
+            <span class="fstat-l">Built with</span>
+            <span class="fstat-r">Chrome Extensions API</span>
+          </div>
+          <div class="fstat">
+            <span class="fstat-l">Extension version</span>
+            <span class="fstat-r g">v2.1</span>
+          </div>
+          <div class="fstat">
+            <span class="fstat-l">Free starter credits</span>
+            <span class="fstat-r g">25 per install</span>
+          </div>
+          <div class="fstat">
+            <span class="fstat-l">Browsers supported</span>
+            <span class="fstat-r">Chrome · Edge · Brave · Opera</span>
+          </div>
+          <div class="fstat">
+            <span class="fstat-l">Data fields per lead</span>
+            <span class="fstat-r g">8 columns</span>
+          </div>
+          <div class="fstat">
+            <span class="fstat-l">Support email</span>
+            <span class="fstat-r" style="font-size:11.5px">support@mapsleadscraper.com</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: bio + why + skills -->
+      <div class="founder-right rev">
+        <div class="bio-block">
+          <p>I build tools that make <strong>real work faster</strong> — not theoretical tools, not demo projects. Things people open on Monday morning and actually use to get their job done.</p>
+          <p>Maps Lead Scraper came out of a very specific frustration: I kept watching freelancers and marketers waste hours copy-pasting business listings from Google Maps one by one into spreadsheets. <em>There had to be a better way.</em></p>
+          <p>I enjoy taking a process that feels painful and reducing it to a single click. Whether it's automating workflows, integrating different systems, or building apps that people actually enjoy using — my focus is always on <strong>making technology work for the people using it</strong>, not the other way around.</p>
+          <p>Most of my experience comes from <strong>enterprise and healthcare environments</strong> — places where errors are expensive and reliability is everything. That background shapes how I build: every feature has to actually work, edge cases get handled, and the user should never have to think about what's happening under the hood.</p>
+        </div>
+
+        <!-- WHY I BUILT IT -->
+        <div class="why-card">
+          <div class="why-label">Why I built Maps Lead Scraper</div>
+          <div class="why-text">
+            During client work, I kept watching the same painful process repeat: someone needed local business contacts — phone numbers, emails, hours — and their only option was to manually open each Google Maps listing and copy the details into a spreadsheet. For 50 listings, that's an hour of tedious work producing data that's already publicly available. <br><br>
+            I realised the problem wasn't laziness — it was that no good tool existed. The existing scrapers were either expensive SaaS products with monthly fees, or CLI scripts that required Python and technical setup. Neither option worked for the people who actually needed it. <br><br>
+            <strong>So I built Maps Lead Scraper as a browser extension.</strong> It lives where the user already works, costs nothing to start, and charges only when it scrapes — because that felt honest. No subscriptions for something you use once a month. Pay per lead, keep your credits, use them whenever.
+          </div>
+        </div>
+
+        <!-- SKILLS -->
+        <div class="skills-section">
+          <div class="skills-label">Tech stack &amp; expertise</div>
+          <div class="skill-tags">
+            <span class="stag st-b">Chrome Extensions API</span>
+            <span class="stag st-b">Manifest V3</span>
+            <span class="stag st-g">JavaScript / Async</span>
+            <span class="stag st-g">Playwright</span>
+            <span class="stag st-a">Gumroad Licensing API</span>
+            <span class="stag st-n">Dynamics 365</span>
+            <span class="stag st-n">Power Platform</span>
+            <span class="stag st-b">Azure</span>
+            <span class="stag st-g">.NET</span>
+            <span class="stag st-g">React</span>
+            <span class="stag st-p">DevOps &amp; CI/CD</span>
+            <span class="stag st-r">Healthcare IT</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="timeline-section rev">
+    <div class="ts-kicker">The build story</div>
+    <h2 class="ts-h">From frustration<br>to <em>finished product</em></h2>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-node active">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <div class="tl-body">
+          <div class="tl-label">The problem</div>
+          <div class="tl-title">Watching hours disappear into copy-paste</div>
+          <div class="tl-desc">Clients and freelancers needed local business data — email, phone, hours — from Google Maps. Every existing solution was either a monthly subscription, required coding, or was already broken. The gap was obvious.</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-node active">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 010 1.4l-8 8a1 1 0 01-.4.3l-4 1a1 1 0 01-1.3-1.3l1-4a1 1 0 01.3-.4l8-8a1 1 0 011.4 0l3 3z"/></svg>
+        </div>
+        <div class="tl-body">
+          <div class="tl-label">The build</div>
+          <div class="tl-title">Chrome extension using Playwright-style injection</div>
+          <div class="tl-desc">Built as a Manifest V3 Chrome extension with a background service worker that opens a hidden tab, navigates Google Maps, scrolls the feed, visits each listing, and extracts structured data — all without any user interaction beyond clicking Start.</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-node active">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div class="tl-body">
+          <div class="tl-label">Email finder</div>
+          <div class="tl-title">Auto-visiting websites to extract contact emails</div>
+          <div class="tl-desc">Added a second fetch layer that visits each business's website and contact page, running regex extraction to find email addresses — the most valuable piece of data for cold outreach that Maps itself doesn't provide.</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-node active">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        </div>
+        <div class="tl-body">
+          <div class="tl-label">The viewer</div>
+          <div class="tl-title">Auto-download + built-in results viewer with Sheets/Excel</div>
+          <div class="tl-desc">When scraping finishes the CSV saves automatically to Downloads, and a full-screen results viewer opens with search, filter, sort — plus one-click Open in Google Sheets and Open in Excel Online buttons with step-by-step import guides.</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-node active">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <div class="tl-body">
+          <div class="tl-label">Monetisation</div>
+          <div class="tl-title">Credit-based model — pay per lead, no subscriptions</div>
+          <div class="tl-desc">Chose a credit system over a monthly subscription deliberately. Users who scrape 50 leads once a month shouldn't pay the same as agencies running 5,000 a week. 25 free credits on install, three packs starting at $5, and credits never expire.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA BAR -->
+<div class="about-cta rev">
+  <div class="about-cta-l">
+    <div class="ac-h">Try it yourself.<br><em>25 free credits</em> on install.</div>
+    <div class="ac-s">No sign-up required · Works on Chrome, Edge, Brave and Opera</div>
+  </div>
+  <div class="about-cta-r">
+    <a class="btn-main" href="index.html#install">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Add to Browser — Free
+    </a>
+    <a class="btn-ghost" href="mailto:support@mapsleadscraper.com">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      Get in touch
+    </a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <a href="index.html" class="f-logo-sm">
+      <div class="f-logo-ic"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+      <span class="f-logo-txt">Maps Lead <em>Scraper</em></span>
+    </a>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="index.html#pricing">Pricing</a>
+      <a href="index.html#faq">FAQ</a>
+      <a href="about.html">About</a>
+      <a href="mailto:support@mapsleadscraper.com">Contact</a>
+    </div>
+    <span>© <script>document.write(new Date().getFullYear())</script> Maps Lead Scraper</span>
+  </div>
+</footer>
+
+<script>
+'use strict';
+// Scroll reveal
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold:0.06, rootMargin:'0px 0px -40px 0px' });
+document.querySelectorAll('.rev,.rev-l').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>

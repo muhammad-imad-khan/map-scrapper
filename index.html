@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maps Lead Scraper — Get Business Leads from Google Maps Instantly</title>
+<meta name="description" content="Scrape Google Maps search results into a CSV with emails, ratings, opening hours and websites. Credit-based browser extension — 25 free credits on install.">
+<meta property="og:title" content="Maps Lead Scraper — Google Maps → CSV in 60 Seconds">
+<meta property="og:description" content="Type any search. Get a spreadsheet of business leads with emails, ratings and hours. 25 free credits on install.">
+<meta name="theme-color" content="#06060c">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2306060c'/%3E%3Cpath d='M16 5a9 9 0 00-9 9c0 7 9 13 9 13s9-6 9-13a9 9 0 00-9-9z' fill='%2322c55e'/%3E%3Ccircle cx='16' cy='14' r='3.5' fill='%2306060c'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06060c;--s1:#0a0a12;--s2:#0f0f1a;--s3:#161622;--s4:#1c1c2e;
+  --b:rgba(255,255,255,.06);--bhi:rgba(255,255,255,.11);--bact:rgba(255,255,255,.18);
+  --g:#22c55e;--g2:#16a34a;--gd:rgba(34,197,94,.1);--gb:rgba(34,197,94,.2);
+  --amber:#f59e0b;--blue:#60a5fa;--red:#f87171;--purple:#a78bfa;
+  --t:#d4d4e8;--t2:#9494b0;--t3:#52526a;
+  --display:'Syne',sans-serif;--body:'DM Sans',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{font-family:var(--body);background:var(--bg);color:var(--t);overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--s4);border-radius:3px}
+::selection{background:rgba(34,197,94,.22);color:#fff}
+.container{max-width:1100px;margin:0 auto;padding:0 24px}
+
+/* cursor styles moved to perf layer */
+
+/* ── BG CANVAS ── */
+#bgCanvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.6}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;transition:background .3s,border-color .3s}
+nav.scrolled{background:rgba(6,6,12,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--b)}
+.nav-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;height:64px;gap:32px;padding:0 24px}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo-ic{width:34px;height:34px;background:var(--gd);border:1px solid var(--gb);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
+.nav-logo:hover .nav-logo-ic{background:var(--gb)}
+.nav-logo-txt{font-family:var(--display);font-size:15px;font-weight:800;color:#fff}
+.nav-logo-txt em{color:var(--g);font-style:normal}
+.nav-links-wrap{margin-left:auto;display:flex;align-items:center;gap:28px}
+.nav-links-wrap a{text-decoration:none;color:var(--t2);font-size:14px;font-weight:500;transition:color .15s;position:relative}
+.nav-links-wrap a::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:1px;background:var(--g);transform:scaleX(0);transition:transform .2s;transform-origin:left}
+.nav-links-wrap a:hover{color:#fff}
+.nav-links-wrap a:hover::after{transform:scaleX(1)}
+.nav-cta{padding:8px 20px;background:var(--g)!important;color:#000!important;border-radius:8px;font-size:13.5px;font-weight:700!important;display:flex;align-items:center;gap:7px;transition:background .15s,transform .1s,box-shadow .2s!important;box-shadow:0 0 0 rgba(34,197,94,0)}
+.nav-cta::after{display:none!important}
+.nav-cta:hover{background:var(--g2)!important;box-shadow:0 0 28px rgba(34,197,94,.3)!important;transform:translateY(-1px)}
+.nav-burger{display:none;background:none;border:1px solid var(--b);border-radius:6px;padding:7px 9px;cursor:pointer;color:var(--t2);margin-left:auto}
+@media(max-width:720px){
+  .nav-links-wrap{display:none;position:fixed;top:64px;left:0;right:0;background:rgba(6,6,12,.98);border-bottom:1px solid var(--b);padding:20px 24px;flex-direction:column;align-items:flex-start;gap:16px;margin-left:0}
+  .nav-links-wrap.open{display:flex}.nav-burger{display:flex;align-items:center}
+}
+
+/* ── HERO ── */
+.hero{position:relative;z-index:1;padding:140px 0 60px;text-align:center;min-height:100vh;display:flex;flex-direction:column;justify-content:center}
+.hero-kicker{display:inline-flex;align-items:center;gap:8px;background:var(--gd);border:1px solid var(--gb);border-radius:100px;padding:6px 18px;margin-bottom:28px;animation:fadeUp .7s ease both}
+.kd{width:7px;height:7px;border-radius:50%;background:var(--g);animation:dot-pulse 2s infinite}
+.kt{font-size:12.5px;font-weight:600;color:var(--g);letter-spacing:.4px}
+@keyframes dot-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.hero-h1{font-family:var(--display);font-size:clamp(48px,8vw,92px);font-weight:800;line-height:.9;letter-spacing:-2.5px;color:#fff;margin-bottom:24px;animation:fadeUp .7s ease .1s both}
+.hero-h1 .acc{color:var(--g)}
+.hero-h1 .line2{display:block;position:relative}
+.hero-sub{font-size:clamp(16px,2.2vw,20px);color:var(--t2);max-width:540px;margin:0 auto 36px;line-height:1.65;animation:fadeUp .7s ease .2s both}
+.hero-sub strong{color:var(--t)}
+.hero-btns{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:18px;animation:fadeUp .7s ease .3s both}
+.btn-main{display:inline-flex;align-items:center;gap:9px;padding:14px 30px;background:var(--g);color:#000;border:none;border-radius:11px;font-size:15.5px;font-weight:700;cursor:pointer;text-decoration:none;font-family:var(--body);transition:background .15s,transform .1s,box-shadow .2s;box-shadow:0 0 50px rgba(34,197,94,.2)}
+.btn-main:hover{background:var(--g2);box-shadow:0 0 90px rgba(34,197,94,.4);transform:translateY(-2px)}
+.btn-main:active{transform:scale(.98)}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:14px 26px;background:transparent;color:var(--t);border:1px solid var(--bhi);border-radius:11px;font-size:15.5px;font-weight:600;cursor:pointer;text-decoration:none;font-family:var(--body);transition:border-color .15s,background .15s,transform .1s}
+.btn-ghost:hover{background:var(--s3);border-color:var(--bact);transform:translateY(-2px)}
+.hero-note{font-size:13px;color:var(--t3);animation:fadeUp .6s ease .4s both}
+.hero-note strong{color:var(--t2)}
+.compat-pills{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap;animation:fadeUp .6s ease .5s both}
+.cp{display:flex;align-items:center;gap:5px;background:var(--s2);border:1px solid var(--b);border-radius:20px;padding:4px 11px;font-size:11.5px;color:var(--t2);font-weight:500;transition:border-color .2s,color .2s}
+.cp:hover{border-color:var(--gb);color:var(--g)}
+
+/* ── LIVE SCRAPER DEMO ── */
+.demo-section{position:relative;z-index:1;padding:20px 0 80px}
+.demo-wrap{max-width:960px;margin:0 auto;padding:0 24px;position:relative}
+.demo-label{text-align:center;font-family:var(--mono);font-size:11px;color:var(--t3);letter-spacing:3px;text-transform:uppercase;margin-bottom:24px}
+.demo-label span{color:var(--g);animation:blink 1.4s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+
+.demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+@media(max-width:760px){.demo-grid{grid-template-columns:1fr}}
+
+/* Extension panel */
+.ext-panel{background:#0b0b14;border:1px solid rgba(255,255,255,.1);border-radius:16px;overflow:hidden;box-shadow:0 32px 100px rgba(0,0,0,.65),0 0 0 1px rgba(34,197,94,.06)}
+.ep-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:#070710;border-bottom:1px solid rgba(255,255,255,.07)}
+.ep-logo{display:flex;align-items:center;gap:8px}
+.ep-ic{width:24px;height:24px;background:var(--gd);border:1px solid var(--gb);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.ep-nm{font-size:11.5px;font-weight:700;color:#fff}.ep-nm em{color:var(--g);font-style:normal}
+.ep-cr{background:var(--gd);border:1px solid var(--gb);border-radius:9px;padding:2px 9px;font-family:var(--mono);font-size:11px;color:var(--g);display:flex;align-items:center;gap:4px}
+.ep-body{padding:12px 13px}
+.ep-inp-w{position:relative;margin-bottom:7px}
+.ep-inp-w::before{content:'🔍';position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:10px;z-index:1;pointer-events:none}
+.ep-inp{width:100%;background:#14141f;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:8px 10px 8px 26px;font-size:11px;color:rgba(255,255,255,.9);font-family:var(--mono);outline:none;transition:border-color .2s;caret-color:var(--g)}
+.ep-inp:focus{border-color:rgba(34,197,94,.4)}
+.ep-opts{display:flex;align-items:center;gap:8px;background:#0e0e18;border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:10.5px;color:var(--t3)}
+.ep-cpill{margin-left:auto;background:var(--gd);border:1px solid rgba(34,197,94,.18);border-radius:10px;padding:2px 9px;font-family:var(--mono);font-size:9.5px;color:var(--g)}
+.ep-btn{width:100%;padding:8px;background:var(--g);color:#000;border:none;border-radius:6px;font-size:11.5px;font-weight:700;margin-bottom:9px;cursor:pointer;font-family:var(--body);transition:background .15s}
+.ep-btn:hover{background:var(--g2)}
+.ep-btn.stop{background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.25)}
+.ep-div{height:1px;background:rgba(255,255,255,.06);margin-bottom:8px}
+.ep-prog{margin-bottom:8px}
+.ep-stat{font-family:var(--mono);font-size:10px;color:var(--g);display:flex;align-items:center;gap:5px;margin-bottom:5px;min-height:14px}
+.ep-sdot{width:5px;height:5px;border-radius:50%;background:var(--g);flex-shrink:0}
+.ep-sdot.pulse{animation:dot-pulse 1.1s infinite}
+.ep-bar-wrap{height:2.5px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;margin-bottom:4px}
+.ep-bar{height:100%;background:linear-gradient(90deg,var(--g),#86efac);border-radius:2px;width:0%;transition:width .6s ease}
+.ep-plbl{display:flex;justify-content:space-between;font-size:9px;color:var(--t3);font-family:var(--mono)}
+.ep-res{border:1px solid rgba(255,255,255,.07);border-radius:6px;overflow:hidden;max-height:170px;overflow-y:auto}
+.ep-res::-webkit-scrollbar{width:3px}.ep-res::-webkit-scrollbar-thumb{background:rgba(34,197,94,.2);border-radius:2px}
+.ep-rth{display:grid;grid-template-columns:1.8fr .9fr 1.6fr;padding:5px 9px;background:#070710;font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);border-bottom:1px solid rgba(255,255,255,.06);position:sticky;top:0}
+.ep-row{display:grid;grid-template-columns:1.8fr .9fr 1.6fr;padding:6px 9px;font-size:10px;border-bottom:1px solid rgba(255,255,255,.04);animation:rowSlide .35s ease both}
+.ep-row:last-child{border-bottom:none}
+@keyframes rowSlide{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+.rn{color:#dde;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rr{color:var(--amber);font-family:var(--mono);font-weight:700}
+.re{font-family:var(--mono);font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.re.found{color:var(--g)}.re.na{color:var(--t3)}
+.ep-export{margin-top:8px;width:100%;padding:7px;background:var(--gd);color:var(--g);border:1px solid rgba(34,197,94,.22);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--body);text-align:center;transition:background .15s;display:none}
+.ep-export:hover{background:var(--gb)}
+.ep-export.show{display:block;animation:fadeUp .3s ease}
+
+/* Map radar panel */
+.map-panel{background:#0b0b14;border:1px solid rgba(255,255,255,.1);border-radius:16px;overflow:hidden;box-shadow:0 32px 100px rgba(0,0,0,.65)}
+.mp-hdr{padding:11px 14px;background:#070710;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between}
+.mp-title{font-size:11.5px;font-weight:600;color:var(--t2)}
+.mp-ping{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--g);font-family:var(--mono)}
+.mp-ping-dot{width:6px;height:6px;border-radius:50%;background:var(--g);animation:dot-pulse 1.2s infinite}
+.mp-body{position:relative;height:260px;overflow:hidden;background:#08080f}
+#mapCanvas{position:absolute;inset:0;width:100%;height:100%}
+.mp-overlay{position:absolute;inset:0;pointer-events:none}
+/* scanning pins */
+.map-pin{position:absolute;transform:translate(-50%,-100%);animation:pinDrop .4s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes pinDrop{from{opacity:0;transform:translate(-50%,-120%) scale(.5)}to{opacity:1;transform:translate(-50%,-100%) scale(1)}}
+.map-pin svg{filter:drop-shadow(0 2px 8px rgba(34,197,94,.6))}
+.map-pin.visited svg{filter:drop-shadow(0 2px 8px rgba(245,158,11,.6))}
+/* scan line */
+.scan-line{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(34,197,94,.6),transparent);animation:scan-sweep 5s ease-in-out infinite;pointer-events:none}
+@keyframes scan-sweep{0%{top:0%;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:100%;opacity:0}}
+/* data stream */
+.mp-stream{padding:10px 14px;background:#06060e;border-top:1px solid rgba(255,255,255,.06);font-family:var(--mono);font-size:10px;color:var(--t3);max-height:76px;overflow:hidden}
+.stream-line{display:flex;gap:8px;align-items:baseline;margin-bottom:3px;animation:fadeUp .3s ease both;white-space:nowrap;overflow:hidden}
+.stream-line:last-child{margin-bottom:0}
+.sl-time{color:var(--t3);flex-shrink:0}
+.sl-type{flex-shrink:0}
+.sl-name{color:rgba(255,255,255,.7);overflow:hidden;text-overflow:ellipsis}
+.sl-email{color:var(--g);flex-shrink:0}
+.sl-rating{color:var(--amber);flex-shrink:0}
+
+/* ── TICKER ── */
+.ticker{border-top:1px solid var(--b);border-bottom:1px solid var(--b);background:var(--s1);overflow:hidden;position:relative;z-index:1;padding:12px 0}
+.ticker::before{content:'';position:absolute;left:0;top:0;bottom:0;width:80px;background:linear-gradient(90deg,var(--s1),transparent);z-index:2;pointer-events:none}
+.ticker::after{content:'';position:absolute;right:0;top:0;bottom:0;width:80px;background:linear-gradient(-90deg,var(--s1),transparent);z-index:2;pointer-events:none}
+.ticker-track{display:flex;animation:tick 90s linear infinite;white-space:nowrap}
+.ticker-track:hover{animation-play-state:paused}
+.ti{display:inline-flex;align-items:center;gap:10px;padding:0 28px;font-size:13px;font-weight:500;color:var(--t2);border-right:1px solid var(--b)}
+.ti .v{font-family:var(--mono);color:var(--g);font-size:13.5px;font-weight:700}
+@keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* ── SECTIONS ── */
+.section{position:relative;z-index:1;padding:96px 0}
+.sk{font-family:var(--mono);font-size:11.5px;font-weight:500;color:var(--g);letter-spacing:3px;text-transform:uppercase;margin-bottom:13px}
+.sh{font-family:var(--display);font-size:clamp(34px,5vw,56px);font-weight:800;line-height:.95;letter-spacing:-1.5px;color:#fff;margin-bottom:16px}
+.sh em{color:var(--g);font-style:normal}
+.ss{font-size:17px;color:var(--t2);max-width:520px;line-height:1.65}
+
+/* HOW IT WORKS */
+.steps-wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:56px;background:var(--b);border:1px solid var(--b);border-radius:14px;overflow:hidden}
+@media(max-width:800px){.steps-wrap{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.steps-wrap{grid-template-columns:1fr}}
+.step{background:var(--s1);padding:28px 24px;position:relative;overflow:hidden;transition:background .25s,transform .2s}
+.step:hover{background:var(--s2)}
+.step-bg-n{font-family:var(--display);font-size:72px;font-weight:800;color:rgba(255,255,255,.03);position:absolute;top:-10px;right:10px;line-height:1;transition:color .3s,transform .3s}
+.step:hover .step-bg-n{color:rgba(34,197,94,.06);transform:scale(1.05)}
+.step-ic{width:40px;height:40px;background:var(--gd);border:1px solid var(--gb);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;transition:transform .2s}
+.step:hover .step-ic{transform:scale(1.1) rotate(-3deg)}
+.step-t{font-size:15px;font-weight:700;color:#fff;margin-bottom:7px}
+.step-d{font-size:13.5px;color:var(--t2);line-height:1.6}
+
+/* ── INTERACTIVE DEMO SECTION ── */
+.idemo-section{position:relative;z-index:1;padding:80px 0;background:var(--s1);border-top:1px solid var(--b);border-bottom:1px solid var(--b)}
+.idemo-inner{display:grid;grid-template-columns:1fr 460px;gap:56px;align-items:center;max-width:1100px;margin:0 auto;padding:0 24px}
+@media(max-width:900px){.idemo-inner{grid-template-columns:1fr;gap:36px}}
+.idemo-left .sk{margin-bottom:10px}
+.idemo-h{font-family:var(--display);font-size:clamp(30px,4vw,48px);font-weight:800;color:#fff;line-height:.95;margin-bottom:16px}
+.idemo-h em{color:var(--g);font-style:normal}
+.idemo-p{font-size:15.5px;color:var(--t2);line-height:1.75;margin-bottom:24px}
+.idemo-stats{display:flex;gap:12px;flex-wrap:wrap}
+.idemo-stat{background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:14px 18px;flex:1;min-width:100px;transition:border-color .2s,transform .15s}
+.idemo-stat:hover{border-color:var(--gb);transform:translateY(-2px)}
+.is-n{font-family:var(--display);font-size:32px;font-weight:800;color:var(--g);line-height:1;margin-bottom:3px}
+.is-l{font-size:12px;color:var(--t3)}
+/* typing demo */
+.type-demo{background:#080810;border:1px solid rgba(255,255,255,.1);border-radius:14px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+.td-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;background:#050508;border-bottom:1px solid rgba(255,255,255,.07)}
+.td-dot{width:10px;height:10px;border-radius:50%}
+.td-inp-row{padding:14px;border-bottom:1px solid rgba(255,255,255,.06)}
+.td-inp-label{font-size:9.5px;font-family:var(--mono);color:var(--t3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px}
+.td-inp-field{background:#0e0e18;border:1px solid rgba(34,197,94,.3);border-radius:7px;padding:10px 12px;font-family:var(--mono);font-size:12.5px;color:var(--g);width:100%;display:flex;align-items:center;gap:6px;min-height:38px}
+.td-inp-field .typed{flex:1}
+.td-caret{width:2px;height:14px;background:var(--g);border-radius:1px;animation:caret-blink .8s step-end infinite;flex-shrink:0}
+@keyframes caret-blink{50%{opacity:0}}
+.td-results-wrap{padding:10px 14px;max-height:200px;overflow:hidden}
+.td-rl{font-size:9px;font-family:var(--mono);color:var(--t3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.td-rl .count{color:var(--g);font-weight:600}
+.td-row{display:grid;grid-template-columns:1.8fr .8fr 1.6fr;gap:4px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;animation:rowSlide .3s ease both}
+.td-row:last-child{border-bottom:none}
+.td-row .dn{color:#dde;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.td-row .dr{color:var(--amber);font-family:var(--mono)}
+.td-row .de{font-family:var(--mono);font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.td-row .de.ok{color:var(--g)}.td-row .de.no{color:var(--t3)}
+.td-prog-bar{height:2px;background:rgba(255,255,255,.05);border-radius:1px;margin-top:10px;overflow:hidden}
+.td-pb-fill{height:100%;background:linear-gradient(90deg,var(--g),#86efac);width:0;transition:width .8s ease;border-radius:1px}
+
+/* FEATURES */
+.feat-s{background:var(--s1);border-top:1px solid var(--b);border-bottom:1px solid var(--b)}
+.feat-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--b);border:1px solid var(--b);border-radius:14px;overflow:hidden;margin-top:56px}
+@media(max-width:800px){.feat-wrap{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){.feat-wrap{grid-template-columns:1fr}}
+.feat{background:var(--s1);padding:28px 24px;transition:background .2s}
+.feat:hover{background:var(--s2)}
+.feat-ic{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;transition:transform .2s}
+.feat:hover .feat-ic{transform:scale(1.1) rotate(-4deg)}
+.fi-g{background:var(--gd);border:1px solid var(--gb)}.fi-a{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2)}.fi-b{background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.2)}.fi-p{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2)}.fi-r{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2)}
+.feat-t{font-size:14.5px;font-weight:700;color:#fff;margin-bottom:7px}
+.feat-d{font-size:13.5px;color:var(--t2);line-height:1.62}
+.cols-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:44px}
+.ctag{display:flex;align-items:center;gap:5px;background:var(--s2);border:1px solid var(--b);border-radius:7px;padding:7px 13px;font-size:12.5px;color:var(--t2);font-weight:500;transition:border-color .15s,color .15s,transform .15s}
+.ctag:hover{border-color:var(--gb);color:var(--g);transform:translateY(-2px)}
+
+/* BROWSERS */
+.b-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:44px}
+@media(max-width:700px){.b-grid{grid-template-columns:repeat(3,1fr)}}
+.b-card{background:var(--s2);border:1px solid var(--b);border-radius:12px;padding:18px 14px;text-align:center;cursor:pointer;text-decoration:none;display:block;transition:border-color .2s,background .2s,transform .15s,box-shadow .2s}
+.b-card:hover{border-color:var(--gb);background:var(--s3);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.b-card.sel{border-color:var(--g);background:var(--gd);box-shadow:0 0 30px rgba(34,197,94,.15)}
+.b-card.na{opacity:.45;cursor:default}.b-card.na:hover{transform:none;border-color:var(--b);box-shadow:none}
+.b-icon{font-size:30px;margin-bottom:8px;display:block}
+.b-name{font-size:12.5px;font-weight:600;color:#fff;margin-bottom:3px}
+.b-status{font-size:10.5px;font-family:var(--mono)}.b-status.ok{color:var(--g)}.b-status.na{color:var(--t3)}
+.b-cta-box{background:linear-gradient(135deg,rgba(34,197,94,.07),rgba(34,197,94,.03));border:1px solid var(--gb);border-radius:14px;padding:32px;margin-top:24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.bcl{flex:1;min-width:190px}
+.bcl-browser{font-size:12px;color:var(--g);font-family:var(--mono);font-weight:500;margin-bottom:5px}
+.bcl-h{font-size:20px;font-weight:700;color:#fff;margin-bottom:7px}
+.bcl-s{font-size:13.5px;color:var(--t2);line-height:1.6}
+.bcr{display:flex;flex-direction:column;gap:9px;min-width:190px}
+.after-install{background:var(--s2);border:1px solid var(--b);border-radius:12px;padding:22px 26px;margin-top:22px}
+.ai-label{font-size:11px;font-family:var(--mono);color:var(--t3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px}
+.ai-steps{display:flex;flex-direction:column;gap:11px}
+.ai-step{display:flex;gap:11px;align-items:flex-start}
+.ai-num{width:21px;height:21px;border-radius:50%;background:var(--gd);border:1px solid var(--gb);color:var(--g);font-size:10.5px;font-family:var(--mono);font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.ai-txt{font-size:13.5px;color:var(--t2);line-height:1.55}
+
+/* PRICING */
+.price-s{background:var(--s1);border-top:1px solid var(--b);border-bottom:1px solid var(--b)}
+.free-strip{background:var(--s2);border:1px solid var(--b);border-radius:14px;padding:26px 30px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:48px;transition:border-color .2s}
+.free-strip:hover{border-color:var(--gb)}
+.fs-l .fs-h{font-size:17px;font-weight:700;color:#fff;margin-bottom:5px}
+.fs-l .fs-s{font-size:13.5px;color:var(--t2)}.fs-l .fs-s strong{color:var(--t)}
+.fs-n{font-family:var(--display);font-size:46px;font-weight:800;color:var(--g);line-height:1;display:flex;align-items:baseline;gap:7px}
+.fs-n span{font-size:15px;font-weight:400;color:var(--t3);font-family:var(--body)}
+.p-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+@media(max-width:680px){.p-grid{grid-template-columns:1fr}}
+.p-card{background:var(--s2);border:1px solid var(--b);border-radius:14px;padding:26px 24px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s,box-shadow .2s}
+.p-card:hover{border-color:var(--bhi);transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.p-card.pop{border-color:var(--g);background:linear-gradient(135deg,rgba(34,197,94,.07),rgba(34,197,94,.03))}
+.p-card.pop:hover{box-shadow:0 20px 60px rgba(34,197,94,.15)}
+.pop-tag{position:absolute;top:0;right:0;background:var(--g);color:#000;font-size:8.5px;font-weight:800;padding:3px 11px;border-radius:0 12px 0 9px;letter-spacing:.7px}
+.p-card-ico{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:21px;margin-bottom:16px}
+.p-creds{font-family:var(--display);font-size:50px;font-weight:800;color:#fff;line-height:1;margin-bottom:3px}
+.p-creds span{font-size:20px;color:var(--t2)}
+.p-lbl{font-size:12.5px;color:var(--t2);margin-bottom:14px}
+.p-price{font-size:26px;font-weight:800;color:var(--g);margin-bottom:3px}
+.p-per{font-family:var(--mono);font-size:10.5px;color:var(--t3);margin-bottom:20px}
+.p-feats{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:22px}
+.p-feats li{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--t2)}
+.p-feats li::before{content:'✓';color:var(--g);font-weight:700;flex-shrink:0}
+.btn-p{width:100%;padding:11px;background:var(--g);color:#000;border:none;border-radius:8px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:var(--body);transition:background .15s,transform .1s;text-decoration:none;display:block;text-align:center}
+.btn-p:hover{background:var(--g2);transform:translateY(-1px)}
+.p-card:not(.pop) .btn-p{background:var(--s4);color:var(--t);border:1px solid var(--bhi)}
+.p-card:not(.pop) .btn-p:hover{background:var(--s3);border-color:var(--bact)}
+
+/* FAQ */
+.faq-wrap{margin-top:48px;border:1px solid var(--b);border-radius:14px;overflow:hidden}
+.faq-item{}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;background:var(--s1);cursor:pointer;font-size:15.5px;font-weight:600;color:#fff;transition:background .15s;user-select:none;border-bottom:1px solid var(--b);gap:14px}
+.faq-item:last-child .faq-q{border-bottom:none}
+.faq-item.op .faq-q{background:var(--s2);border-bottom:1px solid var(--b)}
+.faq-q:hover{background:var(--s2)}
+.faq-arr{width:19px;height:19px;border-radius:50%;background:var(--s3);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .25s,background .15s,border-color .15s;font-size:11px;color:var(--t2)}
+.faq-item.op .faq-arr{transform:rotate(45deg);background:var(--gd);border-color:var(--gb);color:var(--g)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease;background:var(--s1)}
+.faq-item.op .faq-a{max-height:400px;border-bottom:1px solid var(--b)}
+.faq-a-in{padding:0 22px 18px;font-size:14.5px;color:var(--t2);line-height:1.7}
+.faq-a-in a{color:var(--g)}.faq-a-in code{font-family:var(--mono);font-size:12px;background:var(--s3);border:1px solid var(--b);padding:1px 6px;border-radius:4px;color:var(--amber)}
+
+/* CTA BAND */
+.cta-band{background:linear-gradient(135deg,rgba(34,197,94,.1),rgba(34,197,94,.03));border:1px solid var(--gb);border-radius:22px;padding:68px 44px;text-align:center;position:relative;overflow:hidden;margin:96px 0}
+.cta-band::before{content:'';position:absolute;top:-60%;left:-60%;width:220%;height:220%;background:radial-gradient(ellipse,rgba(34,197,94,.04) 0%,transparent 55%);animation:band-glow 14s linear infinite}
+@keyframes band-glow{to{transform:rotate(360deg)}}
+.cta-band h2{font-family:var(--display);font-size:clamp(34px,5vw,60px);font-weight:800;line-height:.95;color:#fff;margin-bottom:16px;position:relative;z-index:1}
+.cta-band h2 em{color:var(--g);font-style:normal}
+.cta-band p{font-size:17px;color:var(--t2);margin-bottom:32px;position:relative;z-index:1}
+.cta-band-btns{display:flex;align-items:center;justify-content:center;gap:11px;flex-wrap:wrap;position:relative;z-index:1}
+
+/* FOOTER */
+footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-index:1}
+.footer-g{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:36px;margin-bottom:44px}
+@media(max-width:680px){.footer-g{grid-template-columns:1fr 1fr}}
+@media(max-width:420px){.footer-g{grid-template-columns:1fr}}
+.f-brand .f-logo{display:flex;align-items:center;gap:9px;margin-bottom:12px;text-decoration:none}
+.f-brand p{font-size:13.5px;color:var(--t3);line-height:1.65;max-width:250px}
+.f-col h4{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin-bottom:12px}
+.f-col a{display:block;font-size:13.5px;color:var(--t2);text-decoration:none;margin-bottom:8px;transition:color .15s}
+.f-col a:hover{color:#fff}
+.f-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-top:22px;border-top:1px solid var(--b);font-size:12.5px;color:var(--t3)}
+
+/* REVEAL */
+.rev{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+.rev.in{opacity:1;transform:none}
+@keyframes fadeUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+@media(max-width:600px){.hero{padding:105px 0 50px;min-height:auto}.cta-band{padding:44px 22px}}
+
+/* ── PERFORMANCE LAYER ── */
+#bgCanvas{will-change:transform;contain:strict}
+#cursor{position:fixed;top:0;left:0;pointer-events:none;z-index:99999;mix-blend-mode:difference}
+#cursor-dot{position:absolute;width:6px;height:6px;background:#22c55e;border-radius:50%;will-change:transform}
+#cursor-ring{position:absolute;width:32px;height:32px;border:1.5px solid rgba(34,197,94,.5);border-radius:50%;transition:width .22s,height .22s,border-color .22s;will-change:transform}
+body.hovering #cursor-ring{width:48px;height:48px;border-color:rgba(34,197,94,.9)}
+@media(pointer:coarse){#cursor{display:none}}
+.ep-bar{will-change:width}
+.ep-row,.td-row,.map-pin,.stream-line{will-change:transform,opacity;backface-visibility:hidden}
+.step,.feat,.b-card,.p-card{will-change:transform}
+.ticker-track{will-change:transform;backface-visibility:hidden}
+nav{will-change:background-color}
+.cta-band::before{animation:none}
+/* scan-line: use transform (GPU) not top (CPU paint) */
+.scan-line{top:0!important;will-change:transform,opacity}
+@keyframes scan-sweep{0%{transform:translateY(0);opacity:0}8%{opacity:1}90%{opacity:1}100%{transform:translateY(260px);opacity:0}}
+/* ticker: force GPU layer */
+@keyframes tick{0%{transform:translate3d(0,0,0)}100%{transform:translate3d(-50%,0,0)}}
+/* content-visibility for off-screen sections */
+.section{content-visibility:auto;contain-intrinsic-size:0 600px}
+.feat-s,.price-s{content-visibility:auto;contain-intrinsic-size:0 700px}
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  #bgCanvas{display:none}#cursor{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div id="cursor"><div id="cursor-ring"></div><div id="cursor-dot"></div></div>
+
+<!-- Particle canvas -->
+<canvas id="bgCanvas"></canvas>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <div class="nav-logo-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+      <span class="nav-logo-txt">Maps Lead <em>Scraper</em></span>
+    </a>
+    <div class="nav-links-wrap" id="navLinks">
+      <a href="#how">How it works</a>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a href="about.html">About</a>
+      <a href="#install" class="nav-cta" id="navCtaBtn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span id="navCtaTxt">Add to Browser</span>
+      </a>
+    </div>
+    <button class="nav-burger" id="navBurger" aria-label="Toggle menu">
+      <svg width="17" height="13" viewBox="0 0 17 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="0" y1="1" x2="17" y2="1"/><line x1="0" y1="6.5" x2="17" y2="6.5"/><line x1="0" y1="12" x2="17" y2="12"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="container">
+    <div class="hero-kicker"><span class="kd"></span><span class="kt">25 FREE CREDITS ON INSTALL — NO SIGN-UP REQUIRED</span></div>
+    <h1 class="hero-h1">
+      <span class="acc">Google Maps</span> Leads<br>
+      <span class="line2">Into Your Spreadsheet.</span>
+    </h1>
+    <p class="hero-sub">Type any search — get business <strong>names, emails, ratings, hours and websites</strong> auto-exported to CSV in under 60 seconds.</p>
+    <div class="hero-btns">
+      <a class="btn-main" href="#" id="heroCta">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span id="heroCtaTxt">Add to Chrome — Free</span>
+      </a>
+      <a class="btn-ghost" href="#how">Watch it scrape →</a>
+    </div>
+    <p class="hero-note"><strong>25 free credits</strong> on install · 1 credit = 1 lead · Credits never expire</p>
+    <div class="compat-pills">
+      <span style="font-size:11.5px;color:var(--t3)">Works on</span>
+      <span class="cp"><svg width="13" height="13" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#4285f4"/><circle cx="12" cy="12" r="4.5" fill="white"/><path d="M12 0a12 12 0 0110.39 6H12V0z" fill="#ea4335"/><path d="M2.54 6A12 12 0 0012 24V12L2.54 6z" fill="#34a853"/><path d="M21.46 18A12 12 0 012.54 6L12 12l9.46-6z" fill="#fbbc05"/></svg> Chrome</span>
+      <span class="cp"><svg width="13" height="13" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#0078d4"/><path d="M6 12c0-6 4-9 8-9 2.8 0 5 1.2 6.5 3H12c-2.8 0-5 2-5 6s2.2 6 5 6h9.8A12 12 0 0112 24c-5.5 0-6-5-6-12z" fill="white"/></svg> Edge</span>
+      <span class="cp"><svg width="13" height="13" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#ff6600"/><path d="M18 7l5 3v3l-2 2 2 2v3l-5 5-5-5v-3l2-2-2-2V10z" fill="white" opacity=".9"/><circle cx="18" cy="12" r="3" fill="#ff6600"/></svg> Brave</span>
+      <span class="cp"><svg width="13" height="13" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#ff1b2d"/><ellipse cx="12" cy="12" rx="6" ry="9" fill="none" stroke="white" stroke-width="2.5"/></svg> Opera</span>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE DEMO SECTION -->
+<section class="demo-section" id="how">
+  <div class="demo-wrap">
+    <div class="demo-label">● <span>LIVE</span> — Interactive scraping demo</div>
+    <div class="demo-grid">
+
+      <!-- Extension Panel -->
+      <div class="ext-panel">
+        <div class="ep-hdr">
+          <div class="ep-logo">
+            <div class="ep-ic"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+            <span class="ep-nm">Maps Lead <em>Scraper</em></span>
+          </div>
+          <div class="ep-cr">🪙 <span id="demoCredits">25</span> <span style="font-size:9px;color:rgba(34,197,94,.55)">cr</span></div>
+        </div>
+        <div class="ep-body">
+          <div class="ep-inp-w">
+            <input class="ep-inp" id="demoInput" value="Best barber in Karachi" readonly>
+          </div>
+          <div class="ep-opts">
+            <span>Max results</span>
+            <span style="font-family:var(--mono);font-size:10.5px;color:var(--t)">10</span>
+            <span class="ep-cpill">🪙 10 credits</span>
+          </div>
+          <button class="ep-btn" id="demoBtn">▶ Start Scraping</button>
+          <div class="ep-div"></div>
+          <div class="ep-prog" id="demoProgWrap" style="display:none">
+            <div class="ep-stat" id="demoStat"><span class="ep-sdot pulse" id="demoDot"></span><span id="demoStatTxt">Initializing…</span></div>
+            <div class="ep-bar-wrap"><div class="ep-bar" id="demoBar"></div></div>
+            <div class="ep-plbl"><span id="demoPct">0%</span><span id="demoCount">0 / 10</span></div>
+          </div>
+          <div class="ep-res" id="demoRes">
+            <div class="ep-rth"><span>Name</span><span>Rating</span><span>Email</span></div>
+            <div id="demoRows"></div>
+          </div>
+          <button class="ep-export" id="demoExport">↓ Download CSV · 10 results</button>
+        </div>
+      </div>
+
+      <!-- Map Radar Panel -->
+      <div class="map-panel">
+        <div class="mp-hdr">
+          <span class="mp-title">📍 Scanning Google Maps</span>
+          <div class="mp-ping" id="mpPing"><span class="mp-ping-dot"></span><span id="mpPingTxt">Searching…</span></div>
+        </div>
+        <div class="mp-body">
+          <canvas id="mapCanvas"></canvas>
+          <div class="mp-overlay" id="mapOverlay">
+            <div class="scan-line" id="scanLine"></div>
+            <div id="mapPins"></div>
+          </div>
+        </div>
+        <div class="mp-stream" id="streamLog"></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track">
+    <span class="ti"><span class="v">8</span> data fields per lead</span>
+    <span class="ti"><span class="v">60s</span> average scrape time</span>
+    <span class="ti"><span class="v">25</span> free starter credits</span>
+    <span class="ti"><span class="v">1</span> credit per result</span>
+    <span class="ti">Auto email finder</span>
+    <span class="ti">CSV + Google Sheets + Excel</span>
+    <span class="ti"><span class="v">∞</span> credits never expire</span>
+    <span class="ti">Chrome · Edge · Brave · Opera</span>
+    <span class="ti">No monthly fees · No sign-up</span>
+    <span class="ti"><span class="v">0</span> coding required</span>
+    <span class="ti"><span class="v">8</span> data fields per lead</span>
+    <span class="ti"><span class="v">60s</span> average scrape time</span>
+    <span class="ti"><span class="v">25</span> free starter credits</span>
+    <span class="ti"><span class="v">1</span> credit per result</span>
+    <span class="ti">Auto email finder</span>
+    <span class="ti">CSV + Google Sheets + Excel</span>
+    <span class="ti"><span class="v">∞</span> credits never expire</span>
+    <span class="ti">Chrome · Edge · Brave · Opera</span>
+    <span class="ti">No monthly fees · No sign-up</span>
+    <span class="ti"><span class="v">0</span> coding required</span>
+  </div>
+</div>
+
+<!-- INTERACTIVE TYPING DEMO -->
+<section class="idemo-section">
+  <div class="idemo-inner">
+    <div class="idemo-left rev">
+      <div class="sk">Try it live</div>
+      <div class="idemo-h">Watch the<br><em>data flow in</em><br>real time</div>
+      <p class="idemo-p">The extension scrapes each listing, visits its website to find emails, and streams results directly into the popup — credit balance ticking down live as each lead comes in.</p>
+      <div class="idemo-stats">
+        <div class="idemo-stat"><div class="is-n" id="cntTotal">0</div><div class="is-l">leads found</div></div>
+        <div class="idemo-stat"><div class="is-n" id="cntEmails">0</div><div class="is-l">emails found</div></div>
+        <div class="idemo-stat"><div class="is-n" id="cntCredits">25</div><div class="is-l">credits left</div></div>
+      </div>
+    </div>
+    <div class="type-demo rev">
+      <div class="td-bar">
+        <div class="td-dot" style="background:#f87171"></div>
+        <div class="td-dot" style="background:#f59e0b;margin-left:4px"></div>
+        <div class="td-dot" style="background:#22c55e;margin-left:4px"></div>
+        <span style="margin-left:10px;font-size:10.5px;color:var(--t3);font-family:var(--mono)">Maps Lead Scraper · Active</span>
+      </div>
+      <div class="td-inp-row">
+        <div class="td-inp-label">Search Query</div>
+        <div class="td-inp-field">
+          <span class="typed" id="typedQuery"></span>
+          <span class="td-caret" id="typedCaret"></span>
+        </div>
+      </div>
+      <div style="padding:0 14px 10px">
+        <div class="td-rl">
+          <span>Results streaming in</span>
+          <span class="count" id="tdCount">0 / 0</span>
+        </div>
+        <div id="tdRows" style="min-height:100px"></div>
+        <div class="td-prog-bar"><div class="td-pb-fill" id="tdBar"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS STEPS -->
+<section class="section">
+  <div class="container">
+    <div class="rev">
+      <div class="sk">How it works</div>
+      <h2 class="sh">Search to spreadsheet<br>in <em>four steps</em></h2>
+      <p class="ss">No Python. No API keys. No terminal. Just install, type and click.</p>
+    </div>
+    <div class="steps-wrap rev">
+      <div class="step"><div class="step-bg-n">1</div><div class="step-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></div><div class="step-t">Type your search</div><div class="step-d">Enter any Google Maps query — "Best barbers in Chicago", "Dentists near Dubai", anything.</div></div>
+      <div class="step"><div class="step-bg-n">2</div><div class="step-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><div class="step-t">Click Start Scraping</div><div class="step-d">A hidden tab opens, navigates Maps, scrolls all results and visits each listing automatically.</div></div>
+      <div class="step"><div class="step-bg-n">3</div><div class="step-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div class="step-t">Emails auto-found</div><div class="step-d">Visits each business website and contact pages, extracting email addresses automatically.</div></div>
+      <div class="step"><div class="step-bg-n">4</div><div class="step-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div><div class="step-t">CSV auto-downloads</div><div class="step-d">File saves to Downloads automatically. A viewer tab opens with Google Sheets and Excel buttons.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section feat-s" id="features">
+  <div class="container">
+    <div class="rev">
+      <div class="sk">Features</div>
+      <h2 class="sh">Everything you need.<br><em>Nothing you don't.</em></h2>
+      <p class="ss">Built for marketers, sales teams, freelancers and lead gen agencies who need data fast.</p>
+    </div>
+    <div class="feat-wrap rev">
+      <div class="feat"><div class="feat-ic fi-g"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div class="feat-t">Auto Email Finder</div><div class="feat-d">Visits each business website and contact pages, extracting emails via pattern matching — all hands-free.</div></div>
+      <div class="feat"><div class="feat-ic fi-a"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="feat-t">One-click CSV Export</div><div class="feat-d">Auto-saves to Downloads when scraping finishes. UTF-8 BOM encoded — no encoding issues in Excel.</div></div>
+      <div class="feat"><div class="feat-ic fi-b"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div><div class="feat-t">Built-in Results Viewer</div><div class="feat-d">Full-screen tab with sortable columns, search filter, and direct Open in Sheets / Excel buttons.</div></div>
+      <div class="feat"><div class="feat-ic fi-p"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div><div class="feat-t">Any City, Any Niche</div><div class="feat-d">Works on any Maps search in any language or country. No limits on search types or geography.</div></div>
+      <div class="feat"><div class="feat-ic fi-g"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="feat-t">Live Progress Tracking</div><div class="feat-d">Watch results stream in real-time. Credit balance updates per-scrape so you always know your spend.</div></div>
+      <div class="feat"><div class="feat-ic fi-r"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div><div class="feat-t">Zero Account Required</div><div class="feat-d">Install and start immediately. No sign-up, no email, no subscription. Credits live in your browser.</div></div>
+    </div>
+    <div class="rev" style="margin-top:44px">
+      <div style="font-size:11px;color:var(--t3);font-family:var(--mono);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px">8 columns exported per result</div>
+      <div class="cols-tags">
+        <div class="ctag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Business Name</div>
+        <div class="ctag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Email Address</div>
+        <div class="ctag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Star Rating</div>
+        <div class="ctag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Opening Hours</div>
+        <div class="ctag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg> Website URL</div>
+        <div class="ctag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.63a19.79 19.79 0 01-3.07-8.63A2 2 0 012 0h3a2 2 0 012 1.72"/></svg> Phone Number</div>
+        <div class="ctag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Full Address</div>
+        <div class="ctag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> Category</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BROWSERS -->
+<section class="section" id="install">
+  <div class="container">
+    <div class="rev">
+      <div class="sk">Install</div>
+      <h2 class="sh">Works on <em>every</em><br>major browser</h2>
+      <p class="ss">Click your browser for personalised install instructions. Detected browser is pre-selected.</p>
+    </div>
+    <div class="b-grid rev" id="bGrid">
+      <a class="b-card" id="bbc-chrome" href="#" data-br="chrome"><svg class="b-icon" width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="18" r="18" fill="#4285f4"/><circle cx="18" cy="18" r="7.2" fill="white"/><circle cx="18" cy="18" r="4.5" fill="#4285f4"/><path d="M18 3.6A14.4 14.4 0 0130.48 10.8H18V3.6z" fill="#ea4335"/><path d="M3.64 12.6A14.4 14.4 0 0018 32.4V18L3.64 12.6z" fill="#34a853"/><path d="M32.36 12.6A14.4 14.4 0 013.64 12.6L18 18l14.36-5.4z" fill="#fbbc05"/></svg><div class="b-name">Chrome</div><div class="b-status ok">✓ Supported</div></a>
+      <a class="b-card" id="bbc-edge" href="#" data-br="edge"><svg class="b-icon" width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="18" r="18" fill="#0078d4"/><path d="M9 23c0-7 5.5-12.5 12.5-12.5 3.5 0 6.5 1.5 8.5 4H18c-3 0-5.5 2.2-5.5 5.5s2.5 5.5 5.5 5.5h13a14.4 14.4 0 01-13 8.1c-7.5 0-9-5-9-10.6z" fill="white"/></svg><div class="b-name">Edge</div><div class="b-status ok">✓ Supported</div></a>
+      <a class="b-card" id="bbc-brave" href="#" data-br="brave"><svg class="b-icon" width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="18" r="18" fill="#ff6600"/><path d="M18 7l7 3.5v3.5L23.5 15.5 25 17v3.5L18 29l-7-8.5V17l1.5-1.5L11 14v-3.5z" fill="white" opacity=".9"/><circle cx="18" cy="18" r="3.5" fill="#ff6600"/></svg><div class="b-name">Brave</div><div class="b-status ok">✓ Supported</div></a>
+      <a class="b-card" id="bbc-opera" href="#" data-br="opera"><svg class="b-icon" width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="18" r="18" fill="#ff1b2d"/><ellipse cx="18" cy="18" rx="6.5" ry="10" fill="none" stroke="white" stroke-width="2.5"/></svg><div class="b-name">Opera</div><div class="b-status ok">✓ Supported</div></a>
+      <a class="b-card na" id="bbc-firefox" href="#" data-br="firefox"><svg class="b-icon" width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="18" r="18" fill="#ff9500"/><circle cx="18" cy="18" r="11" fill="#ff6000"/><circle cx="18" cy="18" r="5.5" fill="#ff9500"/></svg><div class="b-name">Firefox</div><div class="b-status na">Coming soon</div></a>
+    </div>
+    <div class="b-cta-box rev" id="bCtaBox">
+      <div class="bcl">
+        <div class="bcl-browser" id="bclBrowser">Chrome detected</div>
+        <div class="bcl-h" id="bclH">Install on Chrome — Free</div>
+        <div class="bcl-s" id="bclS">Click the button below — your ZIP downloads automatically and step-by-step install instructions appear.</div>
+      </div>
+      <div class="bcr">
+        <a class="btn-main" id="installBtn" href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span id="installBtnTxt">Install — Free</span>
+        </a>
+        <div style="font-size:11.5px;color:var(--t3);text-align:center">25 free credits · No sign-up</div>
+      </div>
+    </div>
+    <div class="after-install rev">
+      <div class="ai-label">After installing — 3 steps</div>
+      <div class="ai-steps">
+        <div class="ai-step"><span class="ai-num">1</span><span class="ai-txt">Pin the extension: click the puzzle 🧩 icon in your toolbar → pin <strong style="color:var(--t)">Maps Lead Scraper</strong></span></div>
+        <div class="ai-step"><span class="ai-num">2</span><span class="ai-txt">Click the map pin icon — the popup opens with <strong style="color:var(--g)">25 free credits</strong> ready</span></div>
+        <div class="ai-step"><span class="ai-num">3</span><span class="ai-txt">Type your first search and click <strong style="color:var(--g)">▶ Start Scraping</strong></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section price-s" id="pricing">
+  <div class="container">
+    <div class="rev"><div class="sk">Pricing</div><h2 class="sh">Pay per lead.<br><em>Not per month.</em></h2><p class="ss">Buy credits once — spend them whenever. No subscription. Credits never expire.</p></div>
+    <div class="free-strip rev">
+      <div class="fs-l"><div class="fs-h">Start for free — no card needed</div><div class="fs-s">Every install gets <strong>25 free credits</strong> automatically. No sign-up. Just install and go.</div></div>
+      <div class="fs-n">25 <span>free credits</span></div>
+    </div>
+    <div class="p-grid rev">
+      <div class="p-card"><div class="p-card-ico" style="background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.2)">⚡</div><div class="p-creds">100 <span>cr</span></div><div class="p-lbl">Starter Pack</div><div class="p-price">$5</div><div class="p-per">5¢ per lead</div><ul class="p-feats"><li>100 scraping credits</li><li>Credits never expire</li><li>All 8 data columns</li><li>Email auto-finder</li></ul><a href="#install" class="btn-p">Get Starter →</a></div>
+      <div class="p-card pop"><div class="pop-tag">BEST VALUE</div><div class="p-card-ico" style="background:var(--gd);border:1px solid var(--gb)">🚀</div><div class="p-creds">500 <span>cr</span></div><div class="p-lbl">Pro Pack</div><div class="p-price">$19</div><div class="p-per">3.8¢ per lead</div><ul class="p-feats"><li>500 scraping credits</li><li>Credits never expire</li><li>All 8 data columns</li><li>Email auto-finder</li><li>Priority support</li></ul><a href="#install" class="btn-p">Get Pro →</a></div>
+      <div class="p-card"><div class="p-card-ico" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2)">🏆</div><div class="p-creds">1000 <span>cr</span></div><div class="p-lbl">Agency Pack</div><div class="p-price">$35</div><div class="p-per">3.5¢ per lead</div><ul class="p-feats"><li>1,000 scraping credits</li><li>Credits never expire</li><li>All 8 data columns</li><li>Email auto-finder</li><li>Priority support</li></ul><a href="#install" class="btn-p">Get Agency →</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section" id="faq">
+  <div class="container">
+    <div class="rev"><div class="sk">FAQ</div><h2 class="sh">Common <em>questions</em></h2></div>
+    <div class="faq-wrap rev">
+      <div class="faq-item op"><div class="faq-q"><span>What is a credit and when is it deducted?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">One credit = one successfully scraped Maps listing. Credits are only deducted for successfully scraped results — if a listing fails, no credit is spent.</div></div></div>
+      <div class="faq-item"><div class="faq-q"><span>Do credits expire?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">Never. Credits are stored locally in your browser with no expiry date. Buy once and use at your own pace — whether that's today or a year from now.</div></div></div>
+      <div class="faq-item"><div class="faq-q"><span>Which browsers are supported?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">The extension works on all Chromium-based browsers: <strong>Chrome, Edge, Brave and Opera</strong>. Firefox support is in development.</div></div></div>
+      <div class="faq-item"><div class="faq-q"><span>How accurate is the email finder?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">The scraper visits each business website and contact/about pages, extracting emails via regex. Typical hit rates are 40–65% depending on niche and city.</div></div></div>
+      <div class="faq-item"><div class="faq-q"><span>How do I activate credits after purchasing?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">After buying on Gumroad you'll receive a license key by email. Open the extension → click <strong>Buy Credits</strong> tab → paste your key → click Activate. Credits are added instantly.</div></div></div>
+      <div class="faq-item"><div class="faq-q"><span>Is there a refund policy?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">Yes — 30-day money-back guarantee. If you're not satisfied, contact us within 30 days for a full refund via Gumroad.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BAND -->
+<div class="container">
+  <div class="cta-band rev">
+    <h2>Start collecting leads<br><em>in the next 60 seconds</em></h2>
+    <p>25 free credits on install · No sign-up · No credit card</p>
+    <div class="cta-band-btns">
+      <a class="btn-main" id="ctaBtn" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span id="ctaBtnTxt">Add to Chrome — Free</span></a>
+      <a class="btn-ghost" href="#pricing">View Pricing</a>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-g">
+      <div class="f-brand"><a href="#" class="f-logo"><div class="nav-logo-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div><span class="nav-logo-txt">Maps Lead <em>Scraper</em></span></a><p>Scrape Google Maps listings into a CSV with names, emails, ratings and hours. Credit-based — pay only for what you use.</p></div>
+      <div class="f-col"><h4>Product</h4><a href="#how">How it works</a><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#install">Install</a></div>
+      <div class="f-col"><h4>Browsers</h4><a href="#install">Chrome</a><a href="#install">Edge</a><a href="#install">Brave</a><a href="#install">Opera</a><a href="#install">Firefox (soon)</a></div>
+      <div class="f-col"><h4>Support</h4><a href="#faq">FAQ</a><a href="about.html">About the Founder</a><a href="mailto:support@mapsleadscraper.com">Contact Us</a><a href="#">Privacy Policy</a><a href="#">Terms of Service</a></div>
+    </div>
+    <div class="f-bottom"><span>© <span id="yr">2026</span> Maps Lead Scraper. All rights reserved.</span><span>Built for marketers &amp; sales teams worldwide</span></div>
+  </div>
+</footer>
+
+<!-- INSTALL MODAL -->
+<div id="installModal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px">
+  <div id="installModalBox" style="background:#0f0f1a;border:1px solid rgba(255,255,255,.13);border-radius:20px;width:100%;max-width:560px;overflow:hidden;box-shadow:0 48px 140px rgba(0,0,0,.7);animation:modalIn .35s cubic-bezier(.34,1.56,.64,1) both">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 22px 18px;border-bottom:1px solid rgba(255,255,255,.07)">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:34px;height:34px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25);border-radius:9px;display:flex;align-items:center;justify-content:center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+        <div><div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#fff">Direct store install coming soon</div><div style="font-size:11.5px;color:rgba(255,255,255,.35);margin-top:1px">For now — install takes under 2 minutes manually</div></div>
+      </div>
+      <button id="modalClose" style="width:30px;height:30px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);font-size:16px;transition:all .15s">×</button>
+    </div>
+    <div style="background:linear-gradient(135deg,rgba(34,197,94,.1),rgba(34,197,94,.04));border-bottom:1px solid rgba(34,197,94,.18);padding:18px 22px;display:flex;align-items:center;gap:14px">
+      <div style="width:42px;height:42px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+      <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:2px">Step 1 — Downloading your extension ZIP…</div><div style="font-size:12.5px;color:rgba(255,255,255,.4)">maps-scraper-extension-v2.1-fixed.zip · saved to Downloads</div></div>
+      <div id="dlSpinner" style="width:22px;height:22px;border:2px solid rgba(34,197,94,.2);border-top-color:#22c55e;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0"></div>
+      <div id="dlCheck" style="display:none;color:#22c55e;font-size:20px;flex-shrink:0">✓</div>
+    </div>
+    <div style="padding:20px 22px 22px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px">Follow these steps to install</div>
+      <div style="display:flex;gap:13px;margin-bottom:14px"><div style="width:26px;height:26px;border-radius:50%;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#22c55e;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">1</div><div><div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:3px">Unzip the downloaded file</div><div style="font-size:13px;color:rgba(255,255,255,.45);line-height:1.55">Right-click <code style="font-family:'JetBrains Mono',monospace;font-size:11.5px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);padding:1px 6px;border-radius:4px;color:#f59e0b">maps-scraper-extension-v2.1-fixed.zip</code> → Extract / Unzip</div></div></div>
+      <div style="display:flex;gap:13px;margin-bottom:14px"><div style="width:26px;height:26px;border-radius:50%;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#22c55e;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">2</div><div><div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:5px">Open Extensions page</div><div style="display:flex;gap:7px;flex-wrap:wrap"><a id="extPageLink" href="chrome://extensions" style="display:inline-flex;align-items:center;gap:5px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.22);border-radius:7px;padding:5px 12px;font-size:12.5px;color:#22c55e;text-decoration:none;font-weight:600" target="_blank">Open Extensions Page →</a><code id="extPageCode" style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);padding:5px 10px;border-radius:6px;color:#f59e0b;align-self:center">chrome://extensions</code></div></div></div>
+      <div style="display:flex;gap:13px;margin-bottom:14px"><div style="width:26px;height:26px;border-radius:50%;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#22c55e;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">3</div><div><div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:3px">Enable Developer Mode</div><div style="font-size:13px;color:rgba(255,255,255,.45);line-height:1.55">Top-right corner — toggle <strong style="color:rgba(255,255,255,.7)">Developer mode</strong> ON</div></div></div>
+      <div style="display:flex;gap:13px;margin-bottom:14px"><div style="width:26px;height:26px;border-radius:50%;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#22c55e;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">4</div><div><div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:3px">Click "Load unpacked"</div><div style="font-size:13px;color:rgba(255,255,255,.45);line-height:1.55">Click <strong style="color:rgba(255,255,255,.7)">Load unpacked</strong> → select the unzipped folder</div></div></div>
+      <div style="display:flex;gap:13px;margin-bottom:18px"><div style="width:26px;height:26px;border-radius:50%;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#22c55e;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">5</div><div><div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:3px">Pin it and start scraping</div><div style="font-size:13px;color:rgba(255,255,255,.45);line-height:1.55">Puzzle 🧩 icon → pin Maps Lead Scraper → click icon → 25 free credits ready</div></div></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.07);padding-top:14px">
+        <div style="font-size:12px;color:rgba(255,255,255,.25)">Having trouble? <a href="mailto:support@mapsleadscraper.com" style="color:rgba(34,197,94,.7);text-decoration:none">Email support</a></div>
+        <button id="reDownload" style="display:flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.22);border-radius:8px;font-size:12.5px;color:#22c55e;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">↓ Re-download ZIP</button>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+@keyframes modalIn{from{opacity:0;transform:scale(.94) translateY(14px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+#installModal.show{display:flex!important}
+</style>
+
+<script>
+'use strict';
+
+// ══════════════════════════════════════════════════════
+//  PARTICLE BG + CURSOR — single merged RAF loop
+// ══════════════════════════════════════════════════════
+const bgCanvas = document.getElementById('bgCanvas');
+const bgCtx    = bgCanvas.getContext('2d', { alpha:false }); // opaque = faster clear
+const cursorDot  = document.getElementById('cursor-dot');
+const cursorRing = document.getElementById('cursor-ring');
+let particles = [], W = 0, H = 0, bgSkip = 0;
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+function resizeBg() {
+  W = bgCanvas.width  = window.innerWidth;
+  H = bgCanvas.height = window.innerHeight;
+}
+let _rTimer; window.addEventListener('resize', () => { clearTimeout(_rTimer); _rTimer = setTimeout(resizeBg,150); }, {passive:true});
+resizeBg();
+
+class Particle {
+  constructor() { this.reset(true); }
+  reset(init=false) {
+    this.x = Math.random()*W; this.y = init ? Math.random()*H : H+10;
+    this.r = Math.random()*1.2+.4; this.vy = -(Math.random()*.3+.08);
+    this.vx = (Math.random()-.5)*.15; this.a = Math.random()*.4+.08;
+    this.life = 0; this.maxLife = (Math.random()*120+80)|0;
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy; this.life++;
+    if (this.y < -10 || this.life > this.maxLife) this.reset();
+  }
+}
+for (let i = 0; i < 42; i++) particles.push(new Particle()); // 42 particles (was 80)
+
+const THRESH = 88, THRESH2 = THRESH*THRESH;
+function drawBg() {
+  bgCtx.fillStyle = '#06060c';
+  bgCtx.fillRect(0, 0, W, H);
+
+  // Spatial grid for O(n) neighbour lookup instead of O(n²) brute force
+  const G = new Map();
+  const CELL = THRESH;
+  particles.forEach(p => {
+    const k = (p.x/CELL|0)+','+(p.y/CELL|0);
+    (G.has(k) ? G.get(k) : G.set(k,[]).get(k)).push(p);
+  });
+
+  bgCtx.lineWidth = .5;
+  particles.forEach(p => {
+    p.update();
+    const cx = p.x/CELL|0, cy = p.y/CELL|0;
+    for (let ox=-1;ox<=1;ox++) for (let oy=-1;oy<=1;oy++) {
+      const nb = G.get((cx+ox)+','+(cy+oy));
+      if (!nb) continue;
+      for (let j=0;j<nb.length;j++) {
+        const q = nb[j]; if (q===p) continue;
+        const dx=p.x-q.x, dy=p.y-q.y, d2=dx*dx+dy*dy;
+        if (d2 < THRESH2) {
+          bgCtx.strokeStyle = `rgba(34,197,94,${(1-Math.sqrt(d2)/THRESH)*.048})`;
+          bgCtx.beginPath(); bgCtx.moveTo(p.x,p.y); bgCtx.lineTo(q.x,q.y); bgCtx.stroke();
+        }
+      }
+    }
+    const a = Math.sin(p.life/p.maxLife*3.14159)*p.a;
+    bgCtx.beginPath(); bgCtx.arc(p.x,p.y,p.r,0,6.28318);
+    bgCtx.fillStyle = `rgba(34,197,94,${a})`; bgCtx.fill();
+  });
+}
+
+// Cursor hover
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; }, {passive:true});
+document.querySelectorAll('a,button,.step,.feat,.b-card').forEach(el => {
+  el.addEventListener('mouseenter', () => document.body.classList.add('hovering'),    {passive:true});
+  el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'), {passive:true});
+});
+
+// ── ONE MASTER RAF — cursor every frame, particles every 2nd frame ──
+function masterLoop() {
+  // Cursor via transform3d — compositor-only, zero layout cost
+  cursorDot.style.transform  = `translate3d(${mx-3}px,${my-3}px,0)`;
+  rx += (mx-rx)*.16; ry += (my-ry)*.16;
+  cursorRing.style.transform = `translate3d(${rx-16}px,${ry-16}px,0)`;
+
+  // Particles every 2nd frame = halves GPU load
+  if (bgSkip ^= 1) drawBg();
+
+  requestAnimationFrame(masterLoop);
+}
+setTimeout(masterLoop, 400); // defer until after first paint
+
+// Mute canvas when tab hidden
+document.addEventListener('visibilitychange', () => {
+  bgCanvas.style.opacity = document.hidden ? '0' : '';
+});
+
+// ══════════════════════════════════════════════════════
+//  MAP CANVAS — pre-rendered offscreen, never repaints
+// ══════════════════════════════════════════════════════
+const mapCanvas = document.getElementById('mapCanvas');
+const mCtx      = mapCanvas.getContext('2d');
+
+function buildOffscreenMap(W, H) {
+  const oc = document.createElement('canvas');
+  oc.width = W; oc.height = H;
+  const c = oc.getContext('2d');
+  c.fillStyle='#07070f'; c.fillRect(0,0,W,H);
+  c.lineWidth=1; c.strokeStyle='rgba(255,255,255,.04)';
+  for(let x=0;x<W;x+=32){c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke();}
+  for(let y=0;y<H;y+=32){c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke();}
+  c.lineWidth=2; c.strokeStyle='rgba(255,255,255,.07)';
+  [64,160,256].forEach(x=>{c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke();});
+  [48,128,192].forEach(y=>{c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke();});
+  const bl=[[8,8,48,36],[70,8,60,20],[146,8,50,24],[220,8,56,28],[8,55,36,38],[70,35,40,40],[130,35,56,30],[200,35,70,38],[8,105,50,28],[75,105,44,32],[140,105,60,24],[218,105,48,30],[8,152,42,30],[70,155,52,26],[138,155,54,36],[206,155,60,24],[8,198,46,30],[70,198,40,22],[130,200,58,28],[204,200,56,26]];
+  bl.forEach(([x,y,w,h])=>{c.fillStyle='rgba(255,255,255,.025)';c.fillRect(x,y,w,h);c.strokeStyle='rgba(255,255,255,.04)';c.lineWidth=.5;c.strokeRect(x,y,w,h);});
+  c.strokeStyle='rgba(34,197,94,.08)'; c.lineWidth=3;
+  c.beginPath();c.moveTo(0,128);c.lineTo(W,128);c.stroke();
+  c.beginPath();c.moveTo(160,0);c.lineTo(160,H);c.stroke();
+  [[160,128],[64,64],[256,192],[96,192]].forEach(([cx,cy])=>{
+    [6,12].forEach(r=>{c.beginPath();c.arc(cx,cy,r,0,6.28);c.strokeStyle=`rgba(34,197,94,${.06*(12/r)})`;c.lineWidth=1;c.stroke();});
+    c.beginPath();c.arc(cx,cy,3,0,6.28);c.fillStyle='rgba(34,197,94,.2)';c.fill();
+  });
+  return oc;
+}
+
+function resizeMap() {
+  const box = mapCanvas.parentElement.getBoundingClientRect();
+  if (!box.width) return;
+  mapCanvas.width = box.width; mapCanvas.height = box.height;
+  mCtx.drawImage(buildOffscreenMap(box.width, box.height), 0, 0); // one-shot blit
+}
+let _mTimer; window.addEventListener('resize', ()=>{clearTimeout(_mTimer);_mTimer=setTimeout(resizeMap,200);},{passive:true});
+setTimeout(resizeMap, 120);
+
+// ══════════════════════════════════════════════════════
+//  SCRAPING DATA
+// ══════════════════════════════════════════════════════
+const BUSINESSES = [
+  { name:'The Barber Co.',   rating:'4.9', email:'info@barberco.pk',   x:'28%', y:'35%' },
+  { name:'Fade Masters DHA', rating:'4.7', email:'N/A',                x:'65%', y:'22%' },
+  { name:'Crown Cuts',       rating:'4.8', email:'hello@crown.pk',     x:'48%', y:'55%' },
+  { name:'Style Zone',       rating:'4.6', email:'sz@stylezone.pk',    x:'18%', y:'65%' },
+  { name:'Royal Blades',     rating:'4.9', email:'N/A',                x:'75%', y:'50%' },
+  { name:'The Groom Room',   rating:'4.5', email:'groom@room.pk',      x:'38%', y:'75%' },
+  { name:'Gentlemen\'s Cut', rating:'4.8', email:'N/A',                x:'82%', y:'30%' },
+  { name:'Classic Cuts',     rating:'4.7', email:'classic@cuts.pk',    x:'55%', y:'80%' },
+  { name:'Urban Fade',       rating:'4.6', email:'urban@fade.pk',      x:'12%', y:'42%' },
+  { name:'Prime Barbers',    rating:'4.9', email:'N/A',                x:'70%', y:'70%' },
+];
+
+const QUERIES = [
+  'Best barber in Karachi',
+  'Top dentist in Dubai',
+  'Coffee shops in Chicago',
+  'Gyms near downtown NYC',
+  'Restaurants in London',
+];
+
+// ══════════════════════════════════════════════════════
+//  DEMO SCRAPER ENGINE
+// ══════════════════════════════════════════════════════
+let demoRunning   = false;
+let demoTimer     = null;
+let demoAutoTimer = null;
+let demoStep      = 0;
+let demoCredits   = 25;
+
+const demoBtn      = document.getElementById('demoBtn');
+const demoBar      = document.getElementById('demoBar');
+const demoDot      = document.getElementById('demoDot');
+const demoStatTxt  = document.getElementById('demoStatTxt');
+const demoProgWrap = document.getElementById('demoProgWrap');
+const demoRows     = document.getElementById('demoRows');
+const demoPct      = document.getElementById('demoPct');
+const demoCount    = document.getElementById('demoCount');
+const demoCredEl   = document.getElementById('demoCredits');
+const demoExport   = document.getElementById('demoExport');
+const mapPins      = document.getElementById('mapPins');
+const streamLog    = document.getElementById('streamLog');
+const mpPingTxt    = document.getElementById('mpPingTxt');
+
+function addMapPin(biz, visited=false) {
+  const pin = document.createElement('div');
+  pin.className = 'map-pin' + (visited ? ' visited' : '');
+  pin.style.left = biz.x;
+  pin.style.top  = biz.y;
+  pin.innerHTML = visited
+    ? `<svg width="18" height="22" viewBox="0 0 24 30" fill="#f59e0b"><path d="M12 0C7.16 0 3 4.16 3 9c0 7 9 16 9 16s9-9 9-16c0-4.84-4.16-9-9-9z"/><circle cx="12" cy="9" r="3.5" fill="#0f0f18"/></svg>`
+    : `<svg width="18" height="22" viewBox="0 0 24 30" fill="#22c55e"><path d="M12 0C7.16 0 3 4.16 3 9c0 7 9 16 9 16s9-9 9-16c0-4.84-4.16-9-9-9z"/><circle cx="12" cy="9" r="3.5" fill="#06060c"/></svg>`;
+  mapPins.appendChild(pin);
+  return pin;
+}
+
+function addStreamLine(biz) {
+  const line = document.createElement('div');
+  line.className = 'stream-line';
+  const now = new Date();
+  const time = now.toTimeString().slice(0,8);
+  const hasEmail = biz.email !== 'N/A';
+  line.innerHTML = `
+    <span class="sl-time">${time}</span>
+    <span class="sl-type" style="color:rgba(34,197,94,.6)">SCRAPED</span>
+    <span class="sl-name">${biz.name}</span>
+    <span class="sl-rating" style="color:#f59e0b">★${biz.rating}</span>
+    ${hasEmail ? `<span class="sl-email">${biz.email}</span>` : '<span style="color:rgba(255,255,255,.2)">no email</span>'}
+  `;
+  streamLog.insertBefore(line, streamLog.firstChild);
+  while (streamLog.children.length > 3) streamLog.removeChild(streamLog.lastChild);
+}
+
+function addDemoRow(biz) {
+  const row = document.createElement('div');
+  row.className = 'ep-row';
+  const hasEmail = biz.email !== 'N/A';
+  row.innerHTML = `
+    <span class="rn">${biz.name}</span>
+    <span class="rr">★${biz.rating}</span>
+    <span class="re ${hasEmail ? 'found' : 'na'}">${hasEmail ? biz.email : 'N/A'}</span>
+  `;
+  demoRows.appendChild(row);
+  demoRows.parentElement.scrollTop = demoRows.parentElement.scrollHeight;
+}
+
+function runDemoScrape() {
+  if (demoRunning) { stopDemo(); return; }
+  demoRunning = true;
+  demoRows.innerHTML=''; mapPins.innerHTML=''; streamLog.innerHTML='';
+  demoExport.classList.remove('show');
+  demoProgWrap.style.display='block';
+  demoBar.style.width='0%'; demoPct.textContent='0%'; demoCount.textContent='0 / 10';
+  demoBtn.textContent='⏹ Stop'; demoBtn.classList.add('stop');
+  mpPingTxt.textContent='Scanning…'; demoStatTxt.textContent='Opening Google Maps…';
+  let lT=0,lE=0,lC=demoCredits,idx=0;
+
+  function step() {
+    if (!demoRunning||idx>=BUSINESSES.length) {
+      if(demoRunning){demoStatTxt.textContent='✓ Done — 10 results scraped';demoDot.classList.remove('pulse');demoExport.classList.add('show');mpPingTxt.textContent='Complete';}
+      demoBtn.textContent='▶ Run Again'; demoBtn.classList.remove('stop'); demoRunning=false; return;
+    }
+    const i=idx++, biz=BUSINESSES[i], pct=Math.round((i+1)/BUSINESSES.length*100);
+    demoStatTxt.textContent=`Extracting "${biz.name}"…`; mpPingTxt.textContent=biz.name;
+    addMapPin(biz);
+    setTimeout(()=>{
+      if(!demoRunning)return;
+      const pins=mapPins.querySelectorAll('.map-pin');
+      if(pins[i]){pins[i].classList.add('visited');pins[i].innerHTML=`<svg width="18" height="22" viewBox="0 0 24 30" fill="#f59e0b"><path d="M12 0C7.16 0 3 4.16 3 9c0 7 9 16 9 16s9-9 9-16c0-4.84-4.16-9-9-9z"/><circle cx="12" cy="9" r="3.5" fill="#0f0f18"/></svg>`;}
+      addStreamLine(biz); addDemoRow(biz);
+      lT++; if(biz.email!=='N/A')lE++; lC--;
+      demoCredits=lC; demoCredEl.textContent=lC;
+      demoBar.style.width=pct+'%'; demoPct.textContent=pct+'%'; demoCount.textContent=`${i+1} / 10`;
+      document.getElementById('cntTotal').textContent=lT;
+      document.getElementById('cntEmails').textContent=lE;
+      document.getElementById('cntCredits').textContent=lC;
+      setTimeout(step, 850+Math.random()*450);
+    }, i===0?850:160);
+  }
+  setTimeout(step, 650);
+}
+
+function stopDemo() {
+  demoRunning = false;
+  demoBtn.textContent = '▶ Start Scraping';
+  demoBtn.classList.remove('stop');
+  demoStatTxt.textContent = 'Stopped';
+  demoDot.classList.remove('pulse');
+}
+
+demoBtn.addEventListener('click', runDemoScrape);
+demoExport.addEventListener('click', () => {
+  demoExport.textContent = '✓ Downloading…';
+  setTimeout(() => { demoExport.textContent = '↓ Download CSV · 10 results'; }, 1800);
+});
+
+// Auto-start demo when in view
+const demoObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting && !demoRunning && demoRows.children.length === 0) {
+      setTimeout(runDemoScrape, 600);
+      demoObserver.disconnect();
+    }
+  });
+}, { threshold: 0.3 });
+demoObserver.observe(document.querySelector('.demo-section'));
+
+// ══════════════════════════════════════════════════════
+//  TYPING DEMO (second animation section)
+// ══════════════════════════════════════════════════════
+const typedQuery  = document.getElementById('typedQuery');
+const typedCaret  = document.getElementById('typedCaret');
+const tdRows      = document.getElementById('tdRows');
+const tdBar       = document.getElementById('tdBar');
+const tdCount     = document.getElementById('tdCount');
+
+const TD_DATA = [
+  { q: 'Best barber in Karachi',   leads:[
+    { n:'The Barber Co.',   r:'4.9', e:'info@barberco.pk' },
+    { n:'Fade Masters',     r:'4.7', e:'N/A' },
+    { n:'Crown Cuts DHA',   r:'4.8', e:'hello@crown.pk' },
+    { n:'Style Zone',       r:'4.6', e:'sz@style.pk' },
+    { n:'Royal Blades',     r:'4.9', e:'N/A' },
+  ]},
+  { q: 'Dentists in Dubai',        leads:[
+    { n:'Prime Dental Care', r:'4.8', e:'prime@dental.ae' },
+    { n:'Smile Studio',      r:'4.9', e:'N/A' },
+    { n:'City Dental Clinic',r:'4.7', e:'info@city-dental.ae' },
+    { n:'Pearl Dental',      r:'4.6', e:'N/A' },
+    { n:'HealthPlus Dental', r:'4.8', e:'contact@hp.ae' },
+  ]},
+  { q: 'Restaurants in London',    leads:[
+    { n:'The Ivy',          r:'4.7', e:'reservations@theivyweststreet.com' },
+    { n:'Dishoom',          r:'4.9', e:'N/A' },
+    { n:'Sketch London',    r:'4.6', e:'info@sketch.uk.com' },
+    { n:'Duck & Waffle',    r:'4.5', e:'N/A' },
+    { n:'Gymkhana',         r:'4.8', e:'reservations@gymkhanalondon.com' },
+  ]},
+];
+
+let tdRunning = false;
+let tdQueryIdx = 0;
+
+function runTypingDemo() {
+  if (tdRunning) return;
+  tdRunning = true;
+  function cycle() {
+    const set=TD_DATA[tdQueryIdx%TD_DATA.length]; tdQueryIdx++;
+    typedQuery.textContent=''; tdRows.innerHTML=''; tdBar.style.width='0'; tdCount.textContent='0 / 5';
+    typedCaret.style.display='inline-block'; let i=0;
+    (function type(){
+      typedQuery.textContent=set.q.slice(0,i++);
+      if(i<=set.q.length){setTimeout(type,80+Math.random()*50);}
+      else{setTimeout(results,460);}
+    })();
+    function results(){
+      typedCaret.style.display='none'; tdBar.style.width='0'; let ri=0;
+      (function row(){
+        if(ri>=set.leads.length){setTimeout(erase,2500);return;}
+        const l=set.leads[ri],p=Math.round((ri+1)/set.leads.length*100);
+        const el=document.createElement('div'); el.className='td-row';
+        const ok=l.e!=='N/A';
+        el.innerHTML=`<span class="dn">${l.n}</span><span class="dr">★${l.r}</span><span class="de ${ok?'ok':'no'}">${ok?l.e:'N/A'}</span>`;
+        tdRows.appendChild(el); tdBar.style.width=p+'%'; tdCount.textContent=`${++ri} / 5`;
+        setTimeout(row,700+Math.random()*400);
+      })();
+    }
+    function erase(){
+      typedCaret.style.display='inline-block'; let len=set.q.length;
+      (function del(){
+        typedQuery.textContent=set.q.slice(0,len--);
+        if(len>=0){setTimeout(del,35);}else{setTimeout(cycle,500);}
+      })();
+    }
+  }
+  cycle();
+}
+
+// Start typing demo when visible
+const tdObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting && !tdRunning) {
+      runTypingDemo();
+      tdObs.disconnect();
+    }
+  });
+}, { threshold: 0.2 });
+tdObs.observe(document.querySelector('.idemo-section'));
+
+// ══════════════════════════════════════════════════════
+//  BROWSER DETECTION
+// ══════════════════════════════════════════════════════
+const ua       = navigator.userAgent.toLowerCase();
+const isBrave  = !!navigator.brave;
+const isEdge   = ua.includes('edg/');
+const isOpera  = ua.includes('opr/') || ua.includes('opera');
+const isFF     = ua.includes('firefox');
+const isChrome = ua.includes('chrome') && !isBrave && !isEdge && !isOpera;
+
+const EXT_PAGES = { chrome:'chrome://extensions', edge:'edge://extensions', brave:'brave://extensions', opera:'opera://extensions', firefox:'about:addons', unknown:'chrome://extensions' };
+const BR = {
+  chrome:  { name:'Chrome',  btn:'Add to Chrome — Free',  sub:'Your ZIP downloads automatically with step-by-step install instructions.', ok:true },
+  edge:    { name:'Edge',    btn:'Add to Edge — Free',    sub:'Your ZIP downloads with full Edge install instructions.', ok:true },
+  brave:   { name:'Brave',   btn:'Add to Brave — Free',   sub:'Brave supports Chrome extensions. ZIP downloads with install guide.', ok:true },
+  opera:   { name:'Opera',   btn:'Add to Opera — Free',   sub:'ZIP downloads with Opera install instructions.', ok:true },
+  firefox: { name:'Firefox', btn:'Firefox — Coming Soon', sub:'Firefox support is in development. Try Chrome, Edge, Brave or Opera.', ok:false },
+  unknown: { name:'Chrome',  btn:'Add to Chrome — Free',  sub:'ZIP downloads automatically with step-by-step install instructions.', ok:true },
+};
+
+function detect() {
+  if (isBrave) return 'brave'; if (isEdge) return 'edge';
+  if (isOpera) return 'opera'; if (isFF)   return 'firefox';
+  if (isChrome) return 'chrome'; return 'unknown';
+}
+const detected = detect();
+
+function applyBrowser(br) {
+  const info = BR[br] || BR.chrome;
+  ['heroCta','navCtaBtn','installBtn','ctaBtn'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.opacity = info.ok ? '1' : '0.5';
+    el.style.pointerEvents = info.ok ? 'auto' : 'none';
+  });
+  const txtIds = { heroCtaTxt: info.btn, navCtaTxt: info.ok ? 'Add to Browser' : 'Coming Soon', installBtnTxt: info.btn, ctaBtnTxt: info.btn };
+  Object.entries(txtIds).forEach(([id, txt]) => { const el = document.getElementById(id); if (el) el.textContent = txt; });
+  document.getElementById('bclBrowser').textContent = info.name + ' detected';
+  document.getElementById('bclH').textContent = info.ok ? `Install on ${info.name} — Free` : `${info.name} — Coming Soon`;
+  document.getElementById('bclS').textContent = info.sub;
+  document.querySelectorAll('.b-card').forEach(c => c.classList.remove('sel'));
+  const card = document.getElementById('bbc-' + br);
+  if (card) card.classList.add('sel');
+}
+applyBrowser(detected);
+
+document.querySelectorAll('.b-card').forEach(card => {
+  card.addEventListener('click', e => {
+    e.preventDefault();
+    applyBrowser(card.dataset.br);
+    document.getElementById('install').scrollIntoView({ behavior:'smooth' });
+  });
+});
+
+// ══════════════════════════════════════════════════════
+//  INSTALL MODAL
+// ══════════════════════════════════════════════════════
+const ZIP_URL = 'maps-scraper-extension-v2.1-fixed.zip';
+
+function triggerDownload() {
+  const a = Object.assign(document.createElement('a'), { href: ZIP_URL, download: 'maps-scraper-extension-v2.1-fixed.zip' });
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
+function openInstallModal() {
+  const modal = document.getElementById('installModal');
+  const spinner = document.getElementById('dlSpinner');
+  const check   = document.getElementById('dlCheck');
+  const extLink = document.getElementById('extPageLink');
+  const extCode = document.getElementById('extPageCode');
+  const extPage = EXT_PAGES[detected] || EXT_PAGES.chrome;
+  extLink.href = extPage;
+  extCode.textContent = extPage;
+  modal.classList.add('show');
+  document.body.style.overflow = 'hidden';
+  spinner.style.display = 'block'; check.style.display = 'none';
+  triggerDownload();
+  setTimeout(() => { spinner.style.display = 'none'; check.style.display = 'block'; }, 1800);
+}
+function closeInstallModal() {
+  document.getElementById('installModal').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+document.querySelectorAll('#heroCta,#navCtaBtn,#installBtn,#ctaBtn').forEach(btn => {
+  btn.addEventListener('click', e => { e.preventDefault(); openInstallModal(); });
+});
+document.getElementById('modalClose').addEventListener('click', closeInstallModal);
+document.getElementById('reDownload').addEventListener('click', () => {
+  triggerDownload();
+  document.getElementById('reDownload').textContent = '✓ Downloading…';
+  setTimeout(() => { document.getElementById('reDownload').textContent = '↓ Re-download ZIP'; }, 2500);
+});
+document.getElementById('installModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('installModal')) closeInstallModal();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeInstallModal(); });
+
+// ══════════════════════════════════════════════════════
+//  NAV + MISC
+// ══════════════════════════════════════════════════════
+window.addEventListener('scroll', () => {
+  document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 36);
+}, { passive:true });
+
+document.getElementById('navBurger').addEventListener('click', () => {
+  document.getElementById('navLinks').classList.toggle('open');
+});
+document.querySelectorAll('#navLinks a').forEach(a => {
+  a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'));
+});
+
+document.querySelectorAll('.faq-q').forEach(q => {
+  q.addEventListener('click', () => {
+    const item = q.parentElement;
+    const wasOpen = item.classList.contains('op');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('op'));
+    if (!wasOpen) item.classList.add('op');
+  });
+});
+
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold:0.08, rootMargin:'0px 0px -40px 0px' });
+document.querySelectorAll('.rev').forEach(el => obs.observe(el));
+
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior:'smooth' }); }
+  });
+});
+
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+// ══════════════════════════════════════════════════════
+//  ANIMATED COUNTER (stats on scroll)
+// ══════════════════════════════════════════════════════
+function animCounter(el, target, duration=1400) {
+  let start = null;
+  const step = ts => {
+    if (!start) start = ts;
+    const progress = Math.min((ts - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(ease * target).toLocaleString();
+    if (progress < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+</script>
+</body>
+</html>
