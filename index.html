@@ -356,6 +356,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
       <a href="#pricing">Pricing</a>
       <a href="#faq">FAQ</a>
       <a href="about.html">About</a>
+      <a href="terms-and-conditions.html">Terms &amp; Conditions</a>
       <a href="#install" class="nav-cta" id="navCtaBtn">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         <span id="navCtaTxt">Add to Browser</span>
@@ -589,7 +590,12 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
         <div class="bcl-s" id="bclS">Click the button below — your ZIP downloads automatically and step-by-step install instructions appear.</div>
       </div>
       <div class="bcr">
-        <a class="btn-main" id="installBtn" href="#">
+        <label id="termsCheckLabel" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:10px 14px;background:var(--s2);border:1px solid var(--b);border-radius:10px;transition:border-color .2s;margin-bottom:2px">
+          <input type="checkbox" id="termsCheck" style="accent-color:#22c55e;width:18px;height:18px;margin-top:2px;flex-shrink:0;cursor:pointer">
+          <span style="font-size:13px;color:var(--t2);line-height:1.5">I have read and agree to the <a href="terms-and-conditions.html" target="_blank" style="color:#22c55e;text-decoration:none;font-weight:600" onclick="event.stopPropagation()">Terms &amp; Conditions</a></span>
+        </label>
+        <div id="termsError" style="display:none;font-size:12px;color:#f87171;text-align:center;padding:4px 0;animation:fadeUp .3s ease">⚠ Please agree to the Terms &amp; Conditions before installing</div>
+        <a class="btn-main" id="installBtn" href="#" style="opacity:.5;pointer-events:none">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           <span id="installBtnTxt">Install — Free</span>
         </a>
@@ -657,7 +663,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
       <div class="f-brand"><a href="#" class="f-logo"><div class="nav-logo-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div><span class="nav-logo-txt">Maps Lead <em>Scraper</em></span></a><p>Scrape Google Maps listings into a CSV with names, emails, ratings and hours. Credit-based — pay only for what you use.</p></div>
       <div class="f-col"><h4>Product</h4><a href="#how">How it works</a><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#install">Install</a></div>
       <div class="f-col"><h4>Browsers</h4><a href="#install">Chrome</a><a href="#install">Edge</a><a href="#install">Brave</a><a href="#install">Opera</a><a href="#install">Firefox (soon)</a></div>
-      <div class="f-col"><h4>Support</h4><a href="#faq">FAQ</a><a href="about.html">About the Founder</a><a href="mailto:support@mapsleadscraper.com">Contact Us</a><a href="#">Privacy Policy</a><a href="#">Terms of Service</a></div>
+      <div class="f-col"><h4>Support</h4><a href="#faq">FAQ</a><a href="about.html">About the Founder</a><a href="mailto:kimad9963@gmail.com">Contact Us</a><a href="#">Privacy Policy</a><a href="terms-and-conditions.html">Terms &amp; Conditions</a></div>
     </div>
     <div class="f-bottom"><span>© <span id="yr">2026</span> Maps Lead Scraper. All rights reserved.</span><span>Built for marketers &amp; sales teams worldwide</span></div>
   </div>
@@ -675,13 +681,13 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
     </div>
     <div style="background:linear-gradient(135deg,rgba(34,197,94,.1),rgba(34,197,94,.04));border-bottom:1px solid rgba(34,197,94,.18);padding:18px 22px;display:flex;align-items:center;gap:14px">
       <div style="width:42px;height:42px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
-      <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:2px">Step 1 — Downloading your extension ZIP…</div><div style="font-size:12.5px;color:rgba(255,255,255,.4)">maps-scraper-extension-v2.1-fixed.zip · saved to Downloads</div></div>
+      <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:2px">Step 1 — Downloading your extension ZIP…</div><div style="font-size:12.5px;color:rgba(255,255,255,.4)">maps-scraper-extension-v1.0.zip · saved to Downloads</div></div>
       <div id="dlSpinner" style="width:22px;height:22px;border:2px solid rgba(34,197,94,.2);border-top-color:#22c55e;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0"></div>
       <div id="dlCheck" style="display:none;color:#22c55e;font-size:20px;flex-shrink:0">✓</div>
     </div>
     <div style="padding:20px 22px 22px">
       <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px">Follow these steps to install</div>
-      <div style="display:flex;gap:13px;margin-bottom:14px"><div style="width:26px;height:26px;border-radius:50%;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#22c55e;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">1</div><div><div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:3px">Unzip the downloaded file</div><div style="font-size:13px;color:rgba(255,255,255,.45);line-height:1.55">Right-click <code style="font-family:'JetBrains Mono',monospace;font-size:11.5px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);padding:1px 6px;border-radius:4px;color:#f59e0b">maps-scraper-extension-v2.1-fixed.zip</code> → Extract / Unzip</div></div></div>
+      <div style="display:flex;gap:13px;margin-bottom:14px"><div style="width:26px;height:26px;border-radius:50%;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#22c55e;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">1</div><div><div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:3px">Unzip the downloaded file</div><div style="font-size:13px;color:rgba(255,255,255,.45);line-height:1.55">Right-click <code style="font-family:'JetBrains Mono',monospace;font-size:11.5px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);padding:1px 6px;border-radius:4px;color:#f59e0b">maps-scraper-extension-v1.0.zip</code> → Extract / Unzip</div></div></div>
       <div style="display:flex;gap:13px;margin-bottom:14px"><div style="width:26px;height:26px;border-radius:50%;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#22c55e;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">2</div><div><div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:5px">Open Extensions page</div><div style="display:flex;gap:7px;flex-wrap:wrap"><a id="extPageLink" href="chrome://extensions" style="display:inline-flex;align-items:center;gap:5px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.22);border-radius:7px;padding:5px 12px;font-size:12.5px;color:#22c55e;text-decoration:none;font-weight:600" target="_blank">Open Extensions Page →</a><code id="extPageCode" style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);padding:5px 10px;border-radius:6px;color:#f59e0b;align-self:center">chrome://extensions</code></div></div></div>
       <div style="display:flex;gap:13px;margin-bottom:14px"><div style="width:26px;height:26px;border-radius:50%;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#22c55e;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">3</div><div><div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:3px">Enable Developer Mode</div><div style="font-size:13px;color:rgba(255,255,255,.45);line-height:1.55">Top-right corner — toggle <strong style="color:rgba(255,255,255,.7)">Developer mode</strong> ON</div></div></div>
       <div style="display:flex;gap:13px;margin-bottom:14px"><div style="width:26px;height:26px;border-radius:50%;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#22c55e;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">4</div><div><div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:3px">Click "Load unpacked"</div><div style="font-size:13px;color:rgba(255,255,255,.45);line-height:1.55">Click <strong style="color:rgba(255,255,255,.7)">Load unpacked</strong> → select the unzipped folder</div></div></div>
@@ -1195,10 +1201,10 @@ document.querySelectorAll('.b-card').forEach(card => {
 // ══════════════════════════════════════════════════════
 //  INSTALL MODAL
 // ══════════════════════════════════════════════════════
-const ZIP_URL = 'maps-scraper-extension-v2.1-fixed.zip';
+const ZIP_URL = 'maps-scraper-extension-v1.0.zip';
 
 function triggerDownload() {
-  const a = Object.assign(document.createElement('a'), { href: ZIP_URL, download: 'maps-scraper-extension-v2.1-fixed.zip' });
+  const a = Object.assign(document.createElement('a'), { href: ZIP_URL, download: 'maps-scraper-extension-v1.0.zip' });
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
 }
 
@@ -1222,8 +1228,38 @@ function closeInstallModal() {
   document.body.style.overflow = '';
 }
 
+// Terms & Conditions checkbox logic
+const termsCheck = document.getElementById('termsCheck');
+const termsError = document.getElementById('termsError');
+const installBtnEl = document.getElementById('installBtn');
+
+function updateInstallBtnState() {
+  if (termsCheck.checked) {
+    installBtnEl.style.opacity = '1';
+    installBtnEl.style.pointerEvents = 'auto';
+    termsError.style.display = 'none';
+    document.getElementById('termsCheckLabel').style.borderColor = 'rgba(34,197,94,.4)';
+  } else {
+    installBtnEl.style.opacity = '.5';
+    installBtnEl.style.pointerEvents = 'none';
+    document.getElementById('termsCheckLabel').style.borderColor = 'rgba(255,255,255,.06)';
+  }
+}
+termsCheck.addEventListener('change', updateInstallBtnState);
+
+function handleInstallClick(e) {
+  e.preventDefault();
+  if (!termsCheck.checked) {
+    termsError.style.display = 'block';
+    document.getElementById('termsCheckLabel').style.borderColor = 'rgba(248,113,113,.4)';
+    document.getElementById('install').scrollIntoView({ behavior:'smooth' });
+    return;
+  }
+  openInstallModal();
+}
+
 document.querySelectorAll('#heroCta,#navCtaBtn,#installBtn,#ctaBtn').forEach(btn => {
-  btn.addEventListener('click', e => { e.preventDefault(); openInstallModal(); });
+  btn.addEventListener('click', handleInstallClick);
 });
 document.getElementById('modalClose').addEventListener('click', closeInstallModal);
 document.getElementById('reDownload').addEventListener('click', () => {

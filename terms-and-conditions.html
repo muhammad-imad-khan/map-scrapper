@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms &amp; Conditions — Maps Lead Scraper</title>
+<meta name="description" content="Terms and Conditions for using Maps Lead Scraper browser extension. Read before installing.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2306060c'/%3E%3Cpath d='M16 5a9 9 0 00-9 9c0 7 9 13 9 13s9-6 9-13a9 9 0 00-9-9z' fill='%2322c55e'/%3E%3Ccircle cx='16' cy='14' r='3.5' fill='%2306060c'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06060c;--s1:#0a0a12;--s2:#0f0f1a;--s3:#161622;--s4:#1c1c2e;
+  --b:rgba(255,255,255,.06);--bhi:rgba(255,255,255,.11);--bact:rgba(255,255,255,.18);
+  --g:#22c55e;--g2:#16a34a;--gd:rgba(34,197,94,.1);--gb:rgba(34,197,94,.2);
+  --amber:#f59e0b;--ambd:rgba(245,158,11,.1);
+  --blue:#60a5fa;--bld:rgba(96,165,250,.1);--blb:rgba(96,165,250,.2);
+  --red:#f87171;--purple:#a78bfa;
+  --t:#d4d4e8;--t2:#9494b0;--t3:#52526a;
+  --display:'Syne',sans-serif;--body:'DM Sans',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{font-family:var(--body);background:var(--bg);color:var(--t);overflow-x:hidden}
+::selection{background:rgba(34,197,94,.22);color:#fff}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--s4);border-radius:3px}
+
+/* ── BG ── */
+.bg-grid{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(34,197,94,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(34,197,94,.022) 1px,transparent 1px);background-size:60px 60px}
+.bg-glow{position:fixed;top:0;left:50%;transform:translateX(-50%);width:900px;height:600px;background:radial-gradient(ellipse,rgba(34,197,94,.055) 0%,transparent 65%);pointer-events:none;z-index:0}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(6,6,12,.9);backdrop-filter:blur(18px);border-bottom:1px solid var(--b)}
+.nav-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;height:64px;gap:28px;padding:0 24px}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo-ic{width:32px;height:32px;background:var(--gd);border:1px solid var(--gb);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-logo-txt{font-family:var(--display);font-size:15px;font-weight:800;color:#fff}
+.nav-logo-txt em{color:var(--g);font-style:normal}
+.nav-links-wrap{margin-left:auto;display:flex;align-items:center;gap:28px}
+.nav-links-wrap a{text-decoration:none;color:var(--t2);font-size:14px;font-weight:500;transition:color .15s;position:relative}
+.nav-links-wrap a::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:1px;background:var(--g);transform:scaleX(0);transition:transform .2s;transform-origin:left}
+.nav-links-wrap a:hover{color:#fff}
+.nav-links-wrap a:hover::after{transform:scaleX(1)}
+.nav-links-wrap a.active{color:var(--g)}
+.nav-cta{padding:8px 20px;background:var(--g)!important;color:#000!important;border-radius:8px;font-size:13.5px;font-weight:700!important;display:flex;align-items:center;gap:7px;transition:background .15s,transform .1s,box-shadow .2s!important;box-shadow:0 0 0 rgba(34,197,94,0)}
+.nav-cta::after{display:none!important}
+.nav-cta:hover{background:var(--g2)!important;box-shadow:0 0 28px rgba(34,197,94,.3)!important;transform:translateY(-1px)}
+.nav-burger{display:none;background:none;border:1px solid var(--b);border-radius:6px;padding:7px 9px;cursor:pointer;color:var(--t2);margin-left:auto}
+@media(max-width:720px){
+  .nav-links-wrap{display:none;position:fixed;top:64px;left:0;right:0;background:rgba(6,6,12,.98);border-bottom:1px solid var(--b);padding:20px 24px;flex-direction:column;align-items:flex-start;gap:16px;margin-left:0}
+  .nav-links-wrap.open{display:flex}.nav-burger{display:flex;align-items:center}
+}
+
+/* ── HERO STRIP ── */
+.hero-strip{position:relative;z-index:1;padding:110px 0 0;text-align:center}
+.hero-strip .container{max-width:1100px;margin:0 auto;padding:0 24px}
+.breadcrumb{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--t3);margin-bottom:28px}
+.breadcrumb a{color:var(--t3);text-decoration:none;transition:color .15s}.breadcrumb a:hover{color:var(--t)}
+.breadcrumb span{color:var(--t3)}
+.page-kicker{font-family:var(--mono);font-size:11.5px;color:var(--g);letter-spacing:4px;text-transform:uppercase;margin-bottom:14px}
+.page-h{font-family:var(--display);font-size:clamp(42px,6vw,72px);font-weight:800;line-height:.92;color:#fff;letter-spacing:-2px;margin-bottom:0}
+.page-h em{color:var(--g);font-style:normal}
+
+/* ── MAIN LAYOUT ── */
+.main{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:0 24px 100px}
+
+/* ── TERMS CONTENT ── */
+.terms-section{padding-top:64px}
+.terms-meta{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:48px;justify-content:center}
+.terms-meta-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:var(--s2);border:1px solid var(--b);border-radius:8px;font-size:12.5px;color:var(--t2);font-family:var(--mono)}
+.terms-meta-pill svg{flex-shrink:0}
+
+.terms-card{background:var(--s1);border:1px solid var(--b);border-radius:16px;padding:40px 44px;margin-bottom:28px}
+@media(max-width:600px){.terms-card{padding:28px 20px}}
+
+.terms-card h2{font-family:var(--display);font-size:22px;font-weight:800;color:#fff;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.terms-card h2 .tc-num{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:var(--gd);border:1px solid var(--gb);font-family:var(--mono);font-size:13px;color:var(--g);flex-shrink:0}
+
+.terms-card p{font-size:15px;color:var(--t2);line-height:1.8;margin-bottom:14px}
+.terms-card p:last-child{margin-bottom:0}
+.terms-card p strong{color:var(--t)}
+.terms-card p em{color:var(--g);font-style:normal}
+.terms-card ul{list-style:none;display:flex;flex-direction:column;gap:8px;margin:14px 0;padding-left:0}
+.terms-card ul li{display:flex;align-items:flex-start;gap:10px;font-size:14.5px;color:var(--t2);line-height:1.7}
+.terms-card ul li::before{content:'›';color:var(--g);font-weight:700;flex-shrink:0;margin-top:1px;font-size:16px}
+.terms-card a{color:var(--g);text-decoration:none;transition:color .15s}
+.terms-card a:hover{color:var(--g2);text-decoration:underline}
+
+.terms-highlight{background:linear-gradient(135deg,rgba(34,197,94,.07),rgba(34,197,94,.03));border:1px solid var(--gb);border-radius:12px;padding:20px 24px;margin:18px 0}
+.terms-highlight p{color:var(--t);margin-bottom:0}
+
+/* ── CTA BAR ── */
+.terms-cta{
+  position:relative;z-index:1;
+  background:linear-gradient(135deg,rgba(34,197,94,.09),rgba(34,197,94,.03));
+  border:1px solid var(--gb);border-radius:20px;padding:52px 48px;
+  display:flex;align-items:center;justify-content:space-between;gap:28px;
+  flex-wrap:wrap;margin:72px 24px 0;max-width:860px;
+  margin-left:auto;margin-right:auto
+}
+.terms-cta-l .tc-h{font-family:var(--display);font-size:28px;font-weight:800;color:#fff;margin-bottom:8px;line-height:1}
+.terms-cta-l .tc-h em{color:var(--g);font-style:normal}
+.terms-cta-l .tc-s{font-size:15px;color:var(--t2);line-height:1.6}
+.terms-cta-r{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn-main{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;background:var(--g);color:#000;border:none;border-radius:10px;font-size:14.5px;font-weight:700;cursor:pointer;text-decoration:none;font-family:var(--body);transition:background .15s,box-shadow .2s;box-shadow:0 0 40px rgba(34,197,94,.18)}
+.btn-main:hover{background:var(--g2)}
+.btn-ghost{display:inline-flex;align-items:center;gap:7px;padding:13px 22px;background:transparent;color:var(--t);border:1px solid var(--bhi);border-radius:10px;font-size:14.5px;font-weight:600;cursor:pointer;text-decoration:none;font-family:var(--body);transition:all .15s}
+.btn-ghost:hover{background:var(--s3);border-color:var(--bact)}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-index:1;margin-top:72px}
+.footer-inner{max-width:1100px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--t3)}
+.f-logo-sm{display:flex;align-items:center;gap:8px;text-decoration:none}
+.f-logo-ic{width:26px;height:26px;background:var(--gd);border:1px solid var(--gb);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.f-logo-txt{font-family:var(--display);font-size:13px;font-weight:800;color:#fff}
+.f-logo-txt em{color:var(--g);font-style:normal}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap}
+.footer-links a{color:var(--t3);text-decoration:none;transition:color .15s}.footer-links a:hover{color:var(--t)}
+
+/* ── REVEAL ── */
+.rev{opacity:0;transform:translateY(22px);transition:opacity .65s ease,transform .65s ease}
+.rev.in{opacity:1;transform:none}
+@media(max-width:480px){.terms-cta{padding:32px 24px}}
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-ic">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      </div>
+      <span class="nav-logo-txt">Maps Lead <em>Scraper</em></span>
+    </a>
+    <div class="nav-links-wrap" id="navLinks">
+      <a href="index.html#how">How it works</a>
+      <a href="index.html#features">Features</a>
+      <a href="index.html#pricing">Pricing</a>
+      <a href="index.html#faq">FAQ</a>
+      <a href="about.html">About</a>
+      <a href="terms-and-conditions.html" class="active">Terms &amp; Conditions</a>
+      <a href="index.html#install" class="nav-cta">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Add to Browser
+      </a>
+    </div>
+    <button class="nav-burger" id="navBurger" aria-label="Toggle menu">
+      <svg width="17" height="13" viewBox="0 0 17 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="0" y1="1" x2="17" y2="1"/><line x1="0" y1="6.5" x2="17" y2="6.5"/><line x1="0" y1="12" x2="17" y2="12"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO STRIP -->
+<div class="hero-strip">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="index.html">Home</a>
+      <span>›</span>
+      <span>Terms &amp; Conditions</span>
+    </div>
+    <div class="page-kicker">Legal</div>
+    <h1 class="page-h">Terms &amp;<br><em>Conditions</em></h1>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="terms-section rev">
+
+    <div class="terms-meta">
+      <div class="terms-meta-pill">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Last updated: March 17, 2026
+      </div>
+      <div class="terms-meta-pill">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Version 2.1
+      </div>
+    </div>
+
+    <!-- 1. Acceptance -->
+    <div class="terms-card rev">
+      <h2><span class="tc-num">1</span> Acceptance of Terms</h2>
+      <p>By downloading, installing, or using Maps Lead Scraper (the <strong>"Extension"</strong>), you agree to be bound by these Terms and Conditions (<strong>"Terms"</strong>). If you do not agree to these Terms, do not install or use the Extension.</p>
+      <p>Maps Lead Scraper is a browser extension that scrapes publicly available business data from Google Maps, including business names, ratings, opening hours, phone numbers, addresses, website URLs, categories, and email addresses. It is operated by <strong>Imad Khan</strong> (<strong>"we"</strong>, <strong>"us"</strong>, <strong>"our"</strong>).</p>
+    </div>
+
+    <!-- 2. Eligibility -->
+    <div class="terms-card rev">
+      <h2><span class="tc-num">2</span> Eligibility</h2>
+      <p>You must be at least <strong>18 years old</strong> to use Maps Lead Scraper. By installing the Extension, you represent and warrant that you are at least 18 years of age and have the legal capacity to enter into these Terms.</p>
+    </div>
+
+    <!-- 3. Description of Service -->
+    <div class="terms-card rev">
+      <h2><span class="tc-num">3</span> Description of Service</h2>
+      <p>Maps Lead Scraper is a Chrome-compatible browser extension (Manifest V3) that:</p>
+      <ul>
+        <li>Scrapes publicly listed business information from Google Maps search results</li>
+        <li>Extracts 8 data fields per listing: Business Name, Email Address, Star Rating, Opening Hours, Website URL, Phone Number, Full Address, and Category</li>
+        <li>Visits business websites to automatically find email addresses via pattern matching</li>
+        <li>Exports results as a CSV file with auto-download to your Downloads folder</li>
+        <li>Provides a built-in results viewer with search, filter, sort, and one-click Open in Google Sheets / Excel Online</li>
+      </ul>
+      <p>The Extension works on <strong>Chrome, Edge, Brave, and Opera</strong> browsers. Firefox support is not currently available.</p>
+    </div>
+
+    <!-- 4. Credit System & Pricing -->
+    <div class="terms-card rev">
+      <h2><span class="tc-num">4</span> Credit System &amp; Pricing</h2>
+      <p>Maps Lead Scraper operates on a <strong>credit-based model</strong>. There are no monthly subscriptions.</p>
+      <ul>
+        <li><strong>1 credit = 1 successfully scraped lead.</strong> Credits are only deducted when a listing is successfully scraped. Failed scrapes do not consume credits.</li>
+        <li>Every new installation receives <em>25 free credits</em> automatically — no sign-up or credit card required.</li>
+        <li>Additional credits can be purchased in three packs: <strong>Starter (100 credits / $5)</strong>, <strong>Pro (500 credits / $19)</strong>, and <strong>Agency (1,000 credits / $35)</strong>.</li>
+        <li>Credits are stored locally in your browser and <strong>never expire</strong>.</li>
+        <li>Credit purchases are processed through <strong>Gumroad</strong>. After purchase, you receive a license key by email to activate credits in the Extension.</li>
+      </ul>
+      <div class="terms-highlight">
+        <p><strong>Important:</strong> Because credits are stored locally in your browser, uninstalling the Extension or clearing browser data may result in loss of unused credits. We are not responsible for credits lost due to browser data clearing or Extension uninstallation.</p>
+      </div>
+    </div>
+
+    <!-- 5. Acceptable Use -->
+    <div class="terms-card rev">
+      <h2><span class="tc-num">5</span> Acceptable Use</h2>
+      <p>You agree to use Maps Lead Scraper only for <strong>lawful purposes</strong>. You must not:</p>
+      <ul>
+        <li>Use the scraped data for spamming, harassment, or any activity that violates applicable laws or regulations (including anti-spam and data protection laws such as GDPR, CAN-SPAM, or equivalent)</li>
+        <li>Attempt to reverse-engineer, decompile, or modify the Extension</li>
+        <li>Redistribute, resell, or sublicense the Extension or any portion of it</li>
+        <li>Use automated tools or scripts to bypass the credit system or manipulate credit balances</li>
+        <li>Use the Extension to collect data for illegal purposes, including but not limited to identity theft, fraud, or stalking</li>
+        <li>Interfere with or disrupt the operation of the Extension or connected services</li>
+      </ul>
+      <p>You are solely responsible for ensuring your use of scraped data complies with all applicable local, national, and international laws and regulations, including data protection and privacy laws.</p>
+    </div>
+
+    <!-- 6. Data & Privacy -->
+    <div class="terms-card rev">
+      <h2><span class="tc-num">6</span> Data &amp; Privacy</h2>
+      <p>Maps Lead Scraper only collects <strong>publicly available business data</strong> from Google Maps. The Extension does not:</p>
+      <ul>
+        <li>Collect personal user data or browsing history</li>
+        <li>Require user registration or personal information to function</li>
+        <li>Send scraped data to external servers — all data is processed locally in your browser</li>
+        <li>Store cookies or tracking pixels</li>
+      </ul>
+      <p>Credit balances and license keys are stored <strong>locally in your browser's extension storage</strong>. We do not have access to your scraped results or local data.</p>
+      <p>The auto email finder visits publicly accessible business websites and contact pages to extract email addresses using pattern matching. It only accesses publicly available web pages.</p>
+    </div>
+
+    <!-- 7. Intellectual Property -->
+    <div class="terms-card rev">
+      <h2><span class="tc-num">7</span> Intellectual Property</h2>
+      <p>All intellectual property rights in the Extension, including the source code, design, branding, and documentation, are owned by <strong>Imad Khan / Maps Lead Scraper</strong>. These Terms do not transfer any ownership rights to you.</p>
+      <p>You are granted a <strong>limited, non-exclusive, non-transferable, revocable licence</strong> to use the Extension for personal or commercial lead generation purposes in accordance with these Terms.</p>
+    </div>
+
+    <!-- 8. Third-Party Services -->
+    <div class="terms-card rev">
+      <h2><span class="tc-num">8</span> Third-Party Services</h2>
+      <p>The Extension interacts with the following third-party services:</p>
+      <ul>
+        <li><strong>Google Maps:</strong> Maps Lead Scraper scrapes publicly visible data from Google Maps. We are not affiliated with, endorsed by, or sponsored by Google. Google's Terms of Service apply independently to your use of Google Maps.</li>
+        <li><strong>Gumroad:</strong> Credit purchases are processed via Gumroad. Gumroad's terms of service and privacy policy apply to those transactions.</li>
+        <li><strong>Business Websites:</strong> The email finder visits business websites that appear in Google Maps listings. We are not responsible for the content or availability of those websites.</li>
+      </ul>
+      <p>We do not control these third-party services and are not liable for any issues arising from their use.</p>
+    </div>
+
+    <!-- 9. Refund Policy -->
+    <div class="terms-card rev">
+      <h2><span class="tc-num">9</span> Refund Policy</h2>
+      <p>We offer a <strong>30-day money-back guarantee</strong> on all credit purchases. If you are not satisfied with Maps Lead Scraper, contact us within 30 days of your purchase for a full refund via Gumroad.</p>
+      <p>Refund requests should be sent to <a href="mailto:support@mapsleadscraper.com">support@mapsleadscraper.com</a>.</p>
+    </div>
+
+    <!-- 10. Disclaimers -->
+    <div class="terms-card rev">
+      <h2><span class="tc-num">10</span> Disclaimers</h2>
+      <p>Maps Lead Scraper is provided <strong>"as is"</strong> and <strong>"as available"</strong> without warranties of any kind, either express or implied.</p>
+      <ul>
+        <li>We do not guarantee the accuracy, completeness, or timeliness of the scraped data. Business information on Google Maps may change at any time.</li>
+        <li>Email finder results depend on whether businesses publicly list their email addresses on their websites. Typical hit rates are 40–65% depending on niche and location.</li>
+        <li>We do not guarantee uninterrupted or error-free operation. Google may change its interface or policies, which could temporarily or permanently affect the Extension's functionality.</li>
+        <li>We are not responsible for any decisions you make or actions you take based on data collected using the Extension.</li>
+      </ul>
+    </div>
+
+    <!-- 11. Limitation of Liability -->
+    <div class="terms-card rev">
+      <h2><span class="tc-num">11</span> Limitation of Liability</h2>
+      <p>To the maximum extent permitted by law, Imad Khan and Maps Lead Scraper shall not be liable for any <strong>indirect, incidental, special, consequential, or punitive damages</strong> arising from or related to your use of the Extension, including but not limited to loss of revenue, data, or business opportunities.</p>
+      <p>Our total liability for any claim arising from these Terms or your use of the Extension shall not exceed the <strong>total amount you have paid</strong> for credits in the 12 months preceding the claim.</p>
+    </div>
+
+    <!-- 12. Termination -->
+    <div class="terms-card rev">
+      <h2><span class="tc-num">12</span> Termination</h2>
+      <p>You may stop using the Extension at any time by uninstalling it from your browser.</p>
+      <p>We reserve the right to <strong>suspend or terminate</strong> access to the Extension for any user who violates these Terms, abuses the credit system, or uses the Extension for unlawful purposes — without prior notice or refund of unused credits.</p>
+    </div>
+
+    <!-- 13. Changes to Terms -->
+    <div class="terms-card rev">
+      <h2><span class="tc-num">13</span> Changes to Terms</h2>
+      <p>We may update these Terms from time to time. Changes will be posted on this page with an updated "Last updated" date. Continued use of the Extension after changes constitutes acceptance of the revised Terms.</p>
+      <p>For significant changes, we will make reasonable efforts to notify users — for example, through a notice within the Extension or on the website.</p>
+    </div>
+
+    <!-- 14. Contact -->
+    <div class="terms-card rev">
+      <h2><span class="tc-num">14</span> Contact</h2>
+      <p>If you have any questions about these Terms, please contact us:</p>
+      <ul>
+        <li><strong>Email:</strong> <a href="mailto:support@mapsleadscraper.com">support@mapsleadscraper.com</a></li>
+        <li><strong>Founder:</strong> Imad Khan — <a href="https://www.linkedin.com/in/muhammad-imad-khan/" target="_blank" rel="noopener">LinkedIn</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<!-- CTA BAR -->
+<div class="terms-cta rev">
+  <div class="terms-cta-l">
+    <div class="tc-h">Ready to start?<br><em>25 free credits</em> on install.</div>
+    <div class="tc-s">No sign-up required · Works on Chrome, Edge, Brave and Opera</div>
+  </div>
+  <div class="terms-cta-r">
+    <a class="btn-main" href="index.html#install">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Add to Browser — Free
+    </a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <a href="index.html" class="f-logo-sm">
+      <div class="f-logo-ic"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+      <span class="f-logo-txt">Maps Lead <em>Scraper</em></span>
+    </a>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="index.html#pricing">Pricing</a>
+      <a href="index.html#faq">FAQ</a>
+      <a href="about.html">About</a>
+      <a href="terms.html">Terms</a>
+      <a href="mailto:support@mapsleadscraper.com">Contact</a>
+    </div>
+    <span>&copy; <script>document.write(new Date().getFullYear())</script> Maps Lead Scraper</span>
+  </div>
+</footer>
+
+<script>
+'use strict';
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold:0.06, rootMargin:'0px 0px -40px 0px' });
+document.querySelectorAll('.rev').forEach(el => obs.observe(el));
+
+// Mobile burger menu
+document.getElementById('navBurger').addEventListener('click', () => {
+  document.getElementById('navLinks').classList.toggle('open');
+});
+document.querySelectorAll('#navLinks a').forEach(a => {
+  a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'));
+});
+</script>
+</body>
+</html>
