@@ -53,6 +53,8 @@ nav.scrolled{background:rgba(6,6,12,.92);backdrop-filter:blur(20px);border-botto
 .nav-links-wrap a::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:1px;background:var(--g);transform:scaleX(0);transition:transform .2s;transform-origin:left}
 .nav-links-wrap a:hover{color:#fff}
 .nav-links-wrap a:hover::after{transform:scaleX(1)}
+.nav-links-wrap a.active{color:#fff}
+.nav-links-wrap a.active::after{transform:scaleX(1)}
 .nav-cta{padding:8px 20px;background:var(--g)!important;color:#000!important;border-radius:8px;font-size:13.5px;font-weight:700!important;display:flex;align-items:center;gap:7px;transition:background .15s,transform .1s,box-shadow .2s!important;box-shadow:0 0 0 rgba(34,197,94,0)}
 .nav-cta::after{display:none!important}
 .nav-cta:hover{background:var(--g2)!important;box-shadow:0 0 28px rgba(34,197,94,.3)!important;transform:translateY(-1px)}
@@ -276,10 +278,11 @@ nav.scrolled{background:rgba(6,6,12,.92);backdrop-filter:blur(20px);border-botto
 .fs-n span{font-size:15px;font-weight:400;color:var(--t3);font-family:var(--body)}
 .p-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
 @media(max-width:680px){.p-grid{grid-template-columns:1fr}}
-.p-card{background:var(--s2);border:1px solid var(--b);border-radius:14px;padding:26px 24px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s,box-shadow .2s}
-.p-card:hover{border-color:var(--bhi);transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.p-card{background:var(--s2);border:1px solid var(--b);border-radius:14px;padding:26px 24px;position:relative;overflow:hidden;transition:border-color .2s,box-shadow .2s,background .2s;cursor:pointer}
+.p-card:hover{border-color:var(--bhi);box-shadow:0 20px 60px rgba(0,0,0,.22)}
+.p-card:focus-visible{outline:none;border-color:var(--g);box-shadow:0 0 0 3px rgba(34,197,94,.12)}
 .p-card.pop{border-color:var(--g);background:linear-gradient(135deg,rgba(34,197,94,.07),rgba(34,197,94,.03))}
-.p-card.pop:hover{box-shadow:0 20px 60px rgba(34,197,94,.15)}
+.p-card.pop:hover{box-shadow:0 20px 60px rgba(34,197,94,.12)}
 .pop-tag{position:absolute;top:0;right:0;background:var(--g);color:#000;font-size:8.5px;font-weight:800;padding:3px 11px;border-radius:0 12px 0 9px;letter-spacing:.7px}
 .p-card-ico{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:21px;margin-bottom:16px}
 .p-creds{font-family:var(--display);font-size:50px;font-weight:800;color:#fff;line-height:1;margin-bottom:3px}
@@ -354,6 +357,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
       <a href="#how">How it works</a>
       <a href="#features">Features</a>
       <a href="#pricing">Pricing</a>
+      <a href="payment/">Payment</a>
       <a href="#faq">FAQ</a>
       <a href="about.html">About</a>
       <a href="terms-and-conditions.html">Terms &amp; Conditions</a>
@@ -622,9 +626,9 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
       <div class="fs-n">25 <span>free credits</span></div>
     </div>
     <div class="p-grid rev">
-      <div class="p-card"><div class="p-card-ico" style="background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.2)">⚡</div><div class="p-creds">100 <span>cr</span></div><div class="p-lbl">Starter Pack</div><div class="p-price">$5</div><div class="p-per">5¢ per lead</div><ul class="p-feats"><li>100 scraping credits</li><li>Credits never expire</li><li>All 8 data columns</li><li>Email auto-finder</li></ul><a href="#install" class="btn-p">Get Starter →</a></div>
-      <div class="p-card pop"><div class="pop-tag">BEST VALUE</div><div class="p-card-ico" style="background:var(--gd);border:1px solid var(--gb)">🚀</div><div class="p-creds">500 <span>cr</span></div><div class="p-lbl">Pro Pack</div><div class="p-price">$19</div><div class="p-per">3.8¢ per lead</div><ul class="p-feats"><li>500 scraping credits</li><li>Credits never expire</li><li>All 8 data columns</li><li>Email auto-finder</li><li>Priority support</li></ul><a href="#install" class="btn-p">Get Pro →</a></div>
-      <div class="p-card"><div class="p-card-ico" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2)">🏆</div><div class="p-creds">1000 <span>cr</span></div><div class="p-lbl">Agency Pack</div><div class="p-price">$35</div><div class="p-per">3.5¢ per lead</div><ul class="p-feats"><li>1,000 scraping credits</li><li>Credits never expire</li><li>All 8 data columns</li><li>Email auto-finder</li><li>Priority support</li></ul><a href="#install" class="btn-p">Get Agency →</a></div>
+      <div class="p-card" data-payment-pack="starter" tabindex="0" role="link" aria-label="Open payment page for Starter Pack"><div class="p-card-ico" style="background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.2)">⚡</div><div class="p-creds">100 <span>cr</span></div><div class="p-lbl">Starter Pack</div><div class="p-price">$5</div><div class="p-per">5¢ per lead</div><ul class="p-feats"><li>100 scraping credits</li><li>Credits never expire</li><li>All 8 data columns</li><li>Email auto-finder</li></ul><a href="payment/?pack=starter" class="btn-p">Review Payment →</a></div>
+      <div class="p-card pop" data-payment-pack="pro" tabindex="0" role="link" aria-label="Open payment page for Pro Pack"><div class="pop-tag">BEST VALUE</div><div class="p-card-ico" style="background:var(--gd);border:1px solid var(--gb)">🚀</div><div class="p-creds">500 <span>cr</span></div><div class="p-lbl">Pro Pack</div><div class="p-price">$19</div><div class="p-per">3.8¢ per lead</div><ul class="p-feats"><li>500 scraping credits</li><li>Credits never expire</li><li>All 8 data columns</li><li>Email auto-finder</li><li>Priority support</li></ul><a href="payment/?pack=pro" class="btn-p">Review Payment →</a></div>
+      <div class="p-card" data-payment-pack="agency" tabindex="0" role="link" aria-label="Open payment page for Agency Pack"><div class="p-card-ico" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2)">🏆</div><div class="p-creds">1000 <span>cr</span></div><div class="p-lbl">Agency Pack</div><div class="p-price">$35</div><div class="p-per">3.5¢ per lead</div><ul class="p-feats"><li>1,000 scraping credits</li><li>Credits never expire</li><li>All 8 data columns</li><li>Email auto-finder</li><li>Priority support</li></ul><a href="payment/?pack=agency" class="btn-p">Review Payment →</a></div>
     </div>
   </div>
 </section>
@@ -638,8 +642,8 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
       <div class="faq-item"><div class="faq-q"><span>Do credits expire?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">Never. Credits are stored locally in your browser with no expiry date. Buy once and use at your own pace — whether that's today or a year from now.</div></div></div>
       <div class="faq-item"><div class="faq-q"><span>Which browsers are supported?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">The extension works on all Chromium-based browsers: <strong>Chrome, Edge, Brave and Opera</strong>. Firefox support is in development.</div></div></div>
       <div class="faq-item"><div class="faq-q"><span>How accurate is the email finder?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">The scraper visits each business website and contact/about pages, extracting emails via regex. Typical hit rates are 40–65% depending on niche and city.</div></div></div>
-      <div class="faq-item"><div class="faq-q"><span>How do I activate credits after purchasing?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">After buying on Gumroad you'll receive a license key by email. Open the extension → click <strong>Buy Credits</strong> tab → paste your key → click Activate. Credits are added instantly.</div></div></div>
-      <div class="faq-item"><div class="faq-q"><span>Is there a refund policy?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">Yes — 30-day money-back guarantee. If you're not satisfied, contact us within 30 days for a full refund via Gumroad.</div></div></div>
+      <div class="faq-item"><div class="faq-q"><span>How do I activate credits after purchasing?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">After payment you'll receive activation instructions for your selected method. Paddle customers continue through hosted checkout, and Pakistan bank or Sadapay payments are confirmed manually before credits are issued.</div></div></div>
+      <div class="faq-item"><div class="faq-q"><span>Is there a refund policy?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">Yes — 30-day money-back guarantee. If you are not satisfied, contact support within 30 days and include your order details so we can review the refund request.</div></div></div>
     </div>
   </div>
 </section>
@@ -661,7 +665,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
   <div class="container">
     <div class="footer-g">
       <div class="f-brand"><a href="#" class="f-logo"><div class="nav-logo-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div><span class="nav-logo-txt">Maps Lead <em>Scraper</em></span></a><p>Scrape Google Maps listings into a CSV with names, emails, ratings and hours. Credit-based — pay only for what you use.</p></div>
-      <div class="f-col"><h4>Product</h4><a href="#how">How it works</a><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#install">Install</a></div>
+      <div class="f-col"><h4>Product</h4><a href="#how">How it works</a><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="payment/">Payment</a><a href="#install">Install</a></div>
       <div class="f-col"><h4>Browsers</h4><a href="#install">Chrome</a><a href="#install">Edge</a><a href="#install">Brave</a><a href="#install">Opera</a><a href="#install">Firefox (soon)</a></div>
       <div class="f-col"><h4>Support</h4><a href="#faq">FAQ</a><a href="about.html">About the Founder</a><a href="mailto:kimad9963@gmail.com">Contact Us</a><a href="#">Privacy Policy</a><a href="terms-and-conditions.html">Terms &amp; Conditions</a></div>
     </div>
@@ -1284,6 +1288,22 @@ document.getElementById('navBurger').addEventListener('click', () => {
 });
 document.querySelectorAll('#navLinks a').forEach(a => {
   a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'));
+});
+
+function goToPayment(pack) {
+  window.location.href = `payment/?pack=${encodeURIComponent(pack)}`;
+}
+
+document.querySelectorAll('.p-card[data-payment-pack]').forEach(card => {
+  card.addEventListener('click', e => {
+    if (e.target.closest('.btn-p')) return;
+    goToPayment(card.dataset.paymentPack);
+  });
+  card.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    goToPayment(card.dataset.paymentPack);
+  });
 });
 
 document.querySelectorAll('.faq-q').forEach(q => {

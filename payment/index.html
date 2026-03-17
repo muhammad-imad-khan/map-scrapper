@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment — Maps Lead Scraper</title>
+<meta name="description" content="Review your selected credit pack, choose your country and currency, and complete payment for Maps Lead Scraper credits.">
+<meta name="theme-color" content="#06060c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;0,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06060c;--s1:#0a0a12;--s2:#0f0f1a;--s3:#161622;--s4:#1c1c2e;
+  --b:rgba(255,255,255,.06);--bhi:rgba(255,255,255,.12);--bact:rgba(255,255,255,.18);
+  --g:#22c55e;--g2:#16a34a;--gd:rgba(34,197,94,.1);--gb:rgba(34,197,94,.2);
+  --amber:#f59e0b;--blue:#60a5fa;--red:#f87171;
+  --t:#d4d4e8;--t2:#9494b0;--t3:#52526a;
+  --display:'Syne',sans-serif;--body:'DM Sans',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{font-family:var(--body);background:var(--bg);color:var(--t);overflow-x:hidden;min-height:100vh}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--s4);border-radius:3px}
+::selection{background:rgba(34,197,94,.22);color:#fff}
+.container{max-width:1100px;margin:0 auto;padding:0 24px}
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(circle at center,black 32%,transparent 82%);pointer-events:none;z-index:0}
+.bg-glow{position:fixed;inset:auto auto 0 50%;width:720px;height:720px;background:radial-gradient(circle,rgba(34,197,94,.16),transparent 62%);transform:translate(-50%,35%);pointer-events:none;z-index:0;filter:blur(12px)}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(6,6,12,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--b)}
+.nav-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;height:64px;gap:32px;padding:0 24px}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo-ic{width:34px;height:34px;background:var(--gd);border:1px solid var(--gb);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
+.nav-logo:hover .nav-logo-ic{background:var(--gb)}
+.nav-logo-txt{font-family:var(--display);font-size:15px;font-weight:800;color:#fff}.nav-logo-txt em{color:var(--g);font-style:normal}
+.nav-links-wrap{margin-left:auto;display:flex;align-items:center;gap:28px}
+.nav-links-wrap a{text-decoration:none;color:var(--t2);font-size:14px;font-weight:500;transition:color .15s;position:relative}
+.nav-links-wrap a::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:1px;background:var(--g);transform:scaleX(0);transition:transform .2s;transform-origin:left}
+.nav-links-wrap a:hover,.nav-links-wrap a.active{color:#fff}
+.nav-links-wrap a:hover::after,.nav-links-wrap a.active::after{transform:scaleX(1)}
+.nav-cta{padding:8px 20px;background:var(--g)!important;color:#000!important;border-radius:8px;font-size:13.5px;font-weight:700!important;display:flex;align-items:center;gap:7px;transition:background .15s,transform .1s,box-shadow .2s!important;box-shadow:0 0 0 rgba(34,197,94,0)}
+.nav-cta::after{display:none!important}
+.nav-cta:hover{background:var(--g2)!important;box-shadow:0 0 28px rgba(34,197,94,.3)!important;transform:translateY(-1px)}
+.nav-burger{display:none;background:none;border:1px solid var(--b);border-radius:6px;padding:7px 9px;cursor:pointer;color:var(--t2);margin-left:auto}
+.hero-strip{position:relative;z-index:1;padding:136px 0 34px}
+.breadcrumb{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--t3);font-family:var(--mono);margin-bottom:18px}
+.breadcrumb a{color:var(--t2);text-decoration:none}.breadcrumb a:hover{color:var(--g)}
+.page-kicker{display:inline-flex;align-items:center;gap:8px;background:var(--gd);border:1px solid var(--gb);border-radius:100px;padding:7px 16px;font-size:12px;font-weight:600;color:var(--g);margin-bottom:22px;letter-spacing:.4px}
+.page-h{font-family:var(--display);font-size:clamp(36px,6vw,68px);font-weight:800;line-height:.95;letter-spacing:-1.8px;color:#fff;max-width:720px}.page-h em{color:var(--g);font-style:normal}
+.page-sub{margin-top:18px;max-width:640px;font-size:17px;color:var(--t2);line-height:1.7}
+.main{position:relative;z-index:1;padding:24px 0 72px}
+.layout{display:grid;grid-template-columns:1.05fr .95fr;gap:24px;align-items:start}
+.panel{background:linear-gradient(180deg,rgba(15,15,26,.96),rgba(10,10,18,.96));border:1px solid var(--b);border-radius:22px;padding:28px;box-shadow:0 30px 90px rgba(0,0,0,.35)}
+.panel h2{font-family:var(--display);font-size:28px;font-weight:800;color:#fff;letter-spacing:-.9px;margin-bottom:10px}
+.panel-sub{font-size:14.5px;color:var(--t2);line-height:1.7;margin-bottom:24px}
+.plan-summary{display:grid;gap:18px}
+.plan-hero{background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(34,197,94,.03));border:1px solid var(--gb);border-radius:18px;padding:22px}
+.plan-label{font-size:11px;color:var(--g);font-family:var(--mono);letter-spacing:1.8px;text-transform:uppercase;margin-bottom:10px}
+.plan-name{font-size:28px;font-weight:700;color:#fff;margin-bottom:6px}
+.plan-meta{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;background:var(--s2);border:1px solid var(--b);border-radius:999px;font-size:12.5px;color:var(--t2)}
+.plan-price{display:flex;align-items:flex-end;gap:10px}.plan-price strong{font-family:var(--display);font-size:48px;line-height:.9;color:#fff}.plan-price span{font-size:14px;color:var(--t2);padding-bottom:6px}
+.plan-packs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pack-option{appearance:none;background:var(--s2);border:1px solid var(--b);border-radius:16px;padding:16px;text-align:left;cursor:pointer;transition:border-color .2s,transform .15s,background .2s;color:inherit}
+.pack-option:hover{border-color:var(--bhi);transform:translateY(-1px)}
+.pack-option.active{background:linear-gradient(135deg,rgba(34,197,94,.11),rgba(34,197,94,.04));border-color:var(--g)}
+.pack-option.pop{position:relative;overflow:hidden}
+.pack-option.pop::before{content:'BEST VALUE';position:absolute;top:0;right:0;background:var(--g);color:#000;font-size:9px;font-weight:700;padding:4px 10px;border-radius:0 16px 0 10px;letter-spacing:.5px}
+.pack-option .k{display:block;font-family:var(--mono);font-size:11px;color:var(--t3);margin-bottom:8px;text-transform:uppercase;letter-spacing:1.4px}
+.pack-option .v{display:block;font-size:20px;font-weight:700;color:#fff;margin-bottom:4px}
+.pack-option .m{display:block;font-size:12px;color:var(--t2)}
+.plan-points{display:grid;gap:10px;margin-top:4px}
+.plan-point{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--t2);line-height:1.6}
+.plan-point::before{content:'✓';color:var(--g);font-weight:700;flex-shrink:0}
+.payment-form{display:grid;gap:18px}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field{display:grid;gap:8px}
+.field label{font-size:12px;color:var(--t2);font-family:var(--mono);letter-spacing:1.2px;text-transform:uppercase}
+.select{width:100%;background:var(--s2);border:1px solid var(--b);border-radius:14px;padding:14px 15px;color:var(--t);font-size:14px;font-family:var(--body);outline:none;transition:border-color .15s,box-shadow .15s}
+.select:focus{border-color:rgba(34,197,94,.45);box-shadow:0 0 0 3px rgba(34,197,94,.09)}
+.info-card{background:var(--s2);border:1px solid var(--b);border-radius:18px;padding:20px}
+.info-card h3{font-size:18px;font-weight:700;color:#fff;margin-bottom:10px}
+.info-card p{font-size:14px;color:var(--t2);line-height:1.7}
+.muted{font-size:12.5px;color:var(--t3)}
+.detail-list{display:grid;gap:12px;margin-top:16px}
+.detail-row{display:flex;justify-content:space-between;gap:16px;padding:12px 14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:12px}
+.detail-row span{font-size:12px;color:var(--t3);font-family:var(--mono);text-transform:uppercase;letter-spacing:1px}
+.detail-row strong{font-size:14px;color:var(--t);text-align:right}
+.method-grid{display:grid;gap:16px}
+.method{background:linear-gradient(180deg,rgba(15,15,26,.88),rgba(10,10,18,.9));border:1px solid var(--b);border-radius:18px;padding:20px}
+.method-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.method-name{font-size:18px;font-weight:700;color:#fff}
+.tag{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;font-size:11px;font-family:var(--mono);letter-spacing:1px;text-transform:uppercase}
+.tag.local{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.24);color:var(--amber)}
+.tag.global{background:var(--gd);border:1px solid var(--gb);color:var(--g)}
+.checkout-card{display:grid;gap:16px}
+.checkout-status{padding:12px 14px;border-radius:12px;font-size:13px;line-height:1.6}
+.checkout-status.pending{background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);color:var(--blue)}
+.checkout-status.error{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);color:var(--red)}
+.checkout-status.ready{background:var(--gd);border:1px solid var(--gb);color:var(--g)}
+.btn-main,.btn-ghost{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:14px 22px;border-radius:12px;font-size:15px;font-weight:700;text-decoration:none;font-family:var(--body);cursor:pointer;transition:background .15s,transform .1s,border-color .15s,color .15s;white-space:nowrap}
+.btn-main{background:var(--g);color:#000;border:none;box-shadow:0 0 50px rgba(34,197,94,.14)}
+.btn-main:hover{background:var(--g2);transform:translateY(-1px)}
+.btn-main[disabled]{background:rgba(255,255,255,.08);color:rgba(255,255,255,.42);cursor:not-allowed;box-shadow:none;transform:none}
+.btn-ghost{background:transparent;color:var(--t);border:1px solid var(--bhi)}
+.btn-ghost:hover{background:var(--s3);border-color:var(--bact)}
+.actions{display:flex;gap:12px;flex-wrap:wrap}
+.hidden{display:none!important}
+.note{margin-top:14px;padding:14px 16px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:14px;font-size:13px;color:var(--t2);line-height:1.7}
+footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-index:1;margin-top:40px}
+.footer-inner{max-width:1100px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--t3)}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap}
+.footer-links a{color:var(--t3);text-decoration:none;transition:color .15s}.footer-links a:hover{color:var(--t)}
+.f-logo-sm{display:flex;align-items:center;gap:10px;text-decoration:none}.f-logo-txt{font-family:var(--display);font-size:14px;font-weight:800;color:#fff}.f-logo-txt em{color:var(--g);font-style:normal}.f-logo-ic{width:28px;height:28px;background:var(--gd);border:1px solid var(--gb);border-radius:8px;display:flex;align-items:center;justify-content:center}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.plan-packs{grid-template-columns:1fr}.field-grid{grid-template-columns:1fr}}
+@media(max-width:720px){.nav-links-wrap{display:none;position:fixed;top:64px;left:0;right:0;background:rgba(6,6,12,.98);border-bottom:1px solid var(--b);padding:20px 24px;flex-direction:column;align-items:flex-start;gap:16px;margin-left:0}.nav-links-wrap.open{display:flex}.nav-burger{display:flex;align-items:center}.panel{padding:22px}.page-sub{font-size:15px}}
+@media(max-width:520px){.container{padding:0 18px}.panel{border-radius:18px;padding:20px}.detail-row{flex-direction:column;align-items:flex-start}.detail-row strong{text-align:left}.footer-inner{flex-direction:column;text-align:center}.footer-links{justify-content:center}}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+
+<nav>
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-logo">
+      <div class="nav-logo-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+      <span class="nav-logo-txt">Maps Lead <em>Scraper</em></span>
+    </a>
+    <div class="nav-links-wrap" id="navLinks">
+      <a href="../index.html#how">How it works</a>
+      <a href="../index.html#features">Features</a>
+      <a href="../index.html#pricing">Pricing</a>
+      <a href="./" class="active">Payment</a>
+      <a href="../about.html">About</a>
+      <a href="../terms-and-conditions.html">Terms &amp; Conditions</a>
+      <a href="../index.html#install" class="nav-cta">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Add to Browser
+      </a>
+    </div>
+    <button class="nav-burger" id="navBurger" aria-label="Toggle menu">
+      <svg width="17" height="13" viewBox="0 0 17 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="0" y1="1" x2="17" y2="1"/><line x1="0" y1="6.5" x2="17" y2="6.5"/><line x1="0" y1="12" x2="17" y2="12"/></svg>
+    </button>
+  </div>
+</nav>
+
+<div class="hero-strip">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../index.html">Home</a>
+      <span>›</span>
+      <span>Payment</span>
+    </div>
+    <div class="page-kicker">Checkout setup</div>
+    <h1 class="page-h">Review your plan.<br><em>Pay your way.</em></h1>
+    <p class="page-sub">Choose your country and currency, confirm the credit pack you selected, and continue with the payment method that applies to you.</p>
+  </div>
+</div>
+
+<main class="main">
+  <div class="container">
+    <div class="layout">
+      <section class="panel">
+        <h2>Your selected pack</h2>
+        <p class="panel-sub">This page keeps your selected pack visible while you choose where you are paying from and which currency you want to review.</p>
+        <div class="plan-summary">
+          <div class="plan-hero">
+            <div class="plan-label">Selected plan</div>
+            <div class="plan-name" id="planName">Pro Pack</div>
+            <div class="plan-meta">
+              <span class="pill" id="planCredits">500 credits</span>
+              <span class="pill" id="planPerLead">3.8¢ per lead</span>
+              <span class="pill" id="planCurrency">USD</span>
+            </div>
+            <div class="plan-price"><strong id="planPrice">$19</strong><span id="planPriceNote">One-time payment</span></div>
+          </div>
+
+          <div>
+            <div class="plan-label" style="margin-bottom:12px">Switch plan</div>
+            <div class="plan-packs" id="packOptions"></div>
+          </div>
+
+          <div class="plan-points">
+            <div class="plan-point">Credits never expire after activation.</div>
+            <div class="plan-point">1 credit = 1 successfully scraped lead.</div>
+            <div class="plan-point">All packs include the same data columns and email finder.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Payment details</h2>
+        <p class="panel-sub">Country decides which payment instructions are shown. Pakistan uses local details. All other countries use the hosted checkout button.</p>
+
+        <div class="payment-form">
+          <div class="field-grid">
+            <div class="field">
+              <label for="countrySelect">Country</label>
+              <select id="countrySelect" class="select">
+                <option value="Pakistan">Pakistan</option>
+                <option value="United Arab Emirates">United Arab Emirates</option>
+                <option value="Saudi Arabia">Saudi Arabia</option>
+                <option value="United Kingdom">United Kingdom</option>
+                <option value="United States">United States</option>
+                <option value="Canada">Canada</option>
+                <option value="Australia">Australia</option>
+                <option value="Germany">Germany</option>
+                <option value="India">India</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="currencySelect">Currency</label>
+              <select id="currencySelect" class="select">
+                <option value="PKR">PKR</option>
+                <option value="USD">USD</option>
+                <option value="AED">AED</option>
+                <option value="SAR">SAR</option>
+                <option value="GBP">GBP</option>
+                <option value="EUR">EUR</option>
+                <option value="CAD">CAD</option>
+                <option value="AUD">AUD</option>
+                <option value="INR">INR</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <h3>Selection snapshot</h3>
+            <div class="detail-list">
+              <div class="detail-row"><span>Plan</span><strong id="summaryPlan">Pro Pack</strong></div>
+              <div class="detail-row"><span>Country</span><strong id="summaryCountry">Pakistan</strong></div>
+              <div class="detail-row"><span>Currency</span><strong id="summaryCurrency">PKR</strong></div>
+            </div>
+          </div>
+
+          <div id="pakistanMethods" class="method-grid hidden">
+            <div class="method">
+              <div class="method-head">
+                <div class="method-name">Meezan Bank Transfer</div>
+                <span class="tag local">Pakistan only</span>
+              </div>
+              <p>Use these temporary test details for now. Replace them with your real bank information when you are ready.</p>
+              <div class="detail-list">
+                <div class="detail-row"><span>Account title</span><strong>Imad Khan</strong></div>
+                <div class="detail-row"><span>Bank</span><strong>Meezan Bank</strong></div>
+                <div class="detail-row"><span>Account number</span><strong>12345678901234</strong></div>
+                <div class="detail-row"><span>IBAN</span><strong>PK00MEZN00012345678901234</strong></div>
+                <div class="detail-row"><span>Branch</span><strong>Karachi Test Branch</strong></div>
+              </div>
+            </div>
+
+            <div class="method">
+              <div class="method-head">
+                <div class="method-name">Sadapay</div>
+                <span class="tag local">Pakistan only</span>
+              </div>
+              <p>Use this placeholder Sadapay receiver information until you replace it with your live details.</p>
+              <div class="detail-list">
+                <div class="detail-row"><span>Account name</span><strong>Imad Khan</strong></div>
+                <div class="detail-row"><span>Mobile</span><strong>+92 300 1234567</strong></div>
+                <div class="detail-row"><span>Reference</span><strong id="referenceCode">MLS-PRO-PKR</strong></div>
+              </div>
+              <div class="note">After transfer, share your payment proof with <a href="mailto:support@mapsleadscraper.com" style="color:#22c55e;text-decoration:none">support@mapsleadscraper.com</a> so your credits can be issued manually.</div>
+            </div>
+          </div>
+
+          <div id="globalCheckout" class="method checkout-card hidden">
+            <div class="method-head">
+              <div class="method-name">Hosted Checkout</div>
+              <span class="tag global">Outside Pakistan</span>
+            </div>
+            <p>For customers outside Pakistan, continue through the secure checkout page. The URL is served from backend configuration so it can be changed without editing this page.</p>
+            <div id="checkoutStatus" class="checkout-status pending">Loading checkout configuration…</div>
+            <div class="actions">
+              <button id="checkoutBtn" class="btn-main" disabled>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>
+                Continue to Checkout
+              </button>
+              <a class="btn-ghost" href="../index.html#pricing">Change plan</a>
+            </div>
+            <div class="muted">The selected country and currency are stored in the page URL so they can be restored if you come back later.</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <a href="../index.html" class="f-logo-sm">
+      <div class="f-logo-ic"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+      <span class="f-logo-txt">Maps Lead <em>Scraper</em></span>
+    </a>
+    <div class="footer-links">
+      <a href="../index.html">Home</a>
+      <a href="../index.html#pricing">Pricing</a>
+      <a href="./">Payment</a>
+      <a href="../about.html">About</a>
+      <a href="../terms-and-conditions.html">Terms</a>
+      <a href="mailto:support@mapsleadscraper.com">Contact</a>
+    </div>
+    <span>&copy; <span id="year"></span> Maps Lead Scraper</span>
+  </div>
+</footer>
+
+<script>
+'use strict';
+
+const PACKS = {
+  starter: { key:'starter', name:'Starter Pack', credits:100, usdPrice:'$5', perLead:'5¢ per lead', popular:false },
+  pro: { key:'pro', name:'Pro Pack', credits:500, usdPrice:'$19', perLead:'3.8¢ per lead', popular:true },
+  agency: { key:'agency', name:'Agency Pack', credits:1000, usdPrice:'$35', perLead:'3.5¢ per lead', popular:false },
+};
+
+const COUNTRY_DEFAULTS = {
+  Pakistan: 'PKR',
+  'United Arab Emirates': 'AED',
+  'Saudi Arabia': 'SAR',
+  'United Kingdom': 'GBP',
+  'United States': 'USD',
+  Canada: 'CAD',
+  Australia: 'AUD',
+  Germany: 'EUR',
+  India: 'INR',
+};
+
+const PAYMENT_CONFIG_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:3000/api/payment-config'
+  : 'https://map-scraper-paddle-backend.vercel.app/api/payment-config';
+
+const packOptions = document.getElementById('packOptions');
+const countrySelect = document.getElementById('countrySelect');
+const currencySelect = document.getElementById('currencySelect');
+const pakistanMethods = document.getElementById('pakistanMethods');
+const globalCheckout = document.getElementById('globalCheckout');
+const checkoutBtn = document.getElementById('checkoutBtn');
+const checkoutStatus = document.getElementById('checkoutStatus');
+
+const state = {
+  pack: 'pro',
+  country: 'Pakistan',
+  currency: 'PKR',
+  checkoutUrl: '',
+};
+
+function getParams() {
+  const params = new URLSearchParams(window.location.search);
+  const pack = params.get('pack');
+  const country = params.get('country');
+  const currency = params.get('currency');
+  if (pack && PACKS[pack]) state.pack = pack;
+  if (country && COUNTRY_DEFAULTS[country]) state.country = country;
+  if (currency) state.currency = currency.toUpperCase();
+  if (!state.currency) state.currency = COUNTRY_DEFAULTS[state.country] || 'USD';
+}
+
+function syncUrl() {
+  const params = new URLSearchParams();
+  params.set('pack', state.pack);
+  params.set('country', state.country);
+  params.set('currency', state.currency);
+  const next = `${window.location.pathname}?${params.toString()}`;
+  window.history.replaceState({}, '', next);
+}
+
+function renderPackOptions() {
+  packOptions.innerHTML = '';
+  Object.values(PACKS).forEach(pack => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `pack-option${pack.popular ? ' pop' : ''}${state.pack === pack.key ? ' active' : ''}`;
+    button.innerHTML = `<span class="k">${pack.key}</span><span class="v">${pack.credits} credits</span><span class="m">${pack.usdPrice} · ${pack.perLead}</span>`;
+    button.addEventListener('click', () => {
+      state.pack = pack.key;
+      updateReferenceCode();
+      render();
+    });
+    packOptions.appendChild(button);
+  });
+}
+
+function updateReferenceCode() {
+  document.getElementById('referenceCode').textContent = `MLS-${state.pack.toUpperCase()}-${state.currency}`;
+}
+
+function renderSummary() {
+  const pack = PACKS[state.pack];
+  document.getElementById('planName').textContent = pack.name;
+  document.getElementById('planCredits').textContent = `${pack.credits} credits`;
+  document.getElementById('planPerLead').textContent = pack.perLead;
+  document.getElementById('planCurrency').textContent = state.currency;
+  document.getElementById('planPrice').textContent = pack.usdPrice;
+  document.getElementById('summaryPlan').textContent = `${pack.name} · ${pack.credits} credits`;
+  document.getElementById('summaryCountry').textContent = state.country;
+  document.getElementById('summaryCurrency').textContent = state.currency;
+}
+
+function renderMethods() {
+  const isPakistan = state.country === 'Pakistan';
+  pakistanMethods.classList.toggle('hidden', !isPakistan);
+  globalCheckout.classList.toggle('hidden', isPakistan);
+  updateReferenceCode();
+}
+
+async function loadCheckoutUrl() {
+  checkoutStatus.className = 'checkout-status pending';
+  checkoutStatus.textContent = 'Loading checkout configuration…';
+  checkoutBtn.disabled = true;
+
+  try {
+    const response = await fetch(PAYMENT_CONFIG_URL, { headers: { 'Accept': 'application/json' } });
+    const data = await response.json();
+    if (!response.ok || !data.checkoutUrl) throw new Error(data.error || 'Checkout URL unavailable');
+    state.checkoutUrl = data.checkoutUrl;
+    checkoutStatus.className = 'checkout-status ready';
+    checkoutStatus.textContent = 'Checkout is ready. You will be taken to the hosted payment page.';
+    checkoutBtn.disabled = false;
+  } catch (error) {
+    state.checkoutUrl = '';
+    checkoutStatus.className = 'checkout-status error';
+    checkoutStatus.textContent = error.message || 'Unable to load checkout URL.';
+    checkoutBtn.disabled = true;
+  }
+}
+
+function render() {
+  countrySelect.value = state.country;
+  currencySelect.value = state.currency;
+  renderPackOptions();
+  renderSummary();
+  renderMethods();
+  syncUrl();
+}
+
+countrySelect.addEventListener('change', () => {
+  state.country = countrySelect.value;
+  if (!window.location.search.includes('currency=')) {
+    state.currency = COUNTRY_DEFAULTS[state.country] || state.currency;
+  }
+  render();
+});
+
+currencySelect.addEventListener('change', () => {
+  state.currency = currencySelect.value;
+  render();
+});
+
+checkoutBtn.addEventListener('click', () => {
+  if (!state.checkoutUrl) return;
+  window.location.href = state.checkoutUrl;
+});
+
+document.getElementById('navBurger').addEventListener('click', () => {
+  document.getElementById('navLinks').classList.toggle('open');
+});
+document.querySelectorAll('#navLinks a').forEach(anchor => {
+  anchor.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'));
+});
+
+document.getElementById('year').textContent = new Date().getFullYear();
+
+getParams();
+if (!COUNTRY_DEFAULTS[state.country]) state.country = 'Pakistan';
+if (!Array.from(currencySelect.options).some(option => option.value === state.currency)) {
+  state.currency = COUNTRY_DEFAULTS[state.country] || 'USD';
+}
+render();
+loadCheckoutUrl();
+</script>
+</body>
+</html>
