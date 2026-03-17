@@ -26,9 +26,9 @@ const licenseStore = new Map(); // licenseKey → { credits, productId, used }
 // ── Credit packs — match your Paddle product IDs ───────────────
 // Create these products in your Paddle dashboard at paddle.com
 const PACKS = {
-  'pri_100':  { credits: 100,  price: '$5',  label: 'Starter Pack' },
-  'pri_500':  { credits: 500,  price: '$19', label: 'Pro Pack'     },
-  'pri_1000': { credits: 1000, price: '$35', label: 'Agency Pack'  },
+  'pro_01kkwtmnxnjcp2ja76dps3wm63':  { credits: 100,  price: '$5',  label: 'Starter Pack' },
+  'pro_01kkwtnk3zrp25a50jbzhsm6hr':  { credits: 500,  price: '$19', label: 'Pro Pack'     },
+  'pro_01kkwtq5fexkarzr641bg9qj85': { credits: 1000, price: '$35', label: 'Agency Pack'  },
 };
 // Replace pri_100 / pri_500 / pri_1000 with your actual Paddle Price IDs
 // Found in Paddle Dashboard → Catalog → Products → your product → Price ID

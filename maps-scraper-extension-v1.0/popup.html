@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Maps Lead Scraper</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#09090f;--surf:#111118;--card:#17171f;--card2:#1e1e28;
+  --b:rgba(255,255,255,0.07);--bhi:rgba(255,255,255,0.12);--bact:rgba(255,255,255,0.18);
+  --g:#22c55e;--gd:rgba(34,197,94,.11);--gb:rgba(34,197,94,.22);--ghi:rgba(34,197,94,.32);
+  --amber:#f59e0b;--ambd:rgba(245,158,11,.13);--ambb:rgba(245,158,11,.22);
+  --blue:#60a5fa;--bld:rgba(96,165,250,.12);--blb:rgba(96,165,250,.22);
+  --purple:#a78bfa;--purd:rgba(167,139,250,.12);
+  --red:#f87171;--redd:rgba(248,113,113,.12);
+  --t:#d8d8e8;--m:#52526a;
+  --mono:'Courier New',monospace;--ui:-apple-system,'Segoe UI',system-ui,sans-serif;
+}
+body{width:480px;font-family:var(--ui);background:var(--bg);color:var(--t)}
+
+/* ── TOP NAV TABS ─────────────────────────── */
+.tabs{display:flex;background:var(--surf);border-bottom:1px solid var(--b)}
+.tab{flex:1;padding:11px 6px;font-size:12px;font-weight:600;color:var(--m);cursor:pointer;text-align:center;border:none;background:transparent;transition:all .15s;position:relative;letter-spacing:.2px}
+.tab.active{color:var(--g)}
+.tab.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--g);border-radius:2px 2px 0 0}
+.tab:hover:not(.active){color:var(--t)}
+
+/* ── CREDIT BANNER ────────────────────────── */
+.credit-banner{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px;
+  background:linear-gradient(135deg,rgba(34,197,94,.07),rgba(34,197,94,.03));
+  border-bottom:1px solid var(--b)
+}
+.credit-left{display:flex;align-items:center;gap:10px}
+.credit-icon{width:32px;height:32px;background:var(--gd);border:1px solid rgba(34,197,94,.25);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.credit-info{}
+.credit-label{font-size:10px;color:var(--m);text-transform:uppercase;letter-spacing:.8px;margin-bottom:1px}
+.credit-count{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--g);line-height:1}
+.credit-count.warn{color:var(--amber)}.credit-count.empty{color:var(--red)}
+.credit-sub{font-size:10px;color:var(--m);margin-top:1px}
+.btn-topup{padding:6px 14px;background:var(--g);color:#000;border:none;border-radius:6px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:var(--ui);transition:background .15s;white-space:nowrap}
+.btn-topup:hover{background:#16a34a}
+
+/* ── PANELS ───────────────────────────────── */
+.panel{display:none;padding:14px 16px}.panel.show{display:block}
+
+/* ── SCRAPE PANEL ─────────────────────────── */
+.field-label{font-size:10px;color:var(--m);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
+.search-wrap{position:relative;margin-bottom:9px}
+.search-wrap::before{content:'🔍';position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none}
+.iq{width:100%;background:var(--card2);border:1px solid var(--bhi);border-radius:8px;padding:9px 12px 9px 33px;color:var(--t);font-size:13px;outline:none;font-family:var(--ui);transition:border-color .15s}
+.iq:focus{border-color:rgba(34,197,94,.45)}.iq::placeholder{color:var(--m)}
+
+.opts-row{display:flex;align-items:center;gap:10px;margin-bottom:11px;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:8px 12px}
+.ol{font-size:11.5px;color:var(--m)}
+.im{width:52px;background:var(--surf);border:1px solid var(--bhi);border-radius:5px;padding:4px 8px;color:var(--t);font-size:12px;font-family:var(--mono);text-align:center;outline:none}
+.im:focus{border-color:rgba(34,197,94,.4)}
+.credit-cost-pill{margin-left:auto;display:flex;align-items:center;gap:5px;background:var(--gd);border:1px solid rgba(34,197,94,.2);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--g);font-family:var(--mono)}
+
+.btn-start{width:100%;padding:11px 16px;background:var(--g);color:#000;border:none;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:var(--ui);transition:background .15s,transform .1s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-start:hover{background:#16a34a}.btn-start:active{transform:scale(.99)}
+.btn-start.running{background:var(--redd);color:var(--red);border:1px solid rgba(248,113,113,.3)}
+.btn-start.running:hover{background:rgba(248,113,113,.18)}
+.btn-start:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+.divider{height:1px;background:var(--b);margin:12px 0}
+
+/* Progress */
+.prog-sec{display:none;margin-bottom:10px}.prog-sec.show{display:block}
+.status-ln{font-family:var(--mono);font-size:11.5px;color:var(--g);margin-bottom:7px;display:flex;align-items:center;gap:6px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.status-ln.err{color:var(--red)}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--g);flex-shrink:0;animation:pulse 1.2s infinite}
+.status-ln.err .sdot{background:var(--red);animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.ptrack{height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;margin-bottom:4px}
+.pfill{height:100%;background:linear-gradient(90deg,var(--g),#86efac);border-radius:2px;transition:width .5s;width:0%}
+.plbl{display:flex;justify-content:space-between;font-size:10px;color:var(--m);font-family:var(--mono)}
+
+/* Results */
+.res-sec{display:none}.res-sec.show{display:block}
+.res-tb{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.res-cnt{font-size:11.5px;color:var(--m)}.res-cnt strong{color:var(--g);font-family:var(--mono);font-size:13px}
+.btn-export{padding:5px 12px;background:var(--gd);color:var(--g);border:1px solid rgba(34,197,94,.22);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--ui);display:flex;align-items:center;gap:4px;transition:background .15s}
+.btn-export:hover{background:var(--gb)}.btn-export:disabled{opacity:.35;cursor:not-allowed}
+.twrap{border:1px solid var(--b);border-radius:8px;overflow:hidden;max-height:180px;overflow-y:auto}
+.twrap::-webkit-scrollbar{width:3px}.twrap::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+table{width:100%;border-collapse:collapse;font-size:11.5px}
+thead th{background:var(--surf);padding:6px 10px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--m);border-bottom:1px solid var(--b);position:sticky;top:0;z-index:1}
+tbody td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.04);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:0}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:rgba(255,255,255,.02)}
+.cn{width:34%}.cr{width:13%}.ce{width:28%}.cw{width:13%}.ch{width:12%}
+.nm{color:#ededf6;font-weight:600}.rt{color:var(--amber);font-family:var(--mono);font-weight:700}
+.he{color:var(--g);font-family:var(--mono);font-size:10.5px}.ne,.nw,.nh{color:var(--m)}
+.hw{color:var(--blue)}.hh{color:var(--purple)}
+
+/* ── SHOP PANEL ───────────────────────────── */
+.shop-header{text-align:center;margin-bottom:16px}
+.shop-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:4px}
+.shop-sub{font-size:12px;color:var(--m)}
+
+.pack-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.pack-card{
+  display:flex;align-items:center;gap:14px;
+  background:var(--card);border:1px solid var(--b);border-radius:11px;padding:14px 16px;
+  cursor:pointer;transition:border-color .15s,background .15s;position:relative;overflow:hidden
+}
+.pack-card:hover{border-color:var(--bhi);background:var(--card2)}
+.pack-card.popular{border-color:rgba(34,197,94,.3)}
+.pack-card.popular::before{content:'BEST VALUE';position:absolute;top:0;right:0;background:var(--g);color:#000;font-size:9px;font-weight:700;padding:3px 10px;border-radius:0 10px 0 8px;letter-spacing:.5px}
+.pack-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.pi-s{background:var(--bld);border:1px solid rgba(96,165,250,.22)}
+.pi-p{background:var(--gd);border:1px solid rgba(34,197,94,.22)}
+.pi-a{background:var(--purd);border:1px solid rgba(167,139,250,.22)}
+.pack-info{flex:1}
+.pack-name{font-size:14px;font-weight:700;color:#fff;margin-bottom:2px}
+.pack-desc{font-size:11.5px;color:var(--m)}
+.pack-right{text-align:right}
+.pack-price{font-size:18px;font-weight:700;color:#fff;margin-bottom:2px}
+.pack-per{font-size:10px;color:var(--m);font-family:var(--mono)}
+
+.pack-card .btn-buy{
+  margin-top:10px;width:100%;padding:9px;background:var(--g);color:#000;border:none;
+  border-radius:7px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:var(--ui);
+  transition:background .15s;display:none
+}
+.pack-card.popular .btn-buy{display:block}
+.pack-card:hover .btn-buy{display:block}
+
+/* Redeem code */
+.redeem-section{background:var(--card);border:1px solid var(--b);border-radius:10px;padding:14px}
+.redeem-title{font-size:12px;font-weight:600;color:#fff;margin-bottom:8px;display:flex;align-items:center;gap:7px}
+.redeem-row{display:flex;gap:7px}
+.redeem-input{flex:1;background:var(--surf);border:1px solid var(--bhi);border-radius:7px;padding:8px 12px;color:var(--t);font-size:12px;font-family:var(--mono);outline:none;letter-spacing:.5px}
+.redeem-input:focus{border-color:rgba(34,197,94,.4)}.redeem-input::placeholder{color:var(--m)}
+.btn-redeem{padding:8px 14px;background:var(--gd);color:var(--g);border:1px solid rgba(34,197,94,.22);border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:var(--ui)}
+.btn-redeem:hover{background:var(--gb)}
+.redeem-msg{font-size:11px;font-family:var(--mono);margin-top:7px;min-height:14px;line-height:1.4}
+.redeem-msg.ok{color:var(--g)}.redeem-msg.err{color:var(--red)}
+
+/* ── NO-CREDITS OVERLAY ───────────────────── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:flex-end;justify-content:center;z-index:200;padding-bottom:0}
+.overlay.show{display:flex}
+.overlay-sheet{
+  background:var(--card);border:1px solid var(--bhi);border-radius:20px 20px 0 0;
+  padding:24px 20px 28px;width:100%;
+}
+.ov-handle{width:36px;height:3px;background:rgba(255,255,255,.15);border-radius:2px;margin:0 auto 20px}
+.ov-icon{font-size:36px;text-align:center;margin-bottom:12px}
+.ov-title{font-size:17px;font-weight:700;color:#fff;text-align:center;margin-bottom:6px}
+.ov-sub{font-size:13px;color:var(--m);text-align:center;margin-bottom:20px;line-height:1.6}
+.ov-sub strong{color:var(--t)}
+.ov-packs{display:flex;gap:9px;margin-bottom:16px}
+.ov-pack{
+  flex:1;background:var(--card2);border:1px solid var(--b);border-radius:10px;
+  padding:12px 8px;text-align:center;cursor:pointer;transition:border-color .15s
+}
+.ov-pack:hover{border-color:var(--bhi)}
+.ov-pack.pop{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.05)}
+.ov-pack .opc{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--g);margin-bottom:2px}
+.ov-pack .opl{font-size:10px;color:var(--m);margin-bottom:5px}
+.ov-pack .opp{font-size:14px;font-weight:700;color:#fff}
+.ov-pack.pop .opp{color:var(--g)}
+.btn-ov-close{width:100%;padding:10px;background:transparent;color:var(--m);border:1px solid var(--b);border-radius:8px;font-size:12px;cursor:pointer;font-family:var(--ui)}
+.btn-ov-close:hover{border-color:var(--bhi)}
+
+/* ── FOOTER ───────────────────────────────── */
+.ftr{padding:7px 16px 8px;border-top:1px solid var(--b);display:flex;justify-content:space-between;align-items:center;font-size:9.5px;color:#2a2a3d;font-family:var(--mono)}
+.fdt{width:3px;height:3px;border-radius:50%;background:rgba(34,197,94,.25);display:inline-block;margin:0 5px}
+</style>
+</head>
+<body>
+
+<!-- NO-CREDITS OVERLAY -->
+<div class="overlay" id="noCreditsOverlay">
+  <div class="overlay-sheet">
+    <div class="ov-handle"></div>
+    <div class="ov-icon">💳</div>
+    <div class="ov-title">You're out of credits</div>
+    <div class="ov-sub">Each scraped result costs <strong>1 credit</strong>.<br>Top up to keep scraping.</div>
+    <div class="ov-packs" id="ovPacks">
+      <!-- injected by JS -->
+    </div>
+    <button class="btn-ov-close" id="btnOvClose">Maybe later</button>
+  </div>
+</div>
+
+<!-- CREDIT BANNER -->
+<div class="credit-banner">
+  <div class="credit-left">
+    <div class="credit-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/>
+        <path d="M7 20.662V19a2 2 0 012-2h6a2 2 0 012 2v1.662"/>
+      </svg>
+    </div>
+    <div class="credit-info">
+      <div class="credit-label">Your Credits</div>
+      <div class="credit-count" id="creditCount">—</div>
+      <div class="credit-sub">1 credit = 1 result</div>
+    </div>
+  </div>
+  <button class="btn-topup" id="btnTopup">+ Buy Credits</button>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" id="tabScrape" data-tab="scrape"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg> Scrape</button>
+  <button class="tab" id="tabShop" data-tab="shop"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg> Buy Credits</button>
+</div>
+
+<!-- SCRAPE PANEL -->
+<div class="panel show" id="panelScrape">
+  <div class="field-label" style="margin-top:2px">Search Query</div>
+  <div class="search-wrap">
+    <input type="text" class="iq" id="queryInput" placeholder='"Best barber in Karachi"' />
+  </div>
+  <div class="opts-row">
+    <span class="ol">Max results</span>
+    <input type="number" class="im" id="maxInput" value="15" min="1" max="100" />
+    <div class="credit-cost-pill">
+      <span>🪙</span>
+      <span id="costPill">15 credits</span>
+    </div>
+  </div>
+  <button class="btn-start" id="btnStart">
+    <span id="btnIcon">▶</span><span id="btnLabel">Start Scraping</span>
+  </button>
+
+  <div class="divider"></div>
+
+  <div class="prog-sec" id="progSec">
+    <div class="status-ln" id="statusLn">
+      <span class="sdot" id="sDot"></span>
+      <span id="sTxt">Initializing…</span>
+    </div>
+    <div class="ptrack"><div class="pfill" id="pFill"></div></div>
+    <div class="plbl"><span id="pLeft">0%</span><span id="pRight">0 / 0</span></div>
+    <div class="divider"></div>
+  </div>
+
+  <div class="res-sec" id="resSec">
+    <div class="res-tb">
+      <span class="res-cnt"><strong id="resCnt">0</strong> results</span>
+      <button class="btn-export" id="btnExport" disabled>↓ Export CSV</button>
+    </div>
+    <div class="twrap">
+      <table>
+        <thead><tr>
+          <th class="cn">Name</th><th class="cr">Rating</th>
+          <th class="ce">Email</th><th class="cw">Site</th><th class="ch">Hrs</th>
+        </tr></thead>
+        <tbody id="resTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- SHOP PANEL -->
+<div class="panel" id="panelShop">
+  <div class="shop-header">
+    <div class="shop-title">Buy Credits</div>
+    <div class="shop-sub">Credits never expire · 1 credit = 1 scraped result</div>
+  </div>
+
+  <div class="pack-grid" id="packGrid">
+    <!-- injected by JS -->
+  </div>
+
+  <div class="redeem-section">
+    <div class="redeem-title">🎟 Have a license code?</div>
+    <div class="redeem-row">
+      <input type="text" class="redeem-input" id="redeemInput" placeholder="XXXX-XXXX-XXXX-XXXX" />
+      <button class="btn-redeem" id="btnRedeem">Activate</button>
+    </div>
+    <div class="redeem-msg" id="redeemMsg"></div>
+  </div>
+</div>
+
+<div class="ftr">
+  <span>Maps Lead Scraper</span><span class="fdt"></span>
+  <span>v2.1</span><span class="fdt"></span>
+  <span id="ftrCredits">— credits</span>
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>
