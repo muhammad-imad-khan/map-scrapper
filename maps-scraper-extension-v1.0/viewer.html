@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maps Lead Scraper — Results</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#08080f;--s1:#0f0f18;--s2:#15151f;--s3:#1c1c28;
+  --b:rgba(255,255,255,.07);--bhi:rgba(255,255,255,.12);
+  --g:#22c55e;--gd:rgba(34,197,94,.1);--gb:rgba(34,197,94,.2);
+  --amber:#f59e0b;--ambd:rgba(245,158,11,.1);--ambb:rgba(245,158,11,.2);
+  --blue:#60a5fa;--bld:rgba(96,165,250,.1);
+  --green-txt:#86efac;
+  --red:#f87171;--redd:rgba(248,113,113,.1);
+  --t:#d8d8ea;--m:#52526a;--mhi:#7070a0;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --display:'Syne',sans-serif;
+}
+html,body{height:100%;background:var(--bg);color:var(--t);font-family:var(--sans)}
+
+/* ── TOPBAR ── */
+.topbar{
+  display:flex;align-items:center;gap:16px;
+  padding:12px 24px;
+  background:var(--s1);
+  border-bottom:1px solid var(--b);
+  position:sticky;top:0;z-index:50
+}
+.tb-logo{display:flex;align-items:center;gap:10px}
+.tb-ic{width:32px;height:32px;background:var(--gd);border:1px solid var(--gb);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.tb-name{font-family:var(--display);font-size:16px;font-weight:800;color:#fff}
+.tb-name em{color:var(--g);font-style:normal}
+.tb-sep{width:1px;height:24px;background:var(--b)}
+
+/* stats chips */
+.stat-chip{display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--b);border-radius:8px;padding:5px 12px}
+.sc-val{font-family:var(--mono);font-size:14px;font-weight:600;color:#fff}
+.sc-lbl{font-size:11px;color:var(--m)}
+.stat-chip.green{background:var(--gd);border-color:var(--gb)}.stat-chip.green .sc-val{color:var(--g)}
+.stat-chip.amber{background:var(--ambd);border-color:var(--ambb)}.stat-chip.amber .sc-val{color:var(--amber)}
+.stat-chip.blue{background:var(--bld);border-color:rgba(96,165,250,.2)}.stat-chip.blue .sc-val{color:var(--blue)}
+
+/* action buttons row */
+.actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+
+.btn{display:flex;align-items:center;gap:7px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid;font-family:var(--sans);transition:all .15s;white-space:nowrap}
+.btn svg{width:15px;height:15px;flex-shrink:0}
+
+.btn-dl{background:var(--g);color:#000;border-color:var(--g)}
+.btn-dl:hover{background:#16a34a;border-color:#16a34a}
+
+.btn-sheets{background:rgba(52,168,83,.12);color:#34a853;border-color:rgba(52,168,83,.3)}
+.btn-sheets:hover{background:rgba(52,168,83,.22)}
+
+.btn-excel{background:rgba(33,115,70,.12);color:#217346;border-color:rgba(33,115,70,.3)}
+.btn-excel:hover{background:rgba(33,115,70,.22)}
+
+.btn-copy{background:var(--s2);color:var(--mhi);border-color:var(--b)}
+.btn-copy:hover{background:var(--s3);color:var(--t);border-color:var(--bhi)}
+.btn-copy.copied{color:var(--g);border-color:var(--gb)}
+
+/* ── CONTENT ── */
+.content{padding:20px 24px}
+
+/* ── QUERY BAR ── */
+.query-bar{
+  display:flex;align-items:center;gap:12px;
+  background:var(--s1);border:1px solid var(--b);border-radius:10px;
+  padding:12px 18px;margin-bottom:18px
+}
+.qb-icon{font-size:18px;flex-shrink:0}
+.qb-query{font-family:var(--mono);font-size:14px;color:#fff;flex:1}
+.qb-time{font-size:11px;color:var(--m);white-space:nowrap}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--b);border-radius:8px;padding:6px 12px;flex:1;min-width:200px}
+.search-box input{background:transparent;border:none;outline:none;color:var(--t);font-size:13px;width:100%;font-family:var(--sans)}
+.search-box input::placeholder{color:var(--m)}
+.filter-btn{padding:6px 12px;background:var(--s2);border:1px solid var(--b);border-radius:7px;font-size:12px;color:var(--m);cursor:pointer;font-family:var(--sans);transition:all .15s;white-space:nowrap}
+.filter-btn.active{background:var(--gd);color:var(--g);border-color:var(--gb)}
+.filter-btn:hover:not(.active){color:var(--t);border-color:var(--bhi)}
+
+/* ── TABLE ── */
+.table-wrap{
+  background:var(--s1);
+  border:1px solid var(--b);
+  border-radius:12px;
+  overflow:hidden;
+  overflow-x:auto
+}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{
+  background:var(--s2);
+  padding:10px 14px;
+  text-align:left;
+  font-size:10px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.8px;
+  color:var(--m);
+  border-bottom:1px solid var(--b);
+  white-space:nowrap;
+  cursor:pointer;
+  user-select:none;
+  position:sticky;top:0;z-index:2
+}
+thead th:hover{color:var(--t)}
+thead th .sort-arrow{display:inline-block;margin-left:4px;opacity:.4;transition:opacity .15s}
+thead th.sort-asc .sort-arrow::after{content:'↑';opacity:1}
+thead th.sort-desc .sort-arrow::after{content:'↓';opacity:1}
+thead th:not(.sort-asc):not(.sort-desc) .sort-arrow::after{content:'↕'}
+
+tbody tr{border-bottom:1px solid rgba(255,255,255,.04);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:rgba(255,255,255,.03)}
+tbody tr.highlight{background:rgba(34,197,94,.05)}
+
+tbody td{padding:11px 14px;vertical-align:middle;max-width:220px}
+
+/* cell types */
+.cell-name{color:#e8e8f8;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell-rating{font-family:var(--mono);font-weight:700;white-space:nowrap}
+.star{color:var(--amber);font-size:13px}
+.cell-email a{color:var(--g);font-family:var(--mono);font-size:11.5px;text-decoration:none}
+.cell-email a:hover{text-decoration:underline}
+.cell-email .no{color:var(--m)}
+.cell-web a{color:var(--blue);font-size:12px;text-decoration:none;display:flex;align-items:center;gap:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+.cell-web a:hover{text-decoration:underline}
+.cell-web .no{color:var(--m)}
+.cell-hours{font-size:11.5px;color:var(--t);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cell-phone{font-family:var(--mono);font-size:12px;color:var(--t)}
+.cell-addr{font-size:12px;color:var(--m);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cell-cat{font-size:11.5px;background:var(--s3);border-radius:4px;padding:2px 7px;display:inline-block;color:var(--mhi)}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:80px 20px}
+.empty-icon{font-size:48px;margin-bottom:16px}
+.empty-title{font-family:var(--display);font-size:22px;font-weight:700;color:#fff;margin-bottom:8px}
+.empty-sub{font-size:14px;color:var(--m);line-height:1.6}
+
+/* ── LOADING ── */
+.loading{text-align:center;padding:80px 20px}
+.spinner{width:32px;height:32px;border:2px solid var(--b);border-top-color:var(--g);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{font-size:14px;color:var(--m)}
+
+/* ── SHEETS/EXCEL MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:200;display:none}
+.modal-bg.show{display:flex}
+.modal{background:var(--s2);border:1px solid var(--bhi);border-radius:16px;padding:28px;width:420px;max-width:calc(100vw - 32px)}
+.modal-icon{font-size:36px;margin-bottom:14px;text-align:center}
+.modal-title{font-family:var(--display);font-size:18px;font-weight:800;color:#fff;text-align:center;margin-bottom:8px}
+.modal-sub{font-size:13px;color:var(--m);text-align:center;line-height:1.6;margin-bottom:22px}
+.modal-steps{background:var(--s3);border-radius:10px;padding:16px;margin-bottom:20px}
+.ms-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.ms-row:last-child{margin-bottom:0}
+.ms-num{width:22px;height:22px;border-radius:50%;background:var(--gd);border:1px solid var(--gb);color:var(--g);font-size:11px;font-family:var(--mono);font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.ms-txt{font-size:13px;color:var(--t);line-height:1.5}
+.ms-txt strong{color:#fff}
+.modal-actions{display:flex;gap:10px}
+.btn-modal-go{flex:1;padding:11px;background:var(--g);color:#000;border:none;border-radius:8px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:var(--sans)}
+.btn-modal-go:hover{background:#16a34a}
+.btn-modal-cancel{padding:11px 16px;background:transparent;color:var(--m);border:1px solid var(--b);border-radius:8px;font-size:13px;cursor:pointer;font-family:var(--sans)}
+.btn-modal-cancel:hover{border-color:var(--bhi);color:var(--t)}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:var(--gd);border:1px solid var(--gb);color:var(--g);
+  padding:9px 20px;border-radius:20px;font-size:12.5px;font-family:var(--mono);
+  white-space:nowrap;z-index:300;
+  animation:toastIn .3s ease;
+  pointer-events:none
+}
+.toast.error{background:var(--redd);border-color:rgba(248,113,113,.3);color:var(--red)}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translateX(-50%)}}
+
+/* ── FOOTER ── */
+.footer{
+  padding:14px 24px;border-top:1px solid var(--b);
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:11px;color:var(--m);margin-top:20px
+}
+.footer a{color:var(--m);text-decoration:none}
+.footer a:hover{color:var(--t)}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar" id="topbar">
+  <div class="tb-logo">
+    <div class="tb-ic">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+      </div>
+    <span class="tb-name">Maps Lead <em>Scraper</em></span>
+  </div>
+  <div class="tb-sep"></div>
+  <div class="stat-chip green">
+    <span class="sc-val" id="statTotal">—</span>
+    <span class="sc-lbl">results</span>
+  </div>
+  <div class="stat-chip amber">
+    <span class="sc-val" id="statEmails">—</span>
+    <span class="sc-lbl">emails found</span>
+  </div>
+  <div class="stat-chip blue">
+    <span class="sc-val" id="statSites">—</span>
+    <span class="sc-lbl">websites</span>
+  </div>
+
+  <div class="actions">
+    <!-- Re-download CSV -->
+    <button class="btn btn-dl" id="btnDownload">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download CSV
+    </button>
+
+    <!-- Google Sheets -->
+    <button class="btn btn-sheets" id="btnSheets">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.5 2h-15A1.5 1.5 0 003 3.5v17A1.5 1.5 0 004.5 22h15a1.5 1.5 0 001.5-1.5v-17A1.5 1.5 0 0019.5 2zm-9 13.5H7v-1.5h3.5v1.5zm0-3H7v-1.5h3.5V12zm0-3H7V7.5h3.5V9zm6.5 6.5H13v-1.5H17v1.5zm0-3H13V12h4v1.5zm0-3H13V7.5h4V9z"/></svg>
+      Open in Sheets
+    </button>
+
+    <!-- Excel Online -->
+    <button class="btn btn-excel" id="btnExcel">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.17 3.25Q21.5 3.25 21.76 3.5 22 3.74 22 4.08V19.92Q22 20.26 21.76 20.5 21.5 20.75 21.17 20.75H7.83Q7.5 20.75 7.24 20.5 7 20.26 7 19.92V17H2.83Q2.5 17 2.24 16.76 2 16.5 2 16.17V7.83Q2 7.5 2.24 7.24 2.5 7 2.83 7H7V4.08Q7 3.74 7.24 3.5 7.5 3.25 7.83 3.25M7 13.06L8.18 15.28H9.97L8 12 9.93 8.73H8.22L7 10.87 5.87 8.73H4.1L6 12 4 15.28H5.78M13.88 19.5V17H8.25V19.5M13.88 15.75V12.63H8.25V15.75M13.88 11.38V8.25H8.25V11.38M20.75 19.5V17H15.13V19.5M20.75 15.75V12.63H15.13V15.75M20.75 11.38V8.25H15.13V11.38Z"/></svg>
+      Open in Excel
+    </button>
+
+    <!-- Copy all emails -->
+    <button class="btn btn-copy" id="btnCopyEmails">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+      Copy Emails
+    </button>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- Query bar -->
+  <div class="query-bar" id="queryBar" style="display:none">
+    <span class="qb-icon">🔍</span>
+    <span class="qb-query" id="queryText">—</span>
+    <span class="qb-time" id="queryTime"></span>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar" id="toolbar" style="display:none">
+    <div class="search-box">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#52526a" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="Filter by name, email, address…" />
+    </div>
+    <button class="filter-btn active" id="filterAll" data-filter="all">All</button>
+    <button class="filter-btn" id="filterEmail" data-filter="email">Has Email</button>
+    <button class="filter-btn" id="filterWebsite" data-filter="website">Has Website</button>
+    <span style="font-family:monospace;font-size:12px;color:var(--m);margin-left:4px" id="filterCount"></span>
+  </div>
+
+  <!-- Loading state -->
+  <div class="loading" id="loadingState">
+    <div class="spinner"></div>
+    <div class="loading-txt">Loading results…</div>
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty" id="emptyState" style="display:none">
+    <div class="empty-icon">📭</div>
+    <div class="empty-title">No results yet</div>
+    <div class="empty-sub">Run a scrape from the extension popup<br>and results will appear here automatically.</div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap" id="tableWrap" style="display:none">
+    <table>
+      <thead id="thead">
+        <tr>
+          <th data-col="name">Business Name <span class="sort-arrow"></span></th>
+          <th data-col="rating">Rating <span class="sort-arrow"></span></th>
+          <th data-col="email">Email <span class="sort-arrow"></span></th>
+          <th data-col="website">Website <span class="sort-arrow"></span></th>
+          <th data-col="hours">Hours <span class="sort-arrow"></span></th>
+          <th data-col="phone">Phone <span class="sort-arrow"></span></th>
+          <th data-col="address">Address <span class="sort-arrow"></span></th>
+          <th data-col="category">Category <span class="sort-arrow"></span></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Google Sheets modal -->
+<div class="modal-bg" id="sheetsModal">
+  <div class="modal">
+    <div class="modal-icon">📊</div>
+    <div class="modal-title">Open in Google Sheets</div>
+    <div class="modal-sub">Your CSV has been re-downloaded. Follow these steps to import it:</div>
+    <div class="modal-steps">
+      <div class="ms-row"><span class="ms-num">1</span><span class="ms-txt">Click <strong>Open Google Sheets →</strong> below (a new blank sheet opens)</span></div>
+      <div class="ms-row"><span class="ms-num">2</span><span class="ms-txt">In Google Sheets: go to <strong>File → Import</strong></span></div>
+      <div class="ms-row"><span class="ms-num">3</span><span class="ms-txt">Click <strong>Upload</strong> → drag in the CSV file from your Downloads folder</span></div>
+      <div class="ms-row"><span class="ms-num">4</span><span class="ms-txt">Click <strong>Import data</strong> — done!</span></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal-go" id="btnSheetsGo">Open Google Sheets →</button>
+      <button class="btn-modal-cancel" id="btnSheetsCancelModal">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Excel Online modal -->
+<div class="modal-bg" id="excelModal">
+  <div class="modal">
+    <div class="modal-icon">📗</div>
+    <div class="modal-title">Open in Excel Online</div>
+    <div class="modal-sub">Your CSV has been re-downloaded. Follow these steps to import it:</div>
+    <div class="modal-steps">
+      <div class="ms-row"><span class="ms-num">1</span><span class="ms-txt">Click <strong>Open Excel Online →</strong> below</span></div>
+      <div class="ms-row"><span class="ms-num">2</span><span class="ms-txt">Click <strong>Upload and open</strong> in the top toolbar</span></div>
+      <div class="ms-row"><span class="ms-num">3</span><span class="ms-txt">Select the CSV from your <strong>Downloads folder</strong></span></div>
+      <div class="ms-row"><span class="ms-num">4</span><span class="ms-txt">Excel opens your data with all columns ready to use</span></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal-go" id="btnExcelGo">Open Excel Online →</button>
+      <button class="btn-modal-cancel" id="btnExcelCancelModal">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <span>Maps Lead Scraper Pro · v2.1</span>
+  <span id="footerInfo">—</span>
+</div>
+
+<script src="viewer.js"></script>
+</body>
+</html>
