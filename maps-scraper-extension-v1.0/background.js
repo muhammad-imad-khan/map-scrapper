@@ -13,9 +13,9 @@ const BACKEND_URL = 'https://map-scraper-paddle-backend.vercel.app'; // ← repl
 // Paddle Price IDs — replace with your actual IDs from Paddle Dashboard
 // Catalog → Products → your product → Prices → copy ID (starts with pri_)
 const CREDIT_PACKS = [
-    { id: 'pro_01kkwtmnxnjcp2ja76dps3wm63',  label: '100 Credits', credits: 100,  price: '$5',  popular: false },
-    { id: 'pro_01kkwtnk3zrp25a50jbzhsm6hr',  label: '500 Credits', credits: 500,  price: '$19', popular: true  },
-    { id: 'pro_01kkwtq5fexkarzr641bg9qj85', label: '1000 Credits',credits: 1000, price: '$35', popular: false },
+    { id: 'pri_01kkwtvthhty0fks2hrc68cb52',  label: '100 Credits', credits: 100,  price: '$5',  popular: false },
+    { id: 'pri_01kkwtx0kh2skzrzjbxgmgqngd',  label: '500 Credits', credits: 500,  price: '$19', popular: true  },
+    { id: 'pri_01kkwtyfwvrwspy654f56h4n5d', label: '1000 Credits',credits: 1000, price: '$35', popular: false },
 ];
 const FREE_STARTER_CREDITS = 25;
 const COST_PER_RESULT      = 1;
