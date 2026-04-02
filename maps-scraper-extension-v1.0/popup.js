@@ -39,7 +39,10 @@ chrome.runtime.sendMessage({ type: 'GET_STATE' }, res => {
   if (chrome.runtime.lastError || !res) return;
   currentCredits = res.credits || 0;
   packs = res.packs || [];
-  updateCreditUI(currentCredits);
+  // Fetch expiry from local storage for display
+  chrome.storage.local.get(['expiresAt'], d => {
+    updateCreditUI(currentCredits, d.expiresAt || null);
+  });
   renderPacks(packs);
   renderOvPacks(packs);
   if (res.running) setRunning(true);
@@ -141,18 +144,15 @@ btnExport.addEventListener('click', () => {
 
 // ── Pack cards ────────────────────────────────────────
 function renderPacks(packs) {
-  const icons  = ['pi-s','pi-p','pi-a'];
-  const emojis = ['⚡','🚀','🏆'];
   packGrid.innerHTML = '';
-  packs.forEach((p, i) => {
-    const perCredit = (parseFloat(p.price.replace('$','')) / p.credits * 100).toFixed(1);
+  packs.forEach((p) => {
     const card = document.createElement('div');
-    card.className = 'pack-card' + (p.popular ? ' popular' : '');
+    card.className = 'pack-card popular';
     card.innerHTML = `
-      <div class="pack-icon ${icons[i] || 'pi-s'}">${emojis[i] || '💳'}</div>
+      <div class="pack-icon pi-p">🚀</div>
       <div class="pack-info">
         <div class="pack-name">${p.label}</div>
-        <div class="pack-desc">${p.popular ? 'Most popular · ' : ''}${perCredit}¢ per lead</div>
+        <div class="pack-desc">1¢ per lead · Valid 7 days</div>
       </div>
       <div class="pack-right">
         <div class="pack-price">${p.price}</div>
@@ -208,10 +208,15 @@ btnRedeem.addEventListener('click', () => {
 
 // ── Helpers ───────────────────────────────────────────
 
-function updateCreditUI(n) {
+function updateCreditUI(n, expiresAt) {
   creditCount.textContent = n.toLocaleString();
-  ftrCredits.textContent  = `${n} credits`;
-  creditCount.className   = 'credit-count' + (n === 0 ? ' empty' : n < 10 ? ' warn' : '');
+  if (expiresAt && n > 0) {
+    const days = Math.max(0, Math.ceil((expiresAt - Date.now()) / (1000 * 60 * 60 * 24)));
+    ftrCredits.textContent = `${n} credits · ${days}d left`;
+  } else {
+    ftrCredits.textContent = `${n} credits`;
+  }
+  creditCount.className = 'credit-count' + (n === 0 ? ' empty' : n < 10 ? ' warn' : '');
 }
 
 function setRunning(r) {

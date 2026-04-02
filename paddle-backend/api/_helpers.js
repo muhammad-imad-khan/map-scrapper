@@ -11,12 +11,11 @@ const BASE_URL = PADDLE_ENV === 'live'
 const PADDLE_API_KEY = process.env.PADDLE_API_KEY || '';
 
 const FREE_STARTER_CREDITS = 25;
+const CREDITS_EXPIRY_DAYS = 7;
 
-// Map price IDs → credit amounts
+// Single pack: $5 for 500 credits, one-time, expires in 7 days
 const PRICE_CREDITS = {
-  [process.env.PRICE_STARTER || 'pri_01kkwtvthhty0fks2hrc68cb52']: { credits: 100,  label: 'Starter Pack' },
-  [process.env.PRICE_PRO     || 'pri_01kkwtx0kh2skzrzjbxgmgqngd']: { credits: 500,  label: 'Pro Pack' },
-  [process.env.PRICE_AGENCY  || 'pri_01kkwtyfwvrwspy654f56h4n5d']: { credits: 1000, label: 'Agency Pack' },
+  [process.env.PRICE_PACK || 'pri_01kkwtx0kh2skzrzjbxgmgqngd']: { credits: 500, label: '500 Credits' },
 };
 
 // ── Redis singleton ───────────────────────────────────────
@@ -36,6 +35,7 @@ function getRedis() {
 // ── Key helpers (RLS: each user scoped by installId) ──────
 const keys = {
   credits:   (id) => `credits:${id}`,
+  expiry:    (id) => `expiry:${id}`,
   txnLog:    (id) => `txnlog:${id}`,
   txnDedup:  (txnId) => `txn:${txnId}`,
   install:   (id) => `install:${id}`,
@@ -44,29 +44,56 @@ const keys = {
 // ── Credit operations (all server-side, atomic) ───────────
 async function getCredits(installId) {
   const redis = getRedis();
+  // Check expiry first — if expired, wipe credits
+  const expiry = await redis.get(keys.expiry(installId));
+  if (expiry && Date.now() > parseInt(expiry, 10)) {
+    await redis.set(keys.credits(installId), 0);
+    await redis.del(keys.expiry(installId));
+    return { credits: 0, expired: true, expiresAt: null };
+  }
   const val = await redis.get(keys.credits(installId));
-  return val !== null ? parseInt(val, 10) : null;
+  return {
+    credits: val !== null ? parseInt(val, 10) : null,
+    expired: false,
+    expiresAt: expiry ? parseInt(expiry, 10) : null,
+  };
 }
 
 async function initUser(installId) {
   const redis = getRedis();
   const existing = await redis.get(keys.credits(installId));
-  if (existing !== null) return parseInt(existing, 10);
-  // New user: grant starter credits
+  if (existing !== null) {
+    // Check expiry
+    const expiry = await redis.get(keys.expiry(installId));
+    if (expiry && Date.now() > parseInt(expiry, 10)) {
+      await redis.set(keys.credits(installId), 0);
+      await redis.del(keys.expiry(installId));
+      return { credits: 0, expired: true, expiresAt: null };
+    }
+    return {
+      credits: parseInt(existing, 10),
+      expired: false,
+      expiresAt: expiry ? parseInt(expiry, 10) : null,
+    };
+  }
+  // New user: grant starter credits (no expiry on free credits)
   await redis.set(keys.credits(installId), FREE_STARTER_CREDITS);
   await redis.set(keys.install(installId), JSON.stringify({
     createdAt: new Date().toISOString(),
   }));
-  return FREE_STARTER_CREDITS;
+  return { credits: FREE_STARTER_CREDITS, expired: false, expiresAt: null };
 }
 
 async function addCredits(installId, amount, reason) {
   const redis = getRedis();
   const newBal = await redis.incrby(keys.credits(installId), amount);
+  // Set 7-day expiry from now (resets on each purchase)
+  const expiresAt = Date.now() + CREDITS_EXPIRY_DAYS * 24 * 60 * 60 * 1000;
+  await redis.set(keys.expiry(installId), expiresAt);
   await redis.rpush(keys.txnLog(installId), JSON.stringify({
-    type: 'credit', amount, reason, balance: newBal, at: new Date().toISOString(),
+    type: 'credit', amount, reason, balance: newBal, expiresAt, at: new Date().toISOString(),
   }));
-  return newBal;
+  return { newBalance: newBal, expiresAt };
 }
 
 async function deductCredits(installId, amount) {
@@ -110,7 +137,7 @@ async function paddleRequest(path, body) {
 }
 
 module.exports = {
-  PADDLE_ENV, BASE_URL, PADDLE_API_KEY, PRICE_CREDITS, FREE_STARTER_CREDITS,
+  PADDLE_ENV, BASE_URL, PADDLE_API_KEY, PRICE_CREDITS, FREE_STARTER_CREDITS, CREDITS_EXPIRY_DAYS,
   cors, paddleRequest, getRedis, keys,
   getCredits, initUser, addCredits, deductCredits, isValidInstallId,
 };

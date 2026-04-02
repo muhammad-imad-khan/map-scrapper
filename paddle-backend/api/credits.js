@@ -18,8 +18,13 @@ module.exports = async function handler(req, res) {
   // GET → fetch balance (init user if first time)
   if (req.method === 'GET') {
     try {
-      const credits = await initUser(installId);
-      return res.status(200).json({ credits, installId });
+      const result = await initUser(installId);
+      return res.status(200).json({
+        credits: result.credits,
+        installId,
+        expired: result.expired,
+        expiresAt: result.expiresAt,
+      });
     } catch (err) {
       console.error('Credits GET error:', err);
       return res.status(500).json({ error: 'Internal server error' });
@@ -35,13 +40,17 @@ module.exports = async function handler(req, res) {
     }
 
     try {
+      // Check expiry before deducting
+      const current = await getCredits(installId);
+      if (current.expired || current.credits === 0) {
+        return res.status(402).json({ error: 'Credits expired', credits: 0, expired: true });
+      }
+
       const newBal = await deductCredits(installId, cost);
       if (newBal < 0) {
-        // Insufficient credits — return current balance
-        const current = await getCredits(installId);
-        return res.status(402).json({ error: 'Insufficient credits', credits: current || 0 });
+        return res.status(402).json({ error: 'Insufficient credits', credits: current.credits || 0 });
       }
-      return res.status(200).json({ credits: newBal, deducted: cost });
+      return res.status(200).json({ credits: newBal, deducted: cost, expiresAt: current.expiresAt });
     } catch (err) {
       console.error('Credits POST error:', err);
       return res.status(500).json({ error: 'Internal server error' });

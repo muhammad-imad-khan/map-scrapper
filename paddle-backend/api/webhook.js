@@ -89,8 +89,8 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ received: true, warning: 'No matching prices' });
     }
 
-    // ── Credit the user's account (atomic) ──
-    const newBalance = await addCredits(installId, totalCredits, `purchase:${txnId}:${label}`);
+    // ── Credit the user's account (atomic + set 7-day expiry) ──
+    const result = await addCredits(installId, totalCredits, `purchase:${txnId}:${label}`);
 
     // ── Mark transaction as processed (dedup key, expires in 30 days) ──
     await redis.set(keys.txnDedup(txnId), JSON.stringify({
@@ -99,12 +99,13 @@ module.exports = async function handler(req, res) {
       processedAt: new Date().toISOString(),
     }), 'EX', 60 * 60 * 24 * 30);
 
-    console.log(`Auto-credited ${totalCredits} credits to ${installId} (txn: ${txnId}). New balance: ${newBalance}`);
+    console.log(`Auto-credited ${totalCredits} credits to ${installId} (txn: ${txnId}). New balance: ${result.newBalance}, expires: ${new Date(result.expiresAt).toISOString()}`);
 
     return res.status(200).json({
       received: true,
       credited: totalCredits,
-      newBalance,
+      newBalance: result.newBalance,
+      expiresAt: result.expiresAt,
       installId,
     });
   } catch (err) {

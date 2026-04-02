@@ -120,8 +120,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
 </style>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
-  Paddle.Environment.set('sandbox');
-  Paddle.Initialize({ token: 'test_72fcb1bf88e7b485d977abd74ac' });
+  Paddle.Initialize({ token: 'live_a5e44dc571f960aec1814cb19be' });
 </script>
 </head>
 <body>
@@ -189,7 +188,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
           </div>
 
           <div class="plan-points">
-            <div class="plan-point">Credits never expire after activation.</div>
+            <div class="plan-point">Credits valid for 7 days after purchase.</div>
             <div class="plan-point">1 credit = 1 successfully scraped lead.</div>
             <div class="plan-point">All packs include the same data columns and email finder.</div>
           </div>
@@ -316,9 +315,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
 'use strict';
 
 const PACKS = {
-  starter: { key:'starter', name:'Starter Pack', credits:100, usdPrice:'$5', perLead:'5¢ per lead', popular:false, priceId:'pri_01kn6xewj4wfxtrmaxt3brqsz1' },
-  pro: { key:'pro', name:'Pro Pack', credits:500, usdPrice:'$19', perLead:'3.8¢ per lead', popular:true, priceId:'pri_01kn6xj1tz636cpv1rz1yw6vh5' },
-  agency: { key:'agency', name:'Agency Pack', credits:1000, usdPrice:'$35', perLead:'3.5¢ per lead', popular:false, priceId:'pri_01kn6xxp2w6zhgch7wvvmvng9v' },
+  credits500: { key:'credits500', name:'500 Credits', credits:500, usdPrice:'$5', perLead:'1¢ per lead · Valid 7 days', popular:true, priceId:'pri_01kkwtx0kh2skzrzjbxgmgqngd' },
 };
 
 const COUNTRY_DEFAULTS = {
@@ -346,7 +343,7 @@ const checkoutBtn = document.getElementById('checkoutBtn');
 const checkoutStatus = document.getElementById('checkoutStatus');
 
 const state = {
-  pack: 'pro',
+  pack: 'credits500',
   country: 'Pakistan',
   currency: 'PKR',
   checkoutUrl: '',
@@ -359,7 +356,12 @@ function getParams() {
   const country = params.get('country');
   const currency = params.get('currency');
   const installId = params.get('installId');
+  // Accept pack key or priceId
   if (pack && PACKS[pack]) state.pack = pack;
+  else {
+    const found = Object.values(PACKS).find(p => p.priceId === pack);
+    if (found) state.pack = found.key;
+  }
   if (country && COUNTRY_DEFAULTS[country]) state.country = country;
   if (currency) state.currency = currency.toUpperCase();
   if (installId && /^[a-f0-9-]{36}$/i.test(installId)) state.installId = installId;

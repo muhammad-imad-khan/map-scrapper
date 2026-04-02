@@ -3,7 +3,7 @@
 //  Monetization: SERVER-SIDE CREDIT SYSTEM (Paddle + Redis)
 //  • New installs: 25 free starter credits (server-granted)
 //  • Each scraped result costs 1 credit (server-deducted)
-//  • Packs: 100 / 500 / 1000 credits — Paddle auto-credits on payment
+//  • Packs: $5 for 500 credits (one-time, expires in 7 days)
 //  • Each install has a unique installId (UUID) for RLS
 // ═══════════════════════════════════════════════════════════
 
@@ -11,9 +11,7 @@
 const BACKEND_URL = 'https://map-scraper-paddle-backend.vercel.app';
 
 const CREDIT_PACKS = [
-    { id: 'pri_01kn6xewj4wfxtrmaxt3brqsz1',  label: '100 Credits', credits: 100,  price: '$5',  popular: false },
-    { id: 'pri_01kn6xj1tz636cpv1rz1yw6vh5',  label: '500 Credits', credits: 500,  price: '$19', popular: true  },
-    { id: 'pri_01kn6xxp2w6zhgch7wvvmvng9v', label: '1000 Credits',credits: 1000, price: '$35', popular: false },
+    { id: 'pri_01kkwtx0kh2skzrzjbxgmgqngd', label: '500 Credits', credits: 500, price: '$5', popular: true },
 ];
 const COST_PER_RESULT = 1;
 
@@ -86,7 +84,11 @@ async function getCredits() {
     if (!res.ok) throw new Error('Server error');
     const data = await res.json();
     // Cache locally for offline display
-    await chrome.storage.local.set({ credits: data.credits });
+    await chrome.storage.local.set({
+      credits: data.credits,
+      expiresAt: data.expiresAt || null,
+      expired: data.expired || false,
+    });
     return data.credits;
   } catch {
     // Fallback to cached value if offline
@@ -224,10 +226,11 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
           if (data.checkoutUrl) {
             chrome.tabs.create({ url: data.checkoutUrl });
           } else {
-            chrome.tabs.create({ url: `https://buy.paddle.com/product/${pack.id}` });
+            chrome.tabs.create({ url: `https://map-scrapper-five.vercel.app/payment/?pack=${pack.id}&installId=${installId}` });
           }
         } catch {
-          chrome.tabs.create({ url: `https://buy.paddle.com/product/${pack.id}` });
+          const installId = await getInstallId().catch(() => '');
+          chrome.tabs.create({ url: `https://map-scrapper-five.vercel.app/payment/?pack=${pack.id}&installId=${installId}` });
         }
         sendResponse({ ok: true });
         break;

@@ -300,6 +300,36 @@ nav.scrolled{background:rgba(6,6,12,.92);backdrop-filter:blur(20px);border-botto
 .p-card:not(.pop) .btn-p{background:var(--s4);color:var(--t);border:1px solid var(--bhi)}
 .p-card:not(.pop) .btn-p:hover{background:var(--s3);border-color:var(--bact)}
 
+/* SCARCITY BAR */
+.scarcity-bar{max-width:420px;margin:18px auto 0;background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:14px 18px;display:flex;flex-direction:column;gap:10px}
+.sc-left{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--t2)}
+.sc-left strong{color:#f59e0b;font-family:var(--mono);font-size:14px}
+.sc-dot{width:7px;height:7px;background:#f59e0b;border-radius:50%;animation:scPulse 1.6s ease infinite}
+@keyframes scPulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(245,158,11,.35)}50%{opacity:.7;box-shadow:0 0 0 6px rgba(245,158,11,0)}}
+.sc-bar-wrap{width:100%;height:6px;background:var(--s4);border-radius:3px;overflow:hidden}
+.sc-bar-fill{height:100%;background:linear-gradient(90deg,#f59e0b,#f97316);border-radius:3px;transition:width 1.2s cubic-bezier(.25,.46,.45,.94)}
+/* RECENT PURCHASES */
+.recent-buys{max-width:420px;margin:14px auto 0;background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:16px 18px}
+.rb-header{font-size:11px;font-family:var(--mono);color:var(--t3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.rb-live{width:6px;height:6px;border-radius:50%;background:var(--g);animation:scPulse 1.6s ease infinite}
+.rb-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid rgba(255,255,255,.04)}
+.rb-item:first-child{border-top:none}
+.rb-avatar{width:28px;height:28px;border-radius:50%;background:var(--s4);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.rb-info{flex:1;min-width:0}
+.rb-name{font-size:13px;font-weight:600;color:var(--t)}
+.rb-name .rb-pack{color:var(--g);font-weight:700}
+.rb-meta{font-size:11px;color:var(--t3);font-family:var(--mono);margin-top:1px}
+/* FLOATING TOAST */
+.purchase-toast{position:fixed;bottom:24px;left:24px;z-index:8000;background:var(--s2);border:1px solid var(--gb);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 20px 60px rgba(0,0,0,.5);max-width:340px;opacity:0;transform:translateY(20px) scale(.95);transition:opacity .4s ease,transform .4s ease;pointer-events:none}
+.purchase-toast.show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.pt-ico{width:34px;height:34px;border-radius:50%;background:var(--gd);border:1px solid var(--gb);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.pt-body{flex:1;min-width:0}
+.pt-title{font-size:13px;font-weight:600;color:var(--t)}.pt-title strong{color:var(--g)}
+.pt-sub{font-size:10.5px;color:var(--t3);font-family:var(--mono);margin-top:2px}
+.pt-close{width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.06);border:none;cursor:pointer;color:var(--t3);font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.pt-close:hover{background:rgba(255,255,255,.12)}
+@media(max-width:480px){.purchase-toast{left:12px;right:12px;max-width:none;bottom:12px}}
+
 /* FAQ */
 .faq-wrap{margin-top:48px;border:1px solid var(--b);border-radius:14px;overflow:hidden}
 .faq-item{}
@@ -343,8 +373,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
 </style>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
-  Paddle.Environment.set('sandbox');
-  Paddle.Initialize({ token: 'test_72fcb1bf88e7b485d977abd74ac' });
+  Paddle.Initialize({ token: 'live_a5e44dc571f960aec1814cb19be' });
 </script>
 </head>
 <body>
@@ -395,7 +424,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
       </a>
       <a class="btn-ghost" href="#how">Watch it scrape →</a>
     </div>
-    <p class="hero-note"><strong>25 free credits</strong> on install · 1 credit = 1 lead · Credits never expire</p>
+    <p class="hero-note"><strong>25 free credits</strong> on install · 1 credit = 1 lead · Paid credits valid 7 days</p>
     <div class="compat-pills">
       <span style="font-size:11.5px;color:var(--t3)">Works on</span>
       <span class="cp"><svg width="13" height="13" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#4285f4"/><circle cx="12" cy="12" r="4.5" fill="white"/><path d="M12 0a12 12 0 0110.39 6H12V0z" fill="#ea4335"/><path d="M2.54 6A12 12 0 0012 24V12L2.54 6z" fill="#34a853"/><path d="M21.46 18A12 12 0 012.54 6L12 12l9.46-6z" fill="#fbbc05"/></svg> Chrome</span>
@@ -474,7 +503,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
     <span class="ti"><span class="v">1</span> credit per result</span>
     <span class="ti">Auto email finder</span>
     <span class="ti">CSV + Google Sheets + Excel</span>
-    <span class="ti"><span class="v">∞</span> credits never expire</span>
+    <span class="ti"><span class="v">7d</span> pack valid 7 days</span>
     <span class="ti">Chrome · Edge · Brave · Opera</span>
     <span class="ti">No monthly fees · No sign-up</span>
     <span class="ti"><span class="v">0</span> coding required</span>
@@ -484,7 +513,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
     <span class="ti"><span class="v">1</span> credit per result</span>
     <span class="ti">Auto email finder</span>
     <span class="ti">CSV + Google Sheets + Excel</span>
-    <span class="ti"><span class="v">∞</span> credits never expire</span>
+    <span class="ti"><span class="v">7d</span> pack valid 7 days</span>
     <span class="ti">Chrome · Edge · Brave · Opera</span>
     <span class="ti">No monthly fees · No sign-up</span>
     <span class="ti"><span class="v">0</span> coding required</span>
@@ -627,15 +656,26 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
 <!-- PRICING -->
 <section class="section price-s" id="pricing">
   <div class="container">
-    <div class="rev"><div class="sk">Pricing</div><h2 class="sh">Pay per lead.<br><em>Not per month.</em></h2><p class="ss">Buy credits once — spend them whenever. No subscription. Credits never expire.</p></div>
+    <div class="rev"><div class="sk">Pricing</div><h2 class="sh">Pay per lead.<br><em>Not per month.</em></h2><p class="ss">Buy credits once — use them for 7 days. No subscription. No monthly fees.</p></div>
     <div class="free-strip rev">
       <div class="fs-l"><div class="fs-h">Start for free — no card needed</div><div class="fs-s">Every install gets <strong>25 free credits</strong> automatically. No sign-up. Just install and go.</div></div>
       <div class="fs-n">25 <span>free credits</span></div>
     </div>
-    <div class="p-grid rev">
-      <div class="p-card" data-payment-pack="starter" tabindex="0" role="link" aria-label="Open payment page for Starter Pack"><div class="p-card-ico" style="background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.2)">⚡</div><div class="p-creds">100 <span>cr</span></div><div class="p-lbl">Starter Pack</div><div class="p-price">$5</div><div class="p-per">5¢ per lead</div><ul class="p-feats"><li>100 scraping credits</li><li>Credits never expire</li><li>All 8 data columns</li><li>Email auto-finder</li></ul><a href="payment/?pack=starter" class="btn-p">Review Payment →</a></div>
-      <div class="p-card pop" data-payment-pack="pro" tabindex="0" role="link" aria-label="Open payment page for Pro Pack"><div class="pop-tag">BEST VALUE</div><div class="p-card-ico" style="background:var(--gd);border:1px solid var(--gb)">🚀</div><div class="p-creds">500 <span>cr</span></div><div class="p-lbl">Pro Pack</div><div class="p-price">$19</div><div class="p-per">3.8¢ per lead</div><ul class="p-feats"><li>500 scraping credits</li><li>Credits never expire</li><li>All 8 data columns</li><li>Email auto-finder</li><li>Priority support</li></ul><a href="payment/?pack=pro" class="btn-p">Review Payment →</a></div>
-      <div class="p-card" data-payment-pack="agency" tabindex="0" role="link" aria-label="Open payment page for Agency Pack"><div class="p-card-ico" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2)">🏆</div><div class="p-creds">1000 <span>cr</span></div><div class="p-lbl">Agency Pack</div><div class="p-price">$35</div><div class="p-per">3.5¢ per lead</div><ul class="p-feats"><li>1,000 scraping credits</li><li>Credits never expire</li><li>All 8 data columns</li><li>Email auto-finder</li><li>Priority support</li></ul><a href="payment/?pack=agency" class="btn-p">Review Payment →</a></div>
+    <div class="p-grid rev" style="grid-template-columns:1fr;max-width:420px;margin:0 auto">
+      <div class="p-card pop" data-payment-pack="credits500" tabindex="0" role="link" aria-label="Open payment page for 500 Credits"><div class="pop-tag">ONE-TIME</div><div class="p-card-ico" style="background:var(--gd);border:1px solid var(--gb)">🚀</div><div class="p-creds">500 <span>cr</span></div><div class="p-lbl">500 Credits</div><div class="p-price">$5</div><div class="p-per">1¢ per lead · Valid 7 days</div><ul class="p-feats"><li>500 scraping credits</li><li>Valid for 7 days</li><li>All 8 data columns</li><li>Email auto-finder</li><li>Buy again when credits expire</li></ul><a href="payment/?pack=credits500" class="btn-p">Buy Credits →</a></div>
+    </div>
+    <!-- scarcity bar -->
+    <div class="scarcity-bar rev">
+      <div class="sc-left">
+        <span class="sc-dot"></span>
+        <span class="sc-text">🔥 Only <strong id="packsLeft">100</strong> packs left at this price</span>
+      </div>
+      <div class="sc-bar-wrap"><div class="sc-bar-fill" id="scBarFill" style="width:100%"></div></div>
+    </div>
+    <!-- recent purchases -->
+    <div class="recent-buys rev">
+      <div class="rb-header"><span class="rb-live"></span> Recent purchases</div>
+      <div class="rb-list" id="rbList"></div>
     </div>
   </div>
 </section>
@@ -646,7 +686,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
     <div class="rev"><div class="sk">FAQ</div><h2 class="sh">Common <em>questions</em></h2></div>
     <div class="faq-wrap rev">
       <div class="faq-item op"><div class="faq-q"><span>What is a credit and when is it deducted?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">One credit = one successfully scraped Maps listing. Credits are only deducted for successfully scraped results — if a listing fails, no credit is spent.</div></div></div>
-      <div class="faq-item"><div class="faq-q"><span>Do credits expire?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">Never. Credits are stored locally in your browser with no expiry date. Buy once and use at your own pace — whether that's today or a year from now.</div></div></div>
+      <div class="faq-item"><div class="faq-q"><span>Do credits expire?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">Your 25 free starter credits never expire. Purchased credit packs (500 credits for $5) are valid for <strong>7 days</strong> from the moment of purchase. After 7 days any remaining credits reset and you can buy a fresh pack.</div></div></div>
       <div class="faq-item"><div class="faq-q"><span>Which browsers are supported?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">The extension works on all Chromium-based browsers: <strong>Chrome, Edge, Brave and Opera</strong>. Firefox support is in development.</div></div></div>
       <div class="faq-item"><div class="faq-q"><span>How accurate is the email finder?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">The scraper visits each business website and contact/about pages, extracting emails via regex. Typical hit rates are 40–65% depending on niche and city.</div></div></div>
       <div class="faq-item"><div class="faq-q"><span>How do I activate credits after purchasing?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">After payment you'll receive activation instructions for your selected method. Paddle customers continue through hosted checkout, and Pakistan bank or Sadapay payments are confirmed manually before credits are issued.</div></div></div>
@@ -1350,6 +1390,117 @@ function animCounter(el, target, duration=1400) {
   };
   requestAnimationFrame(step);
 }
+
+// ══════════════════════════════════════════════════════
+//  SCARCITY + LIVE PURCHASE SOCIAL PROOF
+// ══════════════════════════════════════════════════════
+(function(){
+  /* ── data pools ── */
+  const BUYERS = [
+    {name:'Alex M.',city:'New York',flag:'🇺🇸'},{name:'Sarah K.',city:'London',flag:'🇬🇧'},
+    {name:'Marco R.',city:'Milan',flag:'🇮🇹'},{name:'Priya S.',city:'Mumbai',flag:'🇮🇳'},
+    {name:'James T.',city:'Sydney',flag:'🇦🇺'},{name:'Lena B.',city:'Berlin',flag:'🇩🇪'},
+    {name:'Carlos G.',city:'Madrid',flag:'🇪🇸'},{name:'Yuki N.',city:'Tokyo',flag:'🇯🇵'},
+    {name:'Fatima Z.',city:'Dubai',flag:'🇦🇪'},{name:'David L.',city:'Toronto',flag:'🇨🇦'},
+    {name:'Nina P.',city:'Paris',flag:'🇫🇷'},{name:'Ahmed H.',city:'Cairo',flag:'🇪🇬'},
+    {name:'Lisa W.',city:'Chicago',flag:'🇺🇸'},{name:'Raj P.',city:'Bangalore',flag:'🇮🇳'},
+    {name:'Emma J.',city:'Amsterdam',flag:'🇳🇱'},{name:'Oscar F.',city:'Mexico City',flag:'🇲🇽'},
+    {name:'Chloe D.',city:'Melbourne',flag:'🇦🇺'},{name:'Tom H.',city:'San Francisco',flag:'🇺🇸'},
+    {name:'Mia S.',city:'Stockholm',flag:'🇸🇪'},{name:'Leo K.',city:'Seoul',flag:'🇰🇷'},
+    {name:'Anna V.',city:'Warsaw',flag:'🇵🇱'},{name:'Chen W.',city:'Singapore',flag:'🇸🇬'},
+    {name:'Sofia R.',city:'São Paulo',flag:'🇧🇷'},{name:'Jake M.',city:'Austin',flag:'🇺🇸'},
+    {name:'Olivia N.',city:'Dublin',flag:'🇮🇪'},{name:'Hassan A.',city:'Istanbul',flag:'🇹🇷'},
+  ];
+  const TIMES = ['just now','1 min ago','2 min ago','3 min ago','5 min ago','8 min ago',
+    '12 min ago','18 min ago','25 min ago','34 min ago','42 min ago','1 hr ago','2 hr ago'];
+
+  function pick(arr){return arr[Math.floor(Math.random()*arr.length)];}
+  function pickUnique(arr,n){const s=[...arr];for(let i=s.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[s[i],s[j]]=[s[j],s[i]];}return s.slice(0,n);}
+
+  /* ── packs-left counter ── */
+  var STORAGE_KEY = 'mls_packs_left';
+  var STORAGE_TS  = 'mls_packs_ts';
+  var packsLeft = 100;
+  (function initPacks(){
+    var saved = localStorage.getItem(STORAGE_KEY);
+    var ts    = localStorage.getItem(STORAGE_TS);
+    // Reset every 6 hours so returning visitors see a fresh count
+    if(saved && ts && (Date.now()-parseInt(ts,10)) < 6*60*60*1000){
+      packsLeft = parseInt(saved,10);
+    } else {
+      packsLeft = 82 + Math.floor(Math.random()*19); // 82-100
+      localStorage.setItem(STORAGE_TS, Date.now());
+    }
+    renderCount();
+  })();
+
+  function renderCount(){
+    var el = document.getElementById('packsLeft');
+    var bar = document.getElementById('scBarFill');
+    if(el) el.textContent = packsLeft;
+    if(bar) bar.style.width = Math.max(8, packsLeft) + '%';
+    localStorage.setItem(STORAGE_KEY, packsLeft);
+  }
+
+  function decrementPack(){
+    if(packsLeft > 12){
+      packsLeft -= (Math.random()<0.3 ? 2 : 1);
+      renderCount();
+    }
+  }
+
+  /* ── recent purchases list (static on load) ── */
+  var rbList = document.getElementById('rbList');
+  if(rbList){
+    var initBuyers = pickUnique(BUYERS, 5);
+    initBuyers.forEach(function(b, i){
+      var t = TIMES[i+2] || TIMES[i]; // offset so first isn't 'just now'
+      rbList.innerHTML += '<div class="rb-item"><div class="rb-avatar">'+b.flag+'</div><div class="rb-info"><div class="rb-name">'+b.name+' bought <span class="rb-pack">500 Credits</span></div><div class="rb-meta">'+b.city+' · '+t+'</div></div></div>';
+    });
+  }
+
+  /* ── floating toast (pops in every 15-35s) ── */
+  var toast = document.createElement('div');
+  toast.className = 'purchase-toast';
+  toast.innerHTML = '<div class="pt-ico">🎉</div><div class="pt-body"><div class="pt-title"></div><div class="pt-sub"></div></div><button class="pt-close" aria-label="Close">×</button>';
+  document.body.appendChild(toast);
+  toast.querySelector('.pt-close').addEventListener('click',function(){ toast.classList.remove('show'); });
+
+  var toastUsed = [];
+  function showToast(){
+    var pool = BUYERS.filter(function(b){return toastUsed.indexOf(b.name)===-1;});
+    if(pool.length < 3) toastUsed = [];
+    if(!pool.length) pool = BUYERS;
+    var b = pick(pool);
+    toastUsed.push(b.name);
+    toast.querySelector('.pt-title').innerHTML = b.flag + ' <strong>' + b.name + '</strong> bought 500 Credits';
+    toast.querySelector('.pt-sub').textContent = b.city + ' · just now';
+    toast.classList.add('show');
+    decrementPack();
+    // Also prepend to the list
+    if(rbList){
+      var div = document.createElement('div');
+      div.className = 'rb-item';
+      div.style.opacity = '0'; div.style.transform = 'translateY(-8px)';
+      div.innerHTML = '<div class="rb-avatar">'+b.flag+'</div><div class="rb-info"><div class="rb-name">'+b.name+' bought <span class="rb-pack">500 Credits</span></div><div class="rb-meta">'+b.city+' · just now</div></div>';
+      rbList.insertBefore(div, rbList.firstChild);
+      requestAnimationFrame(function(){ div.style.transition='opacity .4s,transform .4s'; div.style.opacity='1'; div.style.transform='translateY(0)'; });
+      // keep max 6 items
+      while(rbList.children.length > 6) rbList.removeChild(rbList.lastChild);
+      // age up previous items
+      Array.from(rbList.querySelectorAll('.rb-meta')).forEach(function(m,i){
+        if(i>0) m.textContent = m.textContent.replace(/just now|[\d]+ min ago/, TIMES[i]||TIMES[TIMES.length-1]);
+      });
+    }
+    setTimeout(function(){ toast.classList.remove('show'); }, 5500);
+  }
+
+  // First toast after 8-14s, then every 15-35s
+  setTimeout(function(){
+    showToast();
+    setInterval(function(){ showToast(); }, (15 + Math.floor(Math.random()*20)) * 1000);
+  }, (8 + Math.floor(Math.random()*6)) * 1000);
+})();
 </script>
 </body>
 </html>
