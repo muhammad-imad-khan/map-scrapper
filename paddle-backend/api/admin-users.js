@@ -1,0 +1,164 @@
+// GET /api/admin-users
+// Secure admin endpoint to paginate through auth users and install subscriptions.
+// Query:
+//   type=users|installs (default: users)
+//   cursor=<redis-scan-cursor> (default: 0)
+//   limit=<1..200> (default: 50)
+// Auth:
+//   X-Admin-Key: <ADMIN_API_KEY>
+//   or Authorization: Bearer <ADMIN_API_KEY>
+const { cors, getRedis, keys } = require('./_helpers');
+
+const MAX_LIMIT = 200;
+const DEFAULT_LIMIT = 50;
+
+function getAdminKey(req) {
+  const fromHeader = (req.headers['x-admin-key'] || '').toString().trim();
+  if (fromHeader) return fromHeader;
+
+  const auth = (req.headers.authorization || '').toString();
+  if (auth.toLowerCase().startsWith('bearer ')) {
+    return auth.slice(7).trim();
+  }
+  return '';
+}
+
+function parseLimit(raw) {
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return DEFAULT_LIMIT;
+  return Math.min(MAX_LIMIT, Math.max(1, Math.floor(n)));
+}
+
+function asIsoTimestamp(ms) {
+  if (!ms) return null;
+  const n = Number(ms);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  return new Date(n).toISOString();
+}
+
+function safeParse(json) {
+  try {
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
+
+async function listUsers(redis, cursor, limit) {
+  const [nextCursor, foundKeys] = await redis.scan(cursor, 'MATCH', 'user:*', 'COUNT', limit);
+  const pipe = redis.pipeline();
+  foundKeys.forEach((k) => pipe.get(k));
+  const results = await pipe.exec();
+
+  const items = [];
+  for (let i = 0; i < foundKeys.length; i++) {
+    const err = results[i] && results[i][0];
+    const raw = results[i] && results[i][1];
+    if (err || !raw) continue;
+
+    const user = safeParse(raw);
+    if (!user || !user.email) continue;
+
+    items.push({
+      email: user.email,
+      name: user.name || null,
+      createdAt: user.createdAt || null,
+      purchasesCount: Array.isArray(user.purchases) ? user.purchases.length : 0,
+    });
+  }
+
+  return {
+    type: 'users',
+    cursor: nextCursor,
+    hasMore: nextCursor !== '0',
+    count: items.length,
+    items,
+  };
+}
+
+async function listInstalls(redis, cursor, limit) {
+  const [nextCursor, installKeys] = await redis.scan(cursor, 'MATCH', 'install:*', 'COUNT', limit);
+  const ids = installKeys.map((k) => k.slice('install:'.length));
+
+  const pipe = redis.pipeline();
+  for (const id of ids) {
+    pipe.get(keys.install(id));
+    pipe.get(keys.credits(id));
+    pipe.get(keys.expiry(id));
+    pipe.llen(keys.txnLog(id));
+    pipe.lindex(keys.txnLog(id), -1);
+  }
+  const rows = await pipe.exec();
+
+  const now = Date.now();
+  const items = [];
+  for (let i = 0; i < ids.length; i++) {
+    const base = i * 5;
+    const installRaw = rows[base] && rows[base][1];
+    const creditsRaw = rows[base + 1] && rows[base + 1][1];
+    const expiryRaw = rows[base + 2] && rows[base + 2][1];
+    const txnCountRaw = rows[base + 3] && rows[base + 3][1];
+    const lastTxnRaw = rows[base + 4] && rows[base + 4][1];
+
+    const install = installRaw ? safeParse(installRaw) : null;
+    const lastTxn = lastTxnRaw ? safeParse(lastTxnRaw) : null;
+    const expiryMs = expiryRaw ? Number(expiryRaw) : null;
+    const txnCount = Number(txnCountRaw || 0);
+
+    items.push({
+      installId: ids[i],
+      createdAt: install && install.createdAt ? install.createdAt : null,
+      credits: creditsRaw === null ? null : Number(creditsRaw),
+      expiresAt: asIsoTimestamp(expiryMs),
+      subscriptionActive: Boolean(expiryMs && expiryMs > now),
+      txnCount,
+      lastTxnAt: lastTxn && lastTxn.at ? lastTxn.at : null,
+      lastTxnReason: lastTxn && lastTxn.reason ? lastTxn.reason : null,
+    });
+  }
+
+  return {
+    type: 'installs',
+    cursor: nextCursor,
+    hasMore: nextCursor !== '0',
+    count: items.length,
+    items,
+  };
+}
+
+module.exports = async function handler(req, res) {
+  cors(res);
+  if (req.method === 'OPTIONS') return res.status(204).end();
+  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+
+  const configuredAdminKey = (process.env.ADMIN_API_KEY || '').trim();
+  if (!configuredAdminKey) {
+    return res.status(500).json({ error: 'ADMIN_API_KEY is not configured.' });
+  }
+
+  const requestAdminKey = getAdminKey(req);
+  if (!requestAdminKey || requestAdminKey !== configuredAdminKey) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const redis = getRedis();
+  const query = req.query || {};
+  const type = (query.type || 'users').toString().toLowerCase();
+  const cursor = (query.cursor || '0').toString();
+  const limit = parseLimit(query.limit);
+
+  if (type !== 'users' && type !== 'installs') {
+    return res.status(400).json({ error: 'Invalid type. Use users or installs.' });
+  }
+
+  try {
+    const payload = type === 'users'
+      ? await listUsers(redis, cursor, limit)
+      : await listInstalls(redis, cursor, limit);
+
+    return res.status(200).json(payload);
+  } catch (err) {
+    console.error('admin-users error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
