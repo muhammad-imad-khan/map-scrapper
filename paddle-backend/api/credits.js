@@ -24,6 +24,7 @@ module.exports = async function handler(req, res) {
         installId,
         expired: result.expired,
         expiresAt: result.expiresAt,
+        tier: result.tier,
       });
     } catch (err) {
       console.error('Credits GET error:', err);
@@ -50,7 +51,7 @@ module.exports = async function handler(req, res) {
       if (newBal < 0) {
         return res.status(402).json({ error: 'Insufficient credits', credits: current.credits || 0 });
       }
-      return res.status(200).json({ credits: newBal, deducted: cost, expiresAt: current.expiresAt });
+      return res.status(200).json({ credits: newBal, deducted: cost, expiresAt: current.expiresAt, tier: current.tier });
     } catch (err) {
       console.error('Credits POST error:', err);
       return res.status(500).json({ error: 'Internal server error' });

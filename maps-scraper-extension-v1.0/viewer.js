@@ -70,8 +70,8 @@ async function loadData() {
 
 // ── Build CSV from rows (fallback) ─────────────────────
 function buildCSV(rows) {
-  const COLS  = ['Name','Website','Email','Rating','Opening Hours','Phone','Address','Category'];
-  const FIELD = { Name:'name',Website:'website',Email:'email',Rating:'rating',
+  const COLS  = ['Name','Website','Email','Social Media','Rating','Opening Hours','Phone','Address','Category'];
+  const FIELD = { Name:'name',Website:'website',Email:'email','Social Media':'socials',Rating:'rating',
     'Opening Hours':'hours',Phone:'phone',Address:'address',Category:'category' };
   const esc = v => `"${String(v||'N/A').replace(/"/g,'""')}"`;
   return [COLS.join(','), ...rows.map(r => COLS.map(c=>esc(r[FIELD[c]])).join(','))].join('\r\n');
@@ -81,7 +81,7 @@ function buildCSV(rows) {
 function renderTable() {
   tbody.innerHTML = '';
   if (filteredRows.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--m);font-size:13px">No results match your filter.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--m);font-size:13px">No results match your filter.</td></tr>`;
     return;
   }
 
@@ -91,6 +91,7 @@ function renderTable() {
     const hasPhone   = r.phone   && r.phone   !== 'N/A';
     const hasHours   = r.hours   && r.hours   !== 'N/A';
     const hasAddr    = r.address && r.address !== 'N/A';
+    const hasSocials = r.socials && r.socials !== 'N/A';
     const ratingNum  = parseFloat(r.rating);
     const stars      = !isNaN(ratingNum) ? '★'.repeat(Math.round(ratingNum)).padEnd(5,'☆') : '';
 
@@ -109,6 +110,9 @@ function renderTable() {
         ${hasEmail
           ? `<a href="mailto:${esc(r.email)}" title="${esc(r.email)}">${esc(trunc(r.email, 28))}</a>`
           : '<span class="no">—</span>'}
+      </td>
+      <td class="cell-social" title="${esc(r.socials)}">
+        ${hasSocials ? esc(trunc(r.socials, 30)) : '<span class="no">—</span>'}
       </td>
       <td class="cell-web">
         ${hasWebsite
@@ -141,7 +145,7 @@ function applyFilters() {
   if (searchQuery) {
     const q = searchQuery.toLowerCase();
     rows = rows.filter(r =>
-      [r.name, r.email, r.address, r.category, r.phone]
+      [r.name, r.email, r.address, r.category, r.phone, r.socials]
         .some(v => v && v.toLowerCase().includes(q))
     );
   }

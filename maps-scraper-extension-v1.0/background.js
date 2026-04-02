@@ -3,7 +3,8 @@
 //  Monetization: SERVER-SIDE CREDIT SYSTEM (Paddle + Redis)
 //  • New installs: 25 free starter credits (server-granted)
 //  • Each scraped result costs 1 credit (server-deducted)
-//  • Packs: $5 for 500 credits (one-time, expires in 7 days)
+//  • Pro:        500 cr / $10  — basic + emails
+//  • Enterprise: 1000 cr / $25 — basic + emails + social media
 //  • Each install has a unique installId (UUID) for RLS
 // ═══════════════════════════════════════════════════════════
 
@@ -11,7 +12,8 @@
 const BACKEND_URL = 'https://map-scraper-paddle-backend.vercel.app';
 
 const CREDIT_PACKS = [
-    { id: 'pri_01kkwtx0kh2skzrzjbxgmgqngd', label: '500 Credits', credits: 500, price: '$5', popular: true },
+    { id: 'pri_01kkwtx0kh2skzrzjbxgmgqngd', label: 'Pro Pack',        credits: 500,  price: '$10', tier: 'pro',        popular: true },
+    { id: 'pri_enterprise_placeholder',      label: 'Enterprise Pack',  credits: 1000, price: '$25', tier: 'enterprise', popular: false },
 ];
 const COST_PER_RESULT = 1;
 
@@ -88,6 +90,7 @@ async function getCredits() {
       credits: data.credits,
       expiresAt: data.expiresAt || null,
       expired: data.expired || false,
+      tier: data.tier || 'free',
     });
     return data.credits;
   } catch {
@@ -202,7 +205,8 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
 
       case 'GET_STATE': {
         const credits = await getCredits();
-        sendResponse({ ...state, credits, packs: CREDIT_PACKS, costPerResult: COST_PER_RESULT });
+        const tier = await new Promise(r => chrome.storage.local.get(['tier'], d => r(d.tier || 'free')));
+        sendResponse({ ...state, credits, tier, packs: CREDIT_PACKS, costPerResult: COST_PER_RESULT });
         break;
       }
 
@@ -278,6 +282,9 @@ async function runScraper(query, requestedMax, startCredits) {
   const maxAffordable = Math.floor(startCredits / COST_PER_RESULT);
   const maxResults    = Math.min(requestedMax, maxAffordable);
 
+  // Get user tier for feature gating
+  const userTier = await new Promise(r => chrome.storage.local.get(['tier'], d => r(d.tier || 'free')));
+
   state = {
     running: true, results: [], progress: 0, total: 0,
     status: 'Opening Google Maps…', tabId: null,
@@ -350,11 +357,18 @@ async function runScraper(query, requestedMax, startCredits) {
           break;
         }
 
-        // Fetch email from business website
+        // Tier-gated: fetch email + socials from business website
         if (data.website && data.website !== 'N/A') {
-          state.status = `Finding email for "${data.name}"…`;
-          broadcast('STATE', state);
-          data.email = await fetchEmail(data.website);
+          if (userTier === 'pro' || userTier === 'enterprise') {
+            state.status = `Finding email for "${data.name}"…`;
+            broadcast('STATE', state);
+            const webData = await fetchWebsiteData(data.website, userTier === 'enterprise');
+            data.email = webData.email;
+            data.socials = webData.socials;
+          } else {
+            data.email = 'N/A';
+            data.socials = 'N/A';
+          }
         }
 
         const newCredits = await getCredits();
@@ -425,38 +439,82 @@ function extractDetails() {
     const el = $('[data-item-id="oh"]');
     if (el) hours = el.textContent.trim().replace(/\s+/g, ' ');
   }
-  return { name, rating, website, email: 'N/A', phone, address, hours, category };
+  return { name, rating, website, email: 'N/A', phone, address, hours, category, socials: 'N/A' };
 }
 
-// ── Email fetcher ──────────────────────────────────────────
+// ── Website data fetcher (email + social media) ────────────
 
-async function fetchEmail(url) {
+async function fetchWebsiteData(url, includeSocials) {
   const BL = ['example','domain','sentry','wixpress','schema','noreply','@2x','.png','.jpg','.svg'];
-  const re = /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g;
+  const emailRe = /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g;
+  const SOCIAL_PATTERNS = [
+    { name: 'facebook',  re: /https?:\/\/(?:www\.)?facebook\.com\/[^\s"'<>)]+/gi },
+    { name: 'instagram', re: /https?:\/\/(?:www\.)?instagram\.com\/[^\s"'<>)]+/gi },
+    { name: 'twitter',   re: /https?:\/\/(?:www\.)?(?:twitter\.com|x\.com)\/[^\s"'<>)]+/gi },
+    { name: 'linkedin',  re: /https?:\/\/(?:www\.)?linkedin\.com\/(?:company|in)\/[^\s"'<>)]+/gi },
+    { name: 'youtube',   re: /https?:\/\/(?:www\.)?youtube\.com\/(?:@|channel\/|c\/)[^\s"'<>)]+/gi },
+    { name: 'tiktok',    re: /https?:\/\/(?:www\.)?tiktok\.com\/@[^\s"'<>)]+/gi },
+  ];
+
+  function extractFromHtml(html) {
+    let email = 'N/A';
+    const emails = html.match(emailRe) || [];
+    const validEmail = emails.find(e => !BL.some(b => e.toLowerCase().includes(b)));
+    if (validEmail) email = validEmail;
+
+    let socials = 'N/A';
+    if (includeSocials) {
+      const found = [];
+      for (const sp of SOCIAL_PATTERNS) {
+        const matches = html.match(sp.re);
+        if (matches && matches.length) {
+          // Take the first unique match, clean trailing slashes/fragments
+          const cleaned = matches[0].replace(/[/]+$/, '').split('?')[0].split('#')[0];
+          found.push(cleaned);
+        }
+      }
+      if (found.length) socials = found.join(' | ');
+    }
+    return { email, socials };
+  }
+
   try {
     const ctrl = new AbortController();
     setTimeout(() => ctrl.abort(), 9000);
+
     const res  = await fetch(url, { signal: ctrl.signal });
     const html = await res.text();
-    const m    = html.match(re) || [];
-    const e    = m.find(e => !BL.some(b => e.toLowerCase().includes(b)));
-    if (e) return e;
-    try {
-      const cr  = await fetch(new URL(url).origin + '/contact', { signal: ctrl.signal });
-      const ch  = await cr.text();
-      const cm  = ch.match(re) || [];
-      const ce  = cm.find(e => !BL.some(b => e.toLowerCase().includes(b)));
-      if (ce) return ce;
-    } catch {}
-    return 'N/A';
-  } catch { return 'N/A'; }
+    const result = extractFromHtml(html);
+
+    // If email not found on main page, try /contact
+    if (result.email === 'N/A') {
+      try {
+        const cr = await fetch(new URL(url).origin + '/contact', { signal: ctrl.signal });
+        const ch = await cr.text();
+        const contactResult = extractFromHtml(ch);
+        if (contactResult.email !== 'N/A') result.email = contactResult.email;
+        // Merge socials from contact page too
+        if (includeSocials && contactResult.socials !== 'N/A') {
+          if (result.socials === 'N/A') result.socials = contactResult.socials;
+          else {
+            const existing = new Set(result.socials.split(' | '));
+            contactResult.socials.split(' | ').forEach(s => existing.add(s));
+            result.socials = [...existing].join(' | ');
+          }
+        }
+      } catch {}
+    }
+    return result;
+  } catch {
+    return { email: 'N/A', socials: 'N/A' };
+  }
 }
 
 // ── Auto Export & Open Viewer ──────────────────────────────
 
 function resultsToCSV(rows) {
-  const COLS  = ['Name','Website','Email','Rating','Opening Hours','Phone','Address','Category'];
-  const FIELD = { Name:'name',Website:'website',Email:'email',Rating:'rating',
+  const COLS  = ['Name','Website','Email','Social Media','Rating','Opening Hours','Phone','Address','Category'];
+  const FIELD = { Name:'name',Website:'website',Email:'email','Social Media':'socials',Rating:'rating',
                   'Opening Hours':'hours',Phone:'phone',Address:'address',Category:'category' };
   const escape = v => `"${String(v||'N/A').replace(/"/g,'""')}"`;
   return [

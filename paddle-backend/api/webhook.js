@@ -74,6 +74,7 @@ module.exports = async function handler(req, res) {
     // ── Calculate credits to add ──
     let totalCredits = 0;
     let label = 'Credit Pack';
+    let tier = null;
 
     for (const item of items) {
       const priceId = item?.price?.id;
@@ -81,6 +82,9 @@ module.exports = async function handler(req, res) {
       if (match) {
         totalCredits += match.credits * (item.quantity || 1);
         label = match.label;
+        // Use highest tier from items
+        const rank = { free: 0, pro: 1, enterprise: 2 };
+        if (!tier || (rank[match.tier] || 0) > (rank[tier] || 0)) tier = match.tier;
       }
     }
 
@@ -89,8 +93,8 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ received: true, warning: 'No matching prices' });
     }
 
-    // ── Credit the user's account (atomic + set 7-day expiry) ──
-    const result = await addCredits(installId, totalCredits, `purchase:${txnId}:${label}`);
+    // ── Credit the user's account (atomic + set 7-day expiry + tier) ──
+    const result = await addCredits(installId, totalCredits, `purchase:${txnId}:${label}`, tier);
 
     // ── Mark transaction as processed (dedup key, expires in 30 days) ──
     await redis.set(keys.txnDedup(txnId), JSON.stringify({
@@ -99,13 +103,14 @@ module.exports = async function handler(req, res) {
       processedAt: new Date().toISOString(),
     }), 'EX', 60 * 60 * 24 * 30);
 
-    console.log(`Auto-credited ${totalCredits} credits to ${installId} (txn: ${txnId}). New balance: ${result.newBalance}, expires: ${new Date(result.expiresAt).toISOString()}`);
+    console.log(`Auto-credited ${totalCredits} credits to ${installId} (txn: ${txnId}). Balance: ${result.newBalance}, tier: ${result.tier}, expires: ${new Date(result.expiresAt).toISOString()}`);
 
     return res.status(200).json({
       received: true,
       credited: totalCredits,
       newBalance: result.newBalance,
       expiresAt: result.expiresAt,
+      tier: result.tier,
       installId,
     });
   } catch (err) {
