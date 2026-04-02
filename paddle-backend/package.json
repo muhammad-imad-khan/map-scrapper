@@ -1,0 +1,13 @@
+{
+  "name": "map-scraper-paddle-backend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "ioredis": "^5.10.1"
+  }
+}

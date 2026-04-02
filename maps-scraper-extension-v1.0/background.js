@@ -1,24 +1,21 @@
 // ═══════════════════════════════════════════════════════════
 //  Maps Lead Scraper v2 — Background Service Worker
-//  Monetization: CREDIT SYSTEM (Paddle)
-//  • New installs: 25 free starter credits
-//  • Each scraped result costs 1 credit
-//  • Packs: 100 / 500 / 1000 credits — payments via Paddle
+//  Monetization: SERVER-SIDE CREDIT SYSTEM (Paddle + Redis)
+//  • New installs: 25 free starter credits (server-granted)
+//  • Each scraped result costs 1 credit (server-deducted)
+//  • Packs: 100 / 500 / 1000 credits — Paddle auto-credits on payment
+//  • Each install has a unique installId (UUID) for RLS
 // ═══════════════════════════════════════════════════════════
 
-// ── PADDLE CONFIG ────────────────────────────────────────────
-// Set BACKEND_URL to your deployed Vercel/Railway backend URL
-const BACKEND_URL = 'https://map-scraper-paddle-backend.vercel.app'; // ← replace after deploy
+// ── CONFIG ───────────────────────────────────────────────────
+const BACKEND_URL = 'https://map-scraper-paddle-backend.vercel.app';
 
-// Paddle Price IDs — replace with your actual IDs from Paddle Dashboard
-// Catalog → Products → your product → Prices → copy ID (starts with pri_)
 const CREDIT_PACKS = [
-    { id: 'pri_01kkwtvthhty0fks2hrc68cb52',  label: '100 Credits', credits: 100,  price: '$5',  popular: false },
-    { id: 'pri_01kkwtx0kh2skzrzjbxgmgqngd',  label: '500 Credits', credits: 500,  price: '$19', popular: true  },
-    { id: 'pri_01kkwtyfwvrwspy654f56h4n5d', label: '1000 Credits',credits: 1000, price: '$35', popular: false },
+    { id: 'pri_01kn6xewj4wfxtrmaxt3brqsz1',  label: '100 Credits', credits: 100,  price: '$5',  popular: false },
+    { id: 'pri_01kn6xj1tz636cpv1rz1yw6vh5',  label: '500 Credits', credits: 500,  price: '$19', popular: true  },
+    { id: 'pri_01kn6xxp2w6zhgch7wvvmvng9v', label: '1000 Credits',credits: 1000, price: '$35', popular: false },
 ];
-const FREE_STARTER_CREDITS = 25;
-const COST_PER_RESULT      = 1;
+const COST_PER_RESULT = 1;
 
 // ─────────────────────────────────────────────────────────
 
@@ -55,23 +52,52 @@ async function exec(tabId, fn, args = []) {
   } catch { return null; }
 }
 
-// ── Credit storage ─────────────────────────────────────────
+// ── Install ID (unique per browser install, used as RLS key) ──
 
-async function getCredits() {
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+  });
+}
+
+async function getInstallId() {
   return new Promise(resolve => {
-    chrome.storage.local.get(['credits', 'installed'], data => {
-      // First install: grant starter credits
-      if (data.installed === undefined) {
-        chrome.storage.local.set({ credits: FREE_STARTER_CREDITS, installed: true });
-        resolve(FREE_STARTER_CREDITS);
+    chrome.storage.local.get(['installId'], data => {
+      if (data.installId) {
+        resolve(data.installId);
       } else {
-        resolve(data.credits || 0);
+        const id = generateUUID();
+        chrome.storage.local.set({ installId: id });
+        resolve(id);
       }
     });
   });
 }
 
+// ── Server-side credit operations ──────────────────────────
+
+async function getCredits() {
+  try {
+    const installId = await getInstallId();
+    const res = await fetch(`${BACKEND_URL}/api/credits?installId=${installId}`, {
+      headers: { 'X-Install-Id': installId },
+    });
+    if (!res.ok) throw new Error('Server error');
+    const data = await res.json();
+    // Cache locally for offline display
+    await chrome.storage.local.set({ credits: data.credits });
+    return data.credits;
+  } catch {
+    // Fallback to cached value if offline
+    return new Promise(resolve => {
+      chrome.storage.local.get(['credits'], d => resolve(d.credits || 0));
+    });
+  }
+}
+
 async function setCredits(n) {
+  // Only update local cache — server is the source of truth
   const val = Math.max(0, n);
   await chrome.storage.local.set({ credits: val });
   broadcast('CREDITS_UPDATE', { credits: val });
@@ -79,15 +105,25 @@ async function setCredits(n) {
 }
 
 async function deductCredit() {
-  const cur = await getCredits();
-  if (cur < COST_PER_RESULT) return false;
-  await setCredits(cur - COST_PER_RESULT);
-  return true;
+  try {
+    const installId = await getInstallId();
+    const res = await fetch(`${BACKEND_URL}/api/credits`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Install-Id': installId },
+      body: JSON.stringify({ amount: COST_PER_RESULT }),
+    });
+    if (res.status === 402) return false; // Insufficient credits
+    if (!res.ok) return false;
+    const data = await res.json();
+    await chrome.storage.local.set({ credits: data.credits });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
-// ── License / credit pack redemption ──────────────────────
+// ── License / credit pack redemption (kept for manual codes) ──
 
-// ── Paddle license verification (calls our secure backend) ─────
 async function verifyLicense(key) {
   if (!key || key.length < 8) return false;
   try {
@@ -100,8 +136,6 @@ async function verifyLicense(key) {
     const data = await res.json();
     return data.valid === true ? data : false;
   } catch {
-    // Dev fallback only — remove in production
-    if (key.startsWith('TEST-') && key.length >= 12) return { valid:true, credits:100, label:'Test Pack' };
     return false;
   }
 }
@@ -124,8 +158,8 @@ async function redeemCode(code) {
     usedCodes.push(code);
     await chrome.storage.local.set({ usedCodes });
 
-    const cur    = await getCredits();
-    const newBal = await setCredits(cur + amount);
+    // Sync from server to get updated balance
+    const newBal = await getCredits();
     return { ok: true, amount, newBalance: newBal, msg: `+${amount} credits added! (${result.label || 'Pack'})` };
 
   } catch (e) {
@@ -180,16 +214,16 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
         const pack = CREDIT_PACKS.find(p => p.id === msg.packId);
         if (!pack) { sendResponse({ ok: false }); break; }
         try {
+          const installId = await getInstallId();
           const res  = await fetch(`${BACKEND_URL}/api/checkout`, {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ priceId: pack.id }),
+            body:    JSON.stringify({ priceId: pack.id, installId }),
           });
           const data = await res.json();
           if (data.checkoutUrl) {
             chrome.tabs.create({ url: data.checkoutUrl });
           } else {
-            // Direct Paddle fallback if backend is unreachable
             chrome.tabs.create({ url: `https://buy.paddle.com/product/${pack.id}` });
           }
         } catch {
@@ -217,11 +251,16 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
         break;
       }
 
-      case 'ADD_CREDITS_DEV': {
-        // Dev/testing helper — remove in production
-        const cur = await getCredits();
-        const newBal = await setCredits(cur + (msg.amount || 25));
-        sendResponse({ ok: true, credits: newBal });
+      case 'SYNC_CREDITS': {
+        // Poll server for latest credit balance (e.g., after purchase)
+        const freshCredits = await getCredits();
+        sendResponse({ ok: true, credits: freshCredits });
+        break;
+      }
+
+      case 'GET_INSTALL_ID': {
+        const iid = await getInstallId();
+        sendResponse({ installId: iid });
         break;
       }
     }

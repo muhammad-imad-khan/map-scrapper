@@ -6,6 +6,9 @@
 <title>Payment — Maps Lead Scraper</title>
 <meta name="description" content="Review your selected credit pack, choose your country and currency, and complete payment for Maps Lead Scraper credits.">
 <meta name="theme-color" content="#06060c">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="128x128" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;0,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -115,6 +118,11 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
 @media(max-width:720px){.nav-links-wrap{display:none;position:fixed;top:64px;left:0;right:0;background:rgba(6,6,12,.98);border-bottom:1px solid var(--b);padding:20px 24px;flex-direction:column;align-items:flex-start;gap:16px;margin-left:0}.nav-links-wrap.open{display:flex}.nav-burger{display:flex;align-items:center}.panel{padding:22px}.page-sub{font-size:15px}}
 @media(max-width:520px){.container{padding:0 18px}.panel{border-radius:18px;padding:20px}.detail-row{flex-direction:column;align-items:flex-start}.detail-row strong{text-align:left}.footer-inner{flex-direction:column;text-align:center}.footer-links{justify-content:center}}
 </style>
+<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+<script>
+  Paddle.Environment.set('sandbox');
+  Paddle.Initialize({ token: 'test_72fcb1bf88e7b485d977abd74ac' });
+</script>
 </head>
 <body>
 <div class="bg-grid"></div>
@@ -308,9 +316,9 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
 'use strict';
 
 const PACKS = {
-  starter: { key:'starter', name:'Starter Pack', credits:100, usdPrice:'$5', perLead:'5¢ per lead', popular:false },
-  pro: { key:'pro', name:'Pro Pack', credits:500, usdPrice:'$19', perLead:'3.8¢ per lead', popular:true },
-  agency: { key:'agency', name:'Agency Pack', credits:1000, usdPrice:'$35', perLead:'3.5¢ per lead', popular:false },
+  starter: { key:'starter', name:'Starter Pack', credits:100, usdPrice:'$5', perLead:'5¢ per lead', popular:false, priceId:'pri_01kn6xewj4wfxtrmaxt3brqsz1' },
+  pro: { key:'pro', name:'Pro Pack', credits:500, usdPrice:'$19', perLead:'3.8¢ per lead', popular:true, priceId:'pri_01kn6xj1tz636cpv1rz1yw6vh5' },
+  agency: { key:'agency', name:'Agency Pack', credits:1000, usdPrice:'$35', perLead:'3.5¢ per lead', popular:false, priceId:'pri_01kn6xxp2w6zhgch7wvvmvng9v' },
 };
 
 const COUNTRY_DEFAULTS = {
@@ -342,6 +350,7 @@ const state = {
   country: 'Pakistan',
   currency: 'PKR',
   checkoutUrl: '',
+  installId: '',
 };
 
 function getParams() {
@@ -349,9 +358,11 @@ function getParams() {
   const pack = params.get('pack');
   const country = params.get('country');
   const currency = params.get('currency');
+  const installId = params.get('installId');
   if (pack && PACKS[pack]) state.pack = pack;
   if (country && COUNTRY_DEFAULTS[country]) state.country = country;
   if (currency) state.currency = currency.toUpperCase();
+  if (installId && /^[a-f0-9-]{36}$/i.test(installId)) state.installId = installId;
   if (!state.currency) state.currency = COUNTRY_DEFAULTS[state.country] || 'USD';
 }
 
@@ -404,24 +415,9 @@ function renderMethods() {
 }
 
 async function loadCheckoutUrl() {
-  checkoutStatus.className = 'checkout-status pending';
-  checkoutStatus.textContent = 'Loading checkout configuration…';
-  checkoutBtn.disabled = true;
-
-  try {
-    const response = await fetch(PAYMENT_CONFIG_URL, { headers: { 'Accept': 'application/json' } });
-    const data = await response.json();
-    if (!response.ok || !data.checkoutUrl) throw new Error(data.error || 'Checkout URL unavailable');
-    state.checkoutUrl = data.checkoutUrl;
-    checkoutStatus.className = 'checkout-status ready';
-    checkoutStatus.textContent = 'Checkout is ready. You will be taken to the hosted payment page.';
-    checkoutBtn.disabled = false;
-  } catch (error) {
-    state.checkoutUrl = '';
-    checkoutStatus.className = 'checkout-status error';
-    checkoutStatus.textContent = error.message || 'Unable to load checkout URL.';
-    checkoutBtn.disabled = true;
-  }
+  checkoutStatus.className = 'checkout-status ready';
+  checkoutStatus.textContent = 'Checkout is ready. Click below to open the secure payment overlay.';
+  checkoutBtn.disabled = false;
 }
 
 function render() {
@@ -447,8 +443,35 @@ currencySelect.addEventListener('change', () => {
 });
 
 checkoutBtn.addEventListener('click', () => {
-  if (!state.checkoutUrl) return;
-  window.location.href = state.checkoutUrl;
+  const pack = PACKS[state.pack];
+  if (!pack || !pack.priceId) return;
+  if (!state.installId) {
+    checkoutStatus.className = 'checkout-status error';
+    checkoutStatus.textContent = 'Missing install ID. Please open this page from the extension.';
+    return;
+  }
+  // Use backend API to create checkout with installId in custom_data
+  checkoutBtn.disabled = true;
+  checkoutStatus.className = 'checkout-status pending';
+  checkoutStatus.textContent = 'Creating checkout session...';
+  fetch('https://map-scraper-paddle-backend.vercel.app/api/checkout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ priceId: pack.priceId, installId: state.installId }),
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.checkoutUrl) {
+      window.location.href = data.checkoutUrl;
+    } else {
+      throw new Error(data.error || 'Could not create checkout');
+    }
+  })
+  .catch(err => {
+    checkoutStatus.className = 'checkout-status error';
+    checkoutStatus.textContent = err.message || 'Checkout failed';
+    checkoutBtn.disabled = false;
+  });
 });
 
 document.getElementById('navBurger').addEventListener('click', () => {
