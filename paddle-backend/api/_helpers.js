@@ -13,10 +13,9 @@ const PADDLE_API_KEY = process.env.PADDLE_API_KEY || '';
 const FREE_STARTER_CREDITS = 25;
 const CREDITS_EXPIRY_DAYS = 7;
 
-// Two paid tiers — each maps priceId → credits + tier label
+// Single pack: $5 for 500 credits, one-time, expires in 7 days
 const PRICE_CREDITS = {
-  [process.env.PRICE_PRO || 'pri_01kkwtx0kh2skzrzjbxgmgqngd']:        { credits: 500,  label: 'Pro Pack',        tier: 'pro' },
-  [process.env.PRICE_ENTERPRISE || 'pri_enterprise_placeholder']:       { credits: 1000, label: 'Enterprise Pack',  tier: 'enterprise' },
+  [process.env.PRICE_PACK || 'pri_01kkwtx0kh2skzrzjbxgmgqngd']: { credits: 500, label: '500 Credits' },
 };
 
 // ── Redis singleton ───────────────────────────────────────
@@ -37,7 +36,6 @@ function getRedis() {
 const keys = {
   credits:   (id) => `credits:${id}`,
   expiry:    (id) => `expiry:${id}`,
-  tier:      (id) => `tier:${id}`,
   txnLog:    (id) => `txnlog:${id}`,
   txnDedup:  (txnId) => `txn:${txnId}`,
   install:   (id) => `install:${id}`,
@@ -46,21 +44,18 @@ const keys = {
 // ── Credit operations (all server-side, atomic) ───────────
 async function getCredits(installId) {
   const redis = getRedis();
-  // Check expiry first — if expired, wipe credits and reset tier
+  // Check expiry first — if expired, wipe credits
   const expiry = await redis.get(keys.expiry(installId));
   if (expiry && Date.now() > parseInt(expiry, 10)) {
     await redis.set(keys.credits(installId), 0);
     await redis.del(keys.expiry(installId));
-    await redis.set(keys.tier(installId), 'free');
-    return { credits: 0, expired: true, expiresAt: null, tier: 'free' };
+    return { credits: 0, expired: true, expiresAt: null };
   }
   const val = await redis.get(keys.credits(installId));
-  const tier = await redis.get(keys.tier(installId)) || 'free';
   return {
     credits: val !== null ? parseInt(val, 10) : null,
     expired: false,
     expiresAt: expiry ? parseInt(expiry, 10) : null,
-    tier,
   };
 }
 
@@ -73,45 +68,32 @@ async function initUser(installId) {
     if (expiry && Date.now() > parseInt(expiry, 10)) {
       await redis.set(keys.credits(installId), 0);
       await redis.del(keys.expiry(installId));
-      await redis.set(keys.tier(installId), 'free');
-      return { credits: 0, expired: true, expiresAt: null, tier: 'free' };
+      return { credits: 0, expired: true, expiresAt: null };
     }
-    const tier = await redis.get(keys.tier(installId)) || 'free';
     return {
       credits: parseInt(existing, 10),
       expired: false,
       expiresAt: expiry ? parseInt(expiry, 10) : null,
-      tier,
     };
   }
   // New user: grant starter credits (no expiry on free credits)
   await redis.set(keys.credits(installId), FREE_STARTER_CREDITS);
-  await redis.set(keys.tier(installId), 'free');
   await redis.set(keys.install(installId), JSON.stringify({
     createdAt: new Date().toISOString(),
   }));
-  return { credits: FREE_STARTER_CREDITS, expired: false, expiresAt: null, tier: 'free' };
+  return { credits: FREE_STARTER_CREDITS, expired: false, expiresAt: null };
 }
 
-async function addCredits(installId, amount, reason, tier) {
+async function addCredits(installId, amount, reason) {
   const redis = getRedis();
   const newBal = await redis.incrby(keys.credits(installId), amount);
   // Set 7-day expiry from now (resets on each purchase)
   const expiresAt = Date.now() + CREDITS_EXPIRY_DAYS * 24 * 60 * 60 * 1000;
   await redis.set(keys.expiry(installId), expiresAt);
-  // Upgrade tier (only upward: free → pro → enterprise)
-  if (tier) {
-    const current = await redis.get(keys.tier(installId)) || 'free';
-    const rank = { free: 0, pro: 1, enterprise: 2 };
-    if ((rank[tier] || 0) >= (rank[current] || 0)) {
-      await redis.set(keys.tier(installId), tier);
-    }
-  }
-  const finalTier = await redis.get(keys.tier(installId)) || 'free';
   await redis.rpush(keys.txnLog(installId), JSON.stringify({
-    type: 'credit', amount, reason, balance: newBal, tier: finalTier, expiresAt, at: new Date().toISOString(),
+    type: 'credit', amount, reason, balance: newBal, expiresAt, at: new Date().toISOString(),
   }));
-  return { newBalance: newBal, expiresAt, tier: finalTier };
+  return { newBalance: newBal, expiresAt };
 }
 
 async function deductCredits(installId, amount) {

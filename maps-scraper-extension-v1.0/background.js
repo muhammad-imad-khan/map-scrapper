@@ -90,7 +90,6 @@ async function getCredits() {
       credits: data.credits,
       expiresAt: data.expiresAt || null,
       expired: data.expired || false,
-      tier: data.tier || 'free',
     });
     return data.credits;
   } catch {
@@ -205,8 +204,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
 
       case 'GET_STATE': {
         const credits = await getCredits();
-        const tier = await new Promise(r => chrome.storage.local.get(['tier'], d => r(d.tier || 'free')));
-        sendResponse({ ...state, credits, tier, packs: CREDIT_PACKS, costPerResult: COST_PER_RESULT });
+        sendResponse({ ...state, credits, packs: CREDIT_PACKS, costPerResult: COST_PER_RESULT });
         break;
       }
 
@@ -282,9 +280,6 @@ async function runScraper(query, requestedMax, startCredits) {
   const maxAffordable = Math.floor(startCredits / COST_PER_RESULT);
   const maxResults    = Math.min(requestedMax, maxAffordable);
 
-  // Get user tier for feature gating
-  const userTier = await new Promise(r => chrome.storage.local.get(['tier'], d => r(d.tier || 'free')));
-
   state = {
     running: true, results: [], progress: 0, total: 0,
     status: 'Opening Google Maps…', tabId: null,
@@ -357,18 +352,13 @@ async function runScraper(query, requestedMax, startCredits) {
           break;
         }
 
-        // Tier-gated: fetch email + socials from business website
+        // Fetch email + socials from business website
         if (data.website && data.website !== 'N/A') {
-          if (userTier === 'pro' || userTier === 'enterprise') {
             state.status = `Finding email for "${data.name}"…`;
             broadcast('STATE', state);
-            const webData = await fetchWebsiteData(data.website, userTier === 'enterprise');
+            const webData = await fetchWebsiteData(data.website, true);
             data.email = webData.email;
             data.socials = webData.socials;
-          } else {
-            data.email = 'N/A';
-            data.socials = 'N/A';
-          }
         }
 
         const newCredits = await getCredits();

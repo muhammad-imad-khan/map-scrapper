@@ -173,7 +173,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
         <div class="plan-summary">
           <div class="plan-hero">
             <div class="plan-label">Selected plan</div>
-            <div class="plan-name" id="planName">Pro Pack</div>
+            <div class="plan-name" id="planName">500 Credits</div>
             <div class="plan-meta">
               <span class="pill" id="planCredits">500 credits</span>
               <span class="pill" id="planPerLead">3.8¢ per lead</span>
@@ -190,7 +190,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
           <div class="plan-points">
             <div class="plan-point">Credits valid for 7 days after purchase.</div>
             <div class="plan-point">1 credit = 1 successfully scraped lead.</div>
-            <div class="plan-point">Pro: basic data + emails. Enterprise: + social media handles.</div>
+            <div class="plan-point">Includes emails + social media handles for every lead.</div>
           </div>
         </div>
       </section>
@@ -234,7 +234,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
           <div class="info-card">
             <h3>Selection snapshot</h3>
             <div class="detail-list">
-              <div class="detail-row"><span>Plan</span><strong id="summaryPlan">Pro Pack</strong></div>
+              <div class="detail-row"><span>Plan</span><strong id="summaryPlan">500 Credits</strong></div>
               <div class="detail-row"><span>Country</span><strong id="summaryCountry">Pakistan</strong></div>
               <div class="detail-row"><span>Currency</span><strong id="summaryCurrency">PKR</strong></div>
             </div>
@@ -265,7 +265,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
               <div class="detail-list">
                 <div class="detail-row"><span>Account name</span><strong>Imad Khan</strong></div>
                 <div class="detail-row"><span>Mobile</span><strong>+92 300 1234567</strong></div>
-                <div class="detail-row"><span>Reference</span><strong id="referenceCode">MLS-PRO-PKR</strong></div>
+                <div class="detail-row"><span>Reference</span><strong id="referenceCode">MLS-PACK-PKR</strong></div>
               </div>
               <div class="note">After transfer, share your payment proof with <a href="mailto:support@mapsleadscraper.com" style="color:#22c55e;text-decoration:none">support@mapsleadscraper.com</a> so your credits can be issued manually.</div>
             </div>
@@ -315,8 +315,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
 'use strict';
 
 const PACKS = {
-  pro:        { key:'pro',        name:'Pro Pack',        credits:500,  usdPrice:'$10', perLead:'2¢ per lead · Emails included', popular:true,  priceId:'pri_01kkwtx0kh2skzrzjbxgmgqngd', tier:'pro' },
-  enterprise: { key:'enterprise', name:'Enterprise Pack', credits:1000, usdPrice:'$25', perLead:'2.5¢ per lead · Emails + Socials', popular:false, priceId:'pri_enterprise_placeholder', tier:'enterprise' },
+  pack: { key:'pack', name:'500 Credits', credits:500, usdPrice:'$5', perLead:'1¢ per lead · Emails + Socials', popular:true, priceId:'pri_01kkwtx0kh2skzrzjbxgmgqngd' },
 };
 
 const COUNTRY_DEFAULTS = {
@@ -344,7 +343,7 @@ const checkoutBtn = document.getElementById('checkoutBtn');
 const checkoutStatus = document.getElementById('checkoutStatus');
 
 const state = {
-  pack: 'pro',
+  pack: 'pack',
   country: 'Pakistan',
   currency: 'PKR',
   checkoutUrl: '',

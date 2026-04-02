@@ -32,14 +32,12 @@ const ftrCredits        = document.getElementById('ftrCredits');
 let allResults = [];
 let isRunning  = false;
 let currentCredits = 0;
-let currentTier = 'free';
 let packs = [];
 
 // ── Init ──────────────────────────────────────────────
 chrome.runtime.sendMessage({ type: 'GET_STATE' }, res => {
   if (chrome.runtime.lastError || !res) return;
   currentCredits = res.credits || 0;
-  currentTier = res.tier || 'free';
   packs = res.packs || [];
   // Fetch expiry from local storage for display
   chrome.storage.local.get(['expiresAt'], d => {
@@ -147,16 +145,14 @@ btnExport.addEventListener('click', () => {
 // ── Pack cards ────────────────────────────────────────
 function renderPacks(packs) {
   packGrid.innerHTML = '';
-  const icons = { pro: '⚡', enterprise: '🚀' };
-  const descs = { pro: 'Emails included · Valid 7 days', enterprise: 'Emails + Social Media · Valid 7 days' };
   packs.forEach((p) => {
     const card = document.createElement('div');
     card.className = 'pack-card' + (p.popular ? ' popular' : '');
     card.innerHTML = `
-      <div class="pack-icon pi-p">${icons[p.tier] || '📦'}</div>
+      <div class="pack-icon pi-p">📦</div>
       <div class="pack-info">
         <div class="pack-name">${p.label}</div>
-        <div class="pack-desc">${descs[p.tier] || 'Valid 7 days'}</div>
+        <div class="pack-desc">Emails + Social Media · Valid 7 days</div>
       </div>
       <div class="pack-right">
         <div class="pack-price">${p.price}</div>
