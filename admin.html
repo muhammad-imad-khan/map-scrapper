@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Map Scrapper Admin</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #131a2e;
+      --panel-2: #1a2340;
+      --line: #2a355c;
+      --text: #ecf1ff;
+      --muted: #9aa9d4;
+      --accent: #4ade80;
+      --danger: #fb7185;
+      --warn: #f59e0b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Segoe UI, Arial, sans-serif;
+      background: radial-gradient(circle at top right, #1a2850 0%, var(--bg) 40%);
+      color: var(--text);
+    }
+    .wrap {
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    h1 { margin: 0 0 8px; font-size: 22px; }
+    .muted { color: var(--muted); font-size: 13px; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+    .row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 4px; }
+    input, select {
+      width: 100%;
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px 10px;
+    }
+    button {
+      background: #2a3b75;
+      color: var(--text);
+      border: 1px solid #3a4e94;
+      border-radius: 8px;
+      padding: 9px 12px;
+      cursor: pointer;
+    }
+    button.primary { background: #2563eb; border-color: #3b82f6; }
+    button.ok { background: #166534; border-color: #22c55e; }
+    button.warn { background: #7c2d12; border-color: #f59e0b; }
+    button.danger { background: #7f1d1d; border-color: #fb7185; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .tabs { display: flex; gap: 8px; margin-top: 10px; }
+    .tab.active { border-color: #60a5fa; background: #1f3a8a; }
+    .status {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--muted);
+      min-height: 18px;
+    }
+    .status.error { color: var(--danger); }
+    .status.ok { color: var(--accent); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 9px 6px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { color: var(--muted); font-weight: 600; }
+    .actions button { margin-right: 6px; margin-bottom: 6px; }
+    .pager { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+    code { color: #93c5fd; }
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      .pager { flex-direction: column; gap: 8px; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Admin Panel</h1>
+      <div class="muted">Manage registered users and install subscriptions from one place.</div>
+      <div class="grid" style="margin-top:10px;">
+        <div>
+          <label>Backend API Base URL</label>
+          <input id="apiBase" placeholder="https://paddle-backend-silk.vercel.app" />
+        </div>
+        <div>
+          <label>Admin API Key</label>
+          <input id="adminKey" type="password" placeholder="MSA_..." />
+        </div>
+        <div>
+          <label>Page Size</label>
+          <select id="pageSize">
+            <option>10</option>
+            <option selected>25</option>
+            <option>50</option>
+            <option>100</option>
+            <option>200</option>
+          </select>
+        </div>
+        <div class="row">
+          <button id="saveConfig" class="primary">Save</button>
+          <button id="testConn">Test</button>
+        </div>
+      </div>
+      <div class="tabs">
+        <button id="tabUsers" class="tab active">Users</button>
+        <button id="tabInstalls" class="tab">Installs</button>
+        <button id="refresh" class="ok">Refresh</button>
+      </div>
+      <div id="status" class="status"></div>
+    </div>
+
+    <div class="card">
+      <div id="tableWrap"></div>
+      <div class="pager">
+        <div id="cursorInfo" class="muted"></div>
+        <div class="row">
+          <button id="prevPage">Previous</button>
+          <button id="nextPage">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      type: 'users',
+      currentCursor: '0',
+      cursorStack: [],
+      nextCursor: '0',
+      hasMore: false,
+      items: []
+    };
+
+    const el = {
+      apiBase: document.getElementById('apiBase'),
+      adminKey: document.getElementById('adminKey'),
+      pageSize: document.getElementById('pageSize'),
+      saveConfig: document.getElementById('saveConfig'),
+      testConn: document.getElementById('testConn'),
+      tabUsers: document.getElementById('tabUsers'),
+      tabInstalls: document.getElementById('tabInstalls'),
+      refresh: document.getElementById('refresh'),
+      status: document.getElementById('status'),
+      tableWrap: document.getElementById('tableWrap'),
+      cursorInfo: document.getElementById('cursorInfo'),
+      prevPage: document.getElementById('prevPage'),
+      nextPage: document.getElementById('nextPage')
+    };
+
+    function setStatus(msg, kind) {
+      el.status.textContent = msg || '';
+      el.status.className = 'status' + (kind ? ' ' + kind : '');
+    }
+
+    function loadConfig() {
+      el.apiBase.value = localStorage.getItem('admin_api_base') || 'https://paddle-backend-silk.vercel.app';
+      el.adminKey.value = localStorage.getItem('admin_api_key') || '';
+      el.pageSize.value = localStorage.getItem('admin_page_size') || '25';
+    }
+
+    function saveConfig() {
+      localStorage.setItem('admin_api_base', el.apiBase.value.trim());
+      localStorage.setItem('admin_api_key', el.adminKey.value.trim());
+      localStorage.setItem('admin_page_size', el.pageSize.value);
+      setStatus('Configuration saved.', 'ok');
+    }
+
+    async function callApi(path, options = {}) {
+      const base = el.apiBase.value.trim().replace(/\/$/, '');
+      const key = el.adminKey.value.trim();
+      if (!base) throw new Error('API base URL is required.');
+      if (!key) throw new Error('Admin key is required.');
+
+      const headers = Object.assign({ 'X-Admin-Key': key }, options.headers || {});
+      const res = await fetch(base + path, Object.assign({}, options, { headers }));
+      const text = await res.text();
+      let data = null;
+      try { data = text ? JSON.parse(text) : null; } catch { data = null; }
+
+      if (!res.ok) {
+        const msg = (data && data.error) ? data.error : (text || ('HTTP ' + res.status));
+        throw new Error(msg);
+      }
+      return data;
+    }
+
+    async function fetchPage(cursor) {
+      const limit = Number(el.pageSize.value || 25);
+      const data = await callApi(`/api/admin-users?type=${state.type}&limit=${limit}&cursor=${encodeURIComponent(cursor)}`);
+      state.currentCursor = cursor;
+      state.nextCursor = data.cursor;
+      state.hasMore = Boolean(data.hasMore);
+      state.items = Array.isArray(data.items) ? data.items : [];
+      renderTable();
+      renderPager();
+    }
+
+    function renderPager() {
+      el.cursorInfo.textContent = `Type: ${state.type} | Current cursor: ${state.currentCursor} | Next cursor: ${state.nextCursor} | Rows: ${state.items.length}`;
+      el.prevPage.disabled = state.cursorStack.length === 0;
+      el.nextPage.disabled = !state.hasMore;
+    }
+
+    function promptValue(message, initial = '') {
+      const v = window.prompt(message, initial);
+      return v === null ? null : v.trim();
+    }
+
+    async function onUserDelete(email) {
+      if (!window.confirm(`Delete user ${email}?`)) return;
+      try {
+        await callApi('/api/admin-users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'deleteUser', email })
+        });
+        setStatus(`Deleted user ${email}.`, 'ok');
+        await fetchPage(state.currentCursor);
+      } catch (e) {
+        setStatus(e.message, 'error');
+      }
+    }
+
+    async function onInstallAdjust(installId) {
+      const raw = promptValue('Enter credit delta (e.g. 50 or -20):', '50');
+      if (raw === null) return;
+      const delta = Number(raw);
+      if (!Number.isInteger(delta) || delta === 0) {
+        setStatus('Delta must be a non-zero integer.', 'error');
+        return;
+      }
+      try {
+        await callApi('/api/admin-users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'adjustCredits', installId, delta, reason: 'admin-panel' })
+        });
+        setStatus(`Adjusted ${installId} by ${delta}.`, 'ok');
+        await fetchPage(state.currentCursor);
+      } catch (e) {
+        setStatus(e.message, 'error');
+      }
+    }
+
+    async function onInstallSetCredits(installId) {
+      const raw = promptValue('Set exact credits:', '100');
+      if (raw === null) return;
+      const credits = Number(raw);
+      if (!Number.isInteger(credits) || credits < 0) {
+        setStatus('Credits must be an integer >= 0.', 'error');
+        return;
+      }
+      try {
+        await callApi('/api/admin-users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'setCredits', installId, credits })
+        });
+        setStatus(`Set credits for ${installId} to ${credits}.`, 'ok');
+        await fetchPage(state.currentCursor);
+      } catch (e) {
+        setStatus(e.message, 'error');
+      }
+    }
+
+    async function onInstallSetExpiry(installId) {
+      const raw = promptValue('Set expiry in ISO format (or empty to clear):', '');
+      if (raw === null) return;
+      try {
+        await callApi('/api/admin-users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'setExpiry', installId, expiresAt: raw || null })
+        });
+        setStatus(`Updated expiry for ${installId}.`, 'ok');
+        await fetchPage(state.currentCursor);
+      } catch (e) {
+        setStatus(e.message, 'error');
+      }
+    }
+
+    function esc(str) {
+      return String(str === null || str === undefined ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function renderTable() {
+      if (state.type === 'users') {
+        const rows = state.items.map(u => `
+          <tr>
+            <td><code>${esc(u.email)}</code></td>
+            <td>${esc(u.name || '')}</td>
+            <td>${esc(u.createdAt || '')}</td>
+            <td>${esc(u.purchasesCount)}</td>
+            <td class="actions">
+              <button class="danger" data-act="del-user" data-email="${esc(u.email)}">Delete</button>
+            </td>
+          </tr>
+        `).join('');
+
+        el.tableWrap.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Created</th>
+                <th>Purchases</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>${rows || '<tr><td colspan="5" class="muted">No rows</td></tr>'}</tbody>
+          </table>
+        `;
+      } else {
+        const rows = state.items.map(i => `
+          <tr>
+            <td><code>${esc(i.installId)}</code></td>
+            <td>${esc(i.credits)}</td>
+            <td>${esc(i.subscriptionActive ? 'Yes' : 'No')}</td>
+            <td>${esc(i.expiresAt || '')}</td>
+            <td>${esc(i.txnCount)}</td>
+            <td class="actions">
+              <button class="ok" data-act="adj" data-id="${esc(i.installId)}">Adjust</button>
+              <button class="warn" data-act="set-credits" data-id="${esc(i.installId)}">Set Credits</button>
+              <button data-act="set-expiry" data-id="${esc(i.installId)}">Set/Clear Expiry</button>
+            </td>
+          </tr>
+        `).join('');
+
+        el.tableWrap.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>Install ID</th>
+                <th>Credits</th>
+                <th>Active</th>
+                <th>Expires</th>
+                <th>Txn Count</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>${rows || '<tr><td colspan="6" class="muted">No rows</td></tr>'}</tbody>
+          </table>
+        `;
+      }
+
+      el.tableWrap.querySelectorAll('button[data-act="del-user"]').forEach(btn => {
+        btn.addEventListener('click', () => onUserDelete(btn.dataset.email));
+      });
+      el.tableWrap.querySelectorAll('button[data-act="adj"]').forEach(btn => {
+        btn.addEventListener('click', () => onInstallAdjust(btn.dataset.id));
+      });
+      el.tableWrap.querySelectorAll('button[data-act="set-credits"]').forEach(btn => {
+        btn.addEventListener('click', () => onInstallSetCredits(btn.dataset.id));
+      });
+      el.tableWrap.querySelectorAll('button[data-act="set-expiry"]').forEach(btn => {
+        btn.addEventListener('click', () => onInstallSetExpiry(btn.dataset.id));
+      });
+    }
+
+    async function reloadFromStart() {
+      state.currentCursor = '0';
+      state.cursorStack = [];
+      await fetchPage('0');
+    }
+
+    async function testConnection() {
+      try {
+        setStatus('Testing connection...', '');
+        await callApi('/api/admin-users?type=users&limit=1&cursor=0');
+        setStatus('Connection successful.', 'ok');
+      } catch (e) {
+        setStatus(e.message, 'error');
+      }
+    }
+
+    el.saveConfig.addEventListener('click', saveConfig);
+    el.testConn.addEventListener('click', testConnection);
+    el.refresh.addEventListener('click', async () => {
+      try {
+        setStatus('Refreshing...', '');
+        await reloadFromStart();
+        setStatus('Loaded.', 'ok');
+      } catch (e) {
+        setStatus(e.message, 'error');
+      }
+    });
+
+    el.tabUsers.addEventListener('click', async () => {
+      state.type = 'users';
+      el.tabUsers.classList.add('active');
+      el.tabInstalls.classList.remove('active');
+      try {
+        await reloadFromStart();
+      } catch (e) {
+        setStatus(e.message, 'error');
+      }
+    });
+
+    el.tabInstalls.addEventListener('click', async () => {
+      state.type = 'installs';
+      el.tabInstalls.classList.add('active');
+      el.tabUsers.classList.remove('active');
+      try {
+        await reloadFromStart();
+      } catch (e) {
+        setStatus(e.message, 'error');
+      }
+    });
+
+    el.prevPage.addEventListener('click', async () => {
+      if (state.cursorStack.length === 0) return;
+      const prev = state.cursorStack.pop();
+      try {
+        await fetchPage(prev);
+      } catch (e) {
+        setStatus(e.message, 'error');
+      }
+    });
+
+    el.nextPage.addEventListener('click', async () => {
+      if (!state.hasMore) return;
+      state.cursorStack.push(state.currentCursor);
+      try {
+        await fetchPage(state.nextCursor);
+      } catch (e) {
+        setStatus(e.message, 'error');
+      }
+    });
+
+    loadConfig();
+    renderTable();
+    renderPager();
+  </script>
+</body>
+</html>

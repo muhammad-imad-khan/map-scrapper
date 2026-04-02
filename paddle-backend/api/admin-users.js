@@ -7,7 +7,7 @@
 // Auth:
 //   X-Admin-Key: <ADMIN_API_KEY>
 //   or Authorization: Bearer <ADMIN_API_KEY>
-const { cors, getRedis, keys } = require('./_helpers');
+const { cors, getRedis, keys, isValidInstallId } = require('./_helpers');
 
 const MAX_LIMIT = 200;
 const DEFAULT_LIMIT = 50;
@@ -129,7 +129,9 @@ async function listInstalls(redis, cursor, limit) {
 module.exports = async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(204).end();
-  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== 'GET' && req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
   const configuredAdminKey = (process.env.ADMIN_API_KEY || '').trim();
   if (!configuredAdminKey) {
@@ -141,22 +143,113 @@ module.exports = async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  const redis = getRedis();
-  const query = req.query || {};
-  const type = (query.type || 'users').toString().toLowerCase();
-  const cursor = (query.cursor || '0').toString();
-  const limit = parseLimit(query.limit);
-
-  if (type !== 'users' && type !== 'installs') {
-    return res.status(400).json({ error: 'Invalid type. Use users or installs.' });
-  }
-
   try {
-    const payload = type === 'users'
-      ? await listUsers(redis, cursor, limit)
-      : await listInstalls(redis, cursor, limit);
+    const redis = getRedis();
 
-    return res.status(200).json(payload);
+    if (req.method === 'GET') {
+      const query = req.query || {};
+      const type = (query.type || 'users').toString().toLowerCase();
+      const cursor = (query.cursor || '0').toString();
+      const limit = parseLimit(query.limit);
+
+      if (type !== 'users' && type !== 'installs') {
+        return res.status(400).json({ error: 'Invalid type. Use users or installs.' });
+      }
+
+      const payload = type === 'users'
+        ? await listUsers(redis, cursor, limit)
+        : await listInstalls(redis, cursor, limit);
+
+      return res.status(200).json(payload);
+    }
+
+    const body = req.body || {};
+    const action = (body.action || '').toString();
+
+    if (action === 'adjustCredits') {
+      const installId = (body.installId || '').toString().trim();
+      const delta = Number(body.delta);
+      const reason = (body.reason || 'admin-adjustment').toString().slice(0, 120);
+
+      if (!isValidInstallId(installId)) {
+        return res.status(400).json({ error: 'Invalid installId.' });
+      }
+      if (!Number.isFinite(delta) || Math.floor(delta) !== delta || delta === 0) {
+        return res.status(400).json({ error: 'delta must be a non-zero integer.' });
+      }
+
+      const balance = await redis.incrby(keys.credits(installId), delta);
+      const entry = {
+        type: 'admin-adjustment',
+        amount: delta,
+        reason,
+        balance,
+        at: new Date().toISOString(),
+      };
+      await redis.rpush(keys.txnLog(installId), JSON.stringify(entry));
+
+      return res.status(200).json({ ok: true, installId, balance, entry });
+    }
+
+    if (action === 'setCredits') {
+      const installId = (body.installId || '').toString().trim();
+      const credits = Number(body.credits);
+
+      if (!isValidInstallId(installId)) {
+        return res.status(400).json({ error: 'Invalid installId.' });
+      }
+      if (!Number.isFinite(credits) || Math.floor(credits) !== credits || credits < 0) {
+        return res.status(400).json({ error: 'credits must be an integer >= 0.' });
+      }
+
+      await redis.set(keys.credits(installId), credits);
+      const entry = {
+        type: 'admin-set-credits',
+        amount: credits,
+        reason: 'admin-set',
+        balance: credits,
+        at: new Date().toISOString(),
+      };
+      await redis.rpush(keys.txnLog(installId), JSON.stringify(entry));
+
+      return res.status(200).json({ ok: true, installId, balance: credits });
+    }
+
+    if (action === 'setExpiry') {
+      const installId = (body.installId || '').toString().trim();
+      const expiresAt = body.expiresAt;
+
+      if (!isValidInstallId(installId)) {
+        return res.status(400).json({ error: 'Invalid installId.' });
+      }
+
+      if (expiresAt === null || expiresAt === '' || typeof expiresAt === 'undefined') {
+        await redis.del(keys.expiry(installId));
+        return res.status(200).json({ ok: true, installId, expiresAt: null });
+      }
+
+      const expiryMs = Date.parse(String(expiresAt));
+      if (!Number.isFinite(expiryMs)) {
+        return res.status(400).json({ error: 'Invalid expiresAt datetime.' });
+      }
+
+      await redis.set(keys.expiry(installId), expiryMs);
+      return res.status(200).json({ ok: true, installId, expiresAt: new Date(expiryMs).toISOString() });
+    }
+
+    if (action === 'deleteUser') {
+      const email = (body.email || '').toString().trim().toLowerCase();
+      if (!email) {
+        return res.status(400).json({ error: 'email is required.' });
+      }
+
+      const userKey = `user:${email}`;
+      const removed = await redis.del(userKey);
+
+      return res.status(200).json({ ok: true, email, deleted: removed > 0 });
+    }
+
+    return res.status(400).json({ error: 'Invalid action.' });
   } catch (err) {
     console.error('admin-users error:', err);
     return res.status(500).json({ error: 'Internal server error' });
