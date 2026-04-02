@@ -189,7 +189,6 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
           </div>
 
           <div class="plan-points">
-            <div class="plan-point">Credits valid for 7 days after purchase.</div>
             <div class="plan-point">1 credit = 1 successfully scraped lead.</div>
             <div class="plan-point">All packs include emails + social media handles.</div>
             <div class="plan-point">You must be signed in to complete your purchase.</div>
@@ -317,7 +316,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
 'use strict';
 
 const PACKS = {
-  pro:        { key:'pro',        name:'Pro Pack',        credits:500,  usdPrice:'$10', perLead:'2¢ per lead · Emails + Socials', popular:true,  priceId:'pri_01kkwtx0kh2skzrzjbxgmgqngd' },
+  pro:        { key:'pro',        name:'Pro Pack',        credits:500,  usdPrice:'$5',  perLead:'1¢ per lead · Emails + Socials', popular:true,  priceId:'pri_01kkwtx0kh2skzrzjbxgmgqngd' },
   enterprise: { key:'enterprise', name:'Enterprise Pack', credits:2500, usdPrice:'$25', perLead:'1¢ per lead · Emails + Socials', popular:false, priceId: (typeof PRICE_ENTERPRISE !== 'undefined' ? PRICE_ENTERPRISE : 'pri_enterprise_placeholder') },
 };
 
@@ -508,6 +507,32 @@ if (!Array.from(currencySelect.options).some(option => option.value === state.cu
 }
 render();
 loadCheckoutUrl();
+
+// ── Auto-detect country via timezone / geo ──
+(function detectCountry() {
+  // Only auto-detect if user hasn't explicitly set country in URL
+  if (new URLSearchParams(window.location.search).has('country')) return;
+  var TZ_COUNTRY = {
+    'Asia/Karachi': 'Pakistan',
+    'Asia/Dubai': 'United Arab Emirates',
+    'Asia/Riyadh': 'Saudi Arabia',
+    'Europe/London': 'United Kingdom',
+    'America/New_York': 'United States', 'America/Chicago': 'United States', 'America/Denver': 'United States', 'America/Los_Angeles': 'United States',
+    'America/Toronto': 'Canada', 'America/Vancouver': 'Canada',
+    'Australia/Sydney': 'Australia', 'Australia/Melbourne': 'Australia',
+    'Europe/Berlin': 'Germany',
+    'Asia/Kolkata': 'India', 'Asia/Calcutta': 'India',
+  };
+  try {
+    var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    var detected = TZ_COUNTRY[tz];
+    if (detected && COUNTRY_DEFAULTS[detected]) {
+      state.country = detected;
+      state.currency = COUNTRY_DEFAULTS[detected];
+      render();
+    }
+  } catch(e) {}
+})();
 
 // ── Auth check: show user info or redirect ──
 (function checkPaymentAuth() {

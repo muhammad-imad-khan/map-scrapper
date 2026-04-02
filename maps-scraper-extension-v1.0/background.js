@@ -12,7 +12,7 @@
 const BACKEND_URL = 'https://map-scraper-paddle-backend.vercel.app';
 
 const CREDIT_PACKS = [
-    { id: 'pri_01kkwtx0kh2skzrzjbxgmgqngd', label: 'Pro Pack',        credits: 500,  price: '$10', popular: true },
+    { id: 'pri_01kkwtx0kh2skzrzjbxgmgqngd', label: 'Pro Pack',        credits: 500,  price: '$5', popular: true },
     { id: 'pri_enterprise_placeholder',      label: 'Enterprise Pack',  credits: 2500, price: '$25', popular: false },
 ];
 const COST_PER_RESULT = 1;
