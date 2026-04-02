@@ -13,9 +13,10 @@ const PADDLE_API_KEY = process.env.PADDLE_API_KEY || '';
 const FREE_STARTER_CREDITS = 25;
 const CREDITS_EXPIRY_DAYS = 7;
 
-// Single pack: $5 for 500 credits, one-time, expires in 7 days
+// Two paid tiers — maps priceId → credits + label
 const PRICE_CREDITS = {
-  [process.env.PRICE_PACK || 'pri_01kkwtx0kh2skzrzjbxgmgqngd']: { credits: 500, label: '500 Credits' },
+  [process.env.PRICE_PRO || 'pri_01kkwtx0kh2skzrzjbxgmgqngd']:        { credits: 500,  label: 'Pro Pack' },
+  [process.env.PRICE_ENTERPRISE || 'pri_enterprise_placeholder']:       { credits: 2500, label: 'Enterprise Pack' },
 };
 
 // ── Redis singleton ───────────────────────────────────────

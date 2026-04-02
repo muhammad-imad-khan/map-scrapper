@@ -149,7 +149,7 @@ function renderPacks(packs) {
     const card = document.createElement('div');
     card.className = 'pack-card' + (p.popular ? ' popular' : '');
     card.innerHTML = `
-      <div class="pack-icon pi-p">📦</div>
+      <div class="pack-icon pi-p">${p.popular ? '⚡' : '🚀'}</div>
       <div class="pack-info">
         <div class="pack-name">${p.label}</div>
         <div class="pack-desc">Emails + Social Media · Valid 7 days</div>

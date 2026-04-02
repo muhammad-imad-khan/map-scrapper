@@ -140,6 +140,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
       <a href="./" class="active">Payment</a>
       <a href="../about.html">About</a>
       <a href="../terms-and-conditions.html">Terms &amp; Conditions</a>
+      <a href="../auth/" id="navAccountLink">Account</a>
       <a href="../index.html#install" class="nav-cta">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Add to Browser
@@ -173,7 +174,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
         <div class="plan-summary">
           <div class="plan-hero">
             <div class="plan-label">Selected plan</div>
-            <div class="plan-name" id="planName">500 Credits</div>
+            <div class="plan-name" id="planName">Pro Pack</div>
             <div class="plan-meta">
               <span class="pill" id="planCredits">500 credits</span>
               <span class="pill" id="planPerLead">3.8¢ per lead</span>
@@ -190,7 +191,8 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
           <div class="plan-points">
             <div class="plan-point">Credits valid for 7 days after purchase.</div>
             <div class="plan-point">1 credit = 1 successfully scraped lead.</div>
-            <div class="plan-point">Includes emails + social media handles for every lead.</div>
+            <div class="plan-point">All packs include emails + social media handles.</div>
+            <div class="plan-point">You must be signed in to complete your purchase.</div>
           </div>
         </div>
       </section>
@@ -234,7 +236,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
           <div class="info-card">
             <h3>Selection snapshot</h3>
             <div class="detail-list">
-              <div class="detail-row"><span>Plan</span><strong id="summaryPlan">500 Credits</strong></div>
+              <div class="detail-row"><span>Plan</span><strong id="summaryPlan">Pro Pack</strong></div>
               <div class="detail-row"><span>Country</span><strong id="summaryCountry">Pakistan</strong></div>
               <div class="detail-row"><span>Currency</span><strong id="summaryCurrency">PKR</strong></div>
             </div>
@@ -265,7 +267,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
               <div class="detail-list">
                 <div class="detail-row"><span>Account name</span><strong>Imad Khan</strong></div>
                 <div class="detail-row"><span>Mobile</span><strong>+92 300 1234567</strong></div>
-                <div class="detail-row"><span>Reference</span><strong id="referenceCode">MLS-PACK-PKR</strong></div>
+                <div class="detail-row"><span>Reference</span><strong id="referenceCode">MLS-PRO-PKR</strong></div>
               </div>
               <div class="note">After transfer, share your payment proof with <a href="mailto:support@mapsleadscraper.com" style="color:#22c55e;text-decoration:none">support@mapsleadscraper.com</a> so your credits can be issued manually.</div>
             </div>
@@ -315,7 +317,8 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
 'use strict';
 
 const PACKS = {
-  pack: { key:'pack', name:'500 Credits', credits:500, usdPrice:'$5', perLead:'1¢ per lead · Emails + Socials', popular:true, priceId:'pri_01kkwtx0kh2skzrzjbxgmgqngd' },
+  pro:        { key:'pro',        name:'Pro Pack',        credits:500,  usdPrice:'$10', perLead:'2¢ per lead · Emails + Socials', popular:true,  priceId:'pri_01kkwtx0kh2skzrzjbxgmgqngd' },
+  enterprise: { key:'enterprise', name:'Enterprise Pack', credits:2500, usdPrice:'$25', perLead:'1¢ per lead · Emails + Socials', popular:false, priceId: (typeof PRICE_ENTERPRISE !== 'undefined' ? PRICE_ENTERPRISE : 'pri_enterprise_placeholder') },
 };
 
 const COUNTRY_DEFAULTS = {
@@ -343,7 +346,7 @@ const checkoutBtn = document.getElementById('checkoutBtn');
 const checkoutStatus = document.getElementById('checkoutStatus');
 
 const state = {
-  pack: 'pack',
+  pack: 'pro',
   country: 'Pakistan',
   currency: 'PKR',
   checkoutUrl: '',
@@ -445,12 +448,25 @@ currencySelect.addEventListener('change', () => {
 });
 
 checkoutBtn.addEventListener('click', () => {
+  // Check auth first
+  if (!localStorage.getItem('mls_auth_token')) {
+    const returnUrl = '/payment/' + window.location.search;
+    window.location.href = '../auth/?redirect=' + encodeURIComponent(returnUrl);
+    return;
+  }
   const pack = PACKS[state.pack];
   if (!pack || !pack.priceId) return;
+  // Auto-generate installId if not provided (website purchases)
   if (!state.installId) {
-    checkoutStatus.className = 'checkout-status error';
-    checkoutStatus.textContent = 'Missing install ID. Please open this page from the extension.';
-    return;
+    let webId = localStorage.getItem('mls_web_install_id');
+    if (!webId) {
+      webId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0;
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+      });
+      localStorage.setItem('mls_web_install_id', webId);
+    }
+    state.installId = webId;
   }
   // Use backend API to create checkout with installId in custom_data
   checkoutBtn.disabled = true;
@@ -492,6 +508,40 @@ if (!Array.from(currencySelect.options).some(option => option.value === state.cu
 }
 render();
 loadCheckoutUrl();
+
+// ── Auth check: show user info or redirect ──
+(function checkPaymentAuth() {
+  var TOKEN_KEY = 'mls_auth_token';
+  var USER_KEY = 'mls_auth_user';
+  var AUTH_API = 'https://map-scraper-paddle-backend.vercel.app/api/auth';
+  var token = localStorage.getItem(TOKEN_KEY);
+  var accountLink = document.getElementById('navAccountLink');
+  if (!token) {
+    // Not logged in — show warning in checkout status
+    if (checkoutStatus) {
+      checkoutStatus.className = 'checkout-status pending';
+      checkoutStatus.innerHTML = 'Please <a href="../auth/?redirect=' + encodeURIComponent('/payment/' + window.location.search) + '" style="color:var(--g);font-weight:700;text-decoration:underline">sign in</a> to complete your purchase.';
+    }
+    return;
+  }
+  // Validate token
+  fetch(AUTH_API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'me', token: token }),
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.ok && data.user) {
+      localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+      if (accountLink) accountLink.textContent = data.user.name || 'Account';
+    } else {
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+    }
+  })
+  .catch(function() {});
+})();
 </script>
 </body>
 </html>

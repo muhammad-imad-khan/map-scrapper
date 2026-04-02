@@ -3,8 +3,8 @@
 //  Monetization: SERVER-SIDE CREDIT SYSTEM (Paddle + Redis)
 //  • New installs: 25 free starter credits (server-granted)
 //  • Each scraped result costs 1 credit (server-deducted)
-//  • Pro:        500 cr / $10  — basic + emails
-//  • Enterprise: 1000 cr / $25 — basic + emails + social media
+//  • 500 cr / $10 — emails + social media (Pro)
+//  • 2500 cr / $25 — emails + social media (Enterprise)
 //  • Each install has a unique installId (UUID) for RLS
 // ═══════════════════════════════════════════════════════════
 
@@ -12,8 +12,8 @@
 const BACKEND_URL = 'https://map-scraper-paddle-backend.vercel.app';
 
 const CREDIT_PACKS = [
-    { id: 'pri_01kkwtx0kh2skzrzjbxgmgqngd', label: 'Pro Pack',        credits: 500,  price: '$10', tier: 'pro',        popular: true },
-    { id: 'pri_enterprise_placeholder',      label: 'Enterprise Pack',  credits: 1000, price: '$25', tier: 'enterprise', popular: false },
+    { id: 'pri_01kkwtx0kh2skzrzjbxgmgqngd', label: 'Pro Pack',        credits: 500,  price: '$10', popular: true },
+    { id: 'pri_enterprise_placeholder',      label: 'Enterprise Pack',  credits: 2500, price: '$25', popular: false },
 ];
 const COST_PER_RESULT = 1;
 
