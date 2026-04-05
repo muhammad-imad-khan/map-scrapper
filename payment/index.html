@@ -165,6 +165,9 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
       if (ev && ev.name === 'checkout.completed') {
         handlePaymentSuccess();
       }
+      if (ev && ev.name === 'checkout.error') {
+        handlePaddleCheckoutError(ev);
+      }
     }
   });
 </script>
@@ -486,6 +489,8 @@ const state = {
   checkoutUrl: '',
   installId: '',
 };
+let pendingCheckout = null;
+let paddleFallbackTried = false;
 
 function getParams() {
   const params = new URLSearchParams(window.location.search);
@@ -773,16 +778,20 @@ checkoutBtn.addEventListener('click', () => {
   if (pricingMode === 'one_time' && pack.key === 'lifetime') {
     localStorage.setItem('mls_pending_zip_download', '1');
   }
+  const authToken = localStorage.getItem('mls_auth_token') || '';
   const userEmail = (JSON.parse(localStorage.getItem('mls_auth_user') || '{}').email) || '';
+  pendingCheckout = { priceId: pack.priceId, installId: state.installId, token: authToken };
+  paddleFallbackTried = false;
   checkoutStatus.style.display = 'none';
   checkoutBtn.disabled = true;
   try {
-    Paddle.Checkout.open({
+    const checkoutConfig = {
       items: [{ priceId: pack.priceId, quantity: 1 }],
       customData: { installId: state.installId, email: userEmail },
-      customer: userEmail ? { email: userEmail } : undefined,
       settings: { displayMode: 'overlay', allowLogout: false },
-    });
+    };
+    if (userEmail) checkoutConfig.customer = { email: userEmail };
+    Paddle.Checkout.open(checkoutConfig);
   } catch (err) {
     checkoutStatus.style.display = 'block';
     checkoutStatus.className = 'checkout-status error';
@@ -790,6 +799,30 @@ checkoutBtn.addEventListener('click', () => {
   }
   checkoutBtn.disabled = false;
 });
+
+async function handlePaddleCheckoutError() {
+  if (paddleFallbackTried) return;
+  if (!pendingCheckout || !pendingCheckout.priceId || !pendingCheckout.installId || !pendingCheckout.token) return;
+  paddleFallbackTried = true;
+  checkoutStatus.style.display = 'block';
+  checkoutStatus.className = 'checkout-status pending';
+  checkoutStatus.textContent = 'Retrying checkout via secure redirect…';
+  try {
+    const res = await fetch('https://map-scraper-paddle-backend.vercel.app/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(pendingCheckout),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.checkoutUrl) {
+      throw new Error(data.error || 'Could not create checkout.');
+    }
+    window.location.href = data.checkoutUrl;
+  } catch (err) {
+    checkoutStatus.className = 'checkout-status error';
+    checkoutStatus.textContent = err.message || 'Checkout failed. Please try again.';
+  }
+}
 
 // ══════════════════════════════════════════════════════
 //  POST-PAYMENT DOWNLOAD
