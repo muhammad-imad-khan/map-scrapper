@@ -370,6 +370,10 @@ async function runScraper(query, requestedMax, startCredits) {
     const pageUrl = await exec(tabId, () => location.href);
     console.log('[Scraper] Maps page URL:', pageUrl);
 
+    // Wait for results to load (up to 40 seconds)
+    state.status = 'Waiting for results to load…';
+    broadcast('STATE', state);
+    
     let hasResults = false;
     for (let w = 0; w < 20; w++) {
       hasResults = await exec(tabId, () => {
@@ -390,48 +394,7 @@ async function runScraper(query, requestedMax, startCredits) {
       await sleep(2000);
     }
 
-    // If no results yet, try reloading the page once (Google Maps SPA can glitch)
-    if (!hasResults) {
-      console.log('[Scraper] No results after wait. Reloading page…');
-      state.status = 'Reloading page…';
-      broadcast('STATE', state);
-      await exec(tabId, () => location.reload());
-      await waitForTab(tabId);
-      await sleep(5000);
-
-      // Dismiss overlays again after reload
-      for (let c = 0; c < 3; c++) {
-        const dismissed = await exec(tabId, () => {
-          const dialog = document.querySelector('[role="dialog"]');
-          if (dialog) {
-            const btn = dialog.querySelector('button');
-            if (btn) { btn.click(); return true; }
-          }
-          const bar = document.querySelector('.kwuIFd, .PwqnGe');
-          if (bar) { bar.style.display = 'none'; return true; }
-          const dismiss = [...document.querySelectorAll('button')].find(b =>
-            /not now|no thanks|stay signed out|maybe later|accept/i.test(b.textContent)
-          );
-          if (dismiss) { dismiss.click(); return true; }
-          return false;
-        });
-        if (dismissed) await sleep(1500); else break;
-      }
-      await sleep(3000);
-
-      // Check again
-      for (let w = 0; w < 10; w++) {
-        hasResults = await exec(tabId, () => {
-          return document.querySelectorAll('a[href*="/maps/place/"]').length > 0
-            || document.querySelectorAll('a.hfpxzc').length > 0
-            || (document.querySelector('div[role="feed"]')?.querySelectorAll('a[href]').length || 0) > 0;
-        });
-        if (hasResults) break;
-        await sleep(2000);
-      }
-    }
-
-    // Collect listing URLs
+    // Collect listing URLs (or prep for card-click fallback)
     state.status = 'Collecting listings from results…';
     broadcast('STATE', state);
     const urls = await collectUrls(tabId, maxResults);
@@ -560,110 +523,144 @@ async function runScraper(query, requestedMax, startCredits) {
 
 async function scrapeByClickingResults(tabId, maxResults) {
   let attempts = 0;
-  const maxAttempts = Math.max(maxResults * 8, 25);
+  const maxAttempts = Math.max(maxResults * 8, 30);
+  let successCount = 0;
 
-  while (state.running && state.results.length < maxResults && attempts < maxAttempts) {
+  while (state.running && successCount < maxResults && attempts < maxAttempts) {
     const currentCredits = await getCredits();
     if (currentCredits < COST_PER_RESULT) {
       broadcast('NO_CREDITS', { credits: currentCredits, packs: CREDIT_PACKS, mid: true, scraped: state.results.length });
       break;
     }
 
-    state.progress = state.results.length + 1;
-    state.status = `[${currentCredits} cr] Opening result ${state.results.length + 1} / ${maxResults}…`;
+    state.progress = successCount + 1;
+    state.status = `[${currentCredits} cr] Scraping result ${successCount + 1} / ${maxResults}…`;
     broadcast('STATE', state);
 
     const clicked = await exec(tabId, () => {
       const root = document.querySelector('div[role="feed"]')
-        || document.querySelector('div[role="main"]')
+        || document.querySelector('[role="main"]')
         || document.body;
 
-      const candidates = [
-        ...root.querySelectorAll('div[role="article"]'),
-        ...root.querySelectorAll('div.Nv2PK'),
-        ...root.querySelectorAll('a[href*="/maps/place/"]')
-      ];
+      // Find all potential result cards
+      const candidates = [];
+      root.querySelectorAll('div[role="article"]').forEach(el => candidates.push(el));
+      root.querySelectorAll('a[href*="/maps/place/"]').forEach(el => candidates.push(el));
+      root.querySelectorAll('[jsaction*="click"][aria-label]').forEach(el => candidates.push(el));
 
+      // Find first unclicked, visible card
       const card = candidates.find(el => {
         if (!el || !(el instanceof HTMLElement)) return false;
         if (el.dataset.mlsClicked === '1') return false;
         if (el.closest('[role="dialog"]')) return false;
         const r = el.getBoundingClientRect();
-        return r.width > 20 && r.height > 20;
+        return r.width > 0 && r.height > 0 && r.top < window.innerHeight;
       });
 
-      if (!card) return { ok: false, reason: 'no-card' };
+      if (!card) return { ok: false, reason: 'no-visible-card' };
 
       card.dataset.mlsClicked = '1';
-      card.scrollIntoView({ block: 'center' });
+      card.scrollIntoView({ block: 'nearest' });
 
-      const clickable = card.matches('a[href*="/maps/place/"]')
-        ? card
-        : card.querySelector('a[href*="/maps/place/"], div[role="button"], button') || card;
+      // Click the card or first clickable element inside
+      const clickTarget = card.closest('a[href*="/maps/place/"]')
+        || card.querySelector('a[href*="/maps/place/"]')
+        || card;
 
-      clickable.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
-      if (typeof clickable.click === 'function') clickable.click();
+      if (typeof clickTarget.click === 'function') {
+        clickTarget.click();
+      } else {
+        clickTarget.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+      }
 
       return { ok: true };
     });
 
     if (!clicked?.ok) {
+      attempts++;
+      // Scroll to find more cards
       await exec(tabId, () => {
         const sc = document.querySelector('div[role="feed"]')
-          || document.querySelector('div[role="main"]')
+          || document.querySelector('[role="main"]')
           || document.scrollingElement;
-        if (sc) sc.scrollBy(0, 950);
+        if (sc) sc.scrollBy(0, 600);
       });
-      await sleep(1300);
-      attempts++;
+      await sleep(1200);
       continue;
     }
 
-    await sleep(2300);
+    // Wait for place details to load
+    await sleep(3500);
+
+    // Try to extract details
     const data = await exec(tabId, extractDetails);
     if (!data || !data.name || data.name === 'N/A') {
       attempts++;
+      // Go back to results if extraction failed
+      await exec(tabId, () => {
+        const back = document.querySelector('button[aria-label*="Back"]')
+          || document.querySelector('button[jsaction*="back"]')
+          || document.querySelector('[aria-label*="back"], [aria-label*="Close"]');
+        if (back && typeof back.click === 'function') back.click();
+      });
+      await sleep(1500);
       continue;
     }
 
-    const duplicate = state.results.some(r => r.name === data.name && r.address === data.address);
+    // Check for duplicate
+    const duplicate = state.results.some(r => r.name.toLowerCase() === data.name.toLowerCase());
     if (duplicate) {
       attempts++;
+      await exec(tabId, () => {
+        const back = document.querySelector('button[aria-label*="Back"]')
+          || document.querySelector('button[jsaction*="back"]');
+        if (back && typeof back.click === 'function') back.click();
+      });
+      await sleep(1500);
       continue;
     }
 
+    // Deduct credit
     const deducted = await deductCredit();
     if (!deducted) {
       broadcast('NO_CREDITS', { credits: 0, packs: CREDIT_PACKS, mid: true, scraped: state.results.length });
       break;
     }
 
+    // Fetch email/socials if website exists
     if (data.website && data.website !== 'N/A') {
       state.status = `Finding email for "${data.name}"…`;
       broadcast('STATE', state);
-      const webData = await fetchWebsiteData(data.website, true);
-      data.email = webData.email;
-      data.socials = webData.socials;
+      try {
+        const webData = await fetchWebsiteData(data.website, true);
+        data.email = webData.email;
+        data.socials = webData.socials;
+      } catch (e) {
+        console.warn('[Scraper] Web data fetch failed for', data.name, e);
+      }
     }
 
+    // Add to results
     const newCredits = await getCredits();
     state.results.push(data);
     broadcast('RESULT', { result: data, count: state.results.length, credits: newCredits });
+    successCount++;
 
+    // Go back to results for next iteration
     await exec(tabId, () => {
       const back = document.querySelector('button[aria-label*="Back"]')
-        || document.querySelector('button[jsaction*="pane.place.backToList"]')
-        || document.querySelector('button[jsaction*="back"]');
-      if (back) {
+        || document.querySelector('button[jsaction*="back"]')
+        || document.querySelector('[role="button"][aria-label*="Close"]');
+      if (back && typeof back.click === 'function') {
         back.click();
-        return true;
       }
-      return false;
     });
 
-    await sleep(1500);
+    await sleep(1800);
     attempts++;
   }
+
+  console.log('[Scraper] Card-click mode completed:', successCount, 'results after', attempts, 'attempts');
 }
 
 // ── URL Collector ──────────────────────────────────────────
