@@ -166,6 +166,7 @@
       <div class="tabs">
         <button id="tabUsers" class="tab active">Users</button>
         <button id="tabInstalls" class="tab">Installs</button>
+        <button id="tabReport" class="tab">Monthly Report</button>
         <button id="refresh" class="ok">Refresh</button>
       </div>
       <div id="status" class="status"></div>
@@ -180,6 +181,22 @@
           <button id="nextPage">Next</button>
         </div>
       </div>
+    </div>
+
+    <!-- Monthly Report Section -->
+    <div class="card" id="reportSection" style="display:none;">
+      <h2 style="margin:0 0 6px;font-size:18px;">Monthly Sales Report</h2>
+      <div class="muted" style="margin-bottom:10px;">Revenue and purchase breakdown by month.</div>
+      <div class="row" style="margin-bottom:10px;">
+        <div>
+          <label>Filter Month (optional)</label>
+          <input type="month" id="reportMonth" style="width:180px;" />
+        </div>
+        <button id="loadReport" class="primary" style="align-self:end;">Load Report</button>
+      </div>
+      <div id="reportStatus" class="status"></div>
+      <div id="reportSummary" style="display:flex;gap:16px;margin:10px 0;flex-wrap:wrap;"></div>
+      <div id="reportTableWrap"></div>
     </div>
   </div>
 
@@ -213,12 +230,19 @@
       testConn: document.getElementById('testConn'),
       tabUsers: document.getElementById('tabUsers'),
       tabInstalls: document.getElementById('tabInstalls'),
+      tabReport: document.getElementById('tabReport'),
       refresh: document.getElementById('refresh'),
       status: document.getElementById('status'),
       tableWrap: document.getElementById('tableWrap'),
       cursorInfo: document.getElementById('cursorInfo'),
       prevPage: document.getElementById('prevPage'),
-      nextPage: document.getElementById('nextPage')
+      nextPage: document.getElementById('nextPage'),
+      reportSection: document.getElementById('reportSection'),
+      reportMonth: document.getElementById('reportMonth'),
+      loadReport: document.getElementById('loadReport'),
+      reportStatus: document.getElementById('reportStatus'),
+      reportSummary: document.getElementById('reportSummary'),
+      reportTableWrap: document.getElementById('reportTableWrap'),
     };
 
     function setStatus(msg, kind) {
@@ -469,6 +493,9 @@
       state.type = 'users';
       el.tabUsers.classList.add('active');
       el.tabInstalls.classList.remove('active');
+      el.tabReport.classList.remove('active');
+      el.reportSection.style.display = 'none';
+      el.tableWrap.parentElement.style.display = '';
       try {
         await reloadFromStart();
       } catch (e) {
@@ -480,12 +507,114 @@
       state.type = 'installs';
       el.tabInstalls.classList.add('active');
       el.tabUsers.classList.remove('active');
+      el.tabReport.classList.remove('active');
+      el.reportSection.style.display = 'none';
+      el.tableWrap.parentElement.style.display = '';
       try {
         await reloadFromStart();
       } catch (e) {
         setStatus(e.message, 'error');
       }
     });
+
+    el.tabReport.addEventListener('click', () => {
+      el.tabReport.classList.add('active');
+      el.tabUsers.classList.remove('active');
+      el.tabInstalls.classList.remove('active');
+      el.tableWrap.parentElement.style.display = 'none';
+      el.reportSection.style.display = '';
+      setStatus('');
+    });
+
+    async function loadReport() {
+      const month = el.reportMonth.value || ''; // YYYY-MM or empty
+      el.reportStatus.textContent = 'Loading report...';
+      el.reportStatus.className = 'status';
+      el.reportSummary.innerHTML = '';
+      el.reportTableWrap.innerHTML = '';
+      try {
+        const data = await callApi('/api/admin-users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'monthlyReport', month }),
+        });
+
+        if (!data.months || data.months.length === 0) {
+          el.reportStatus.textContent = 'No purchases found for the selected period.';
+          el.reportStatus.className = 'status';
+          return;
+        }
+
+        // Summary cards
+        let totalSales = 0;
+        let totalRevenue = 0;
+        for (const m of data.months) {
+          totalSales += m.totalSales;
+          totalRevenue += parseFloat(m.totalRevenue);
+        }
+        el.reportSummary.innerHTML = `
+          <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:14px 18px;min-width:140px;">
+            <div class="muted" style="font-size:11px;margin-bottom:4px;">Total Purchases</div>
+            <div style="font-size:22px;font-weight:700;">${totalSales}</div>
+          </div>
+          <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:14px 18px;min-width:140px;">
+            <div class="muted" style="font-size:11px;margin-bottom:4px;">Total Revenue</div>
+            <div style="font-size:22px;font-weight:700;color:var(--accent);">$${totalRevenue.toFixed(2)}</div>
+          </div>
+          <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:14px 18px;min-width:140px;">
+            <div class="muted" style="font-size:11px;margin-bottom:4px;">Months</div>
+            <div style="font-size:22px;font-weight:700;">${data.months.length}</div>
+          </div>
+        `;
+
+        // Monthly breakdown tables
+        let html = '';
+        for (const m of data.months) {
+          const rows = m.purchases.map(p => `
+            <tr>
+              <td>${esc(p.email)}</td>
+              <td>${esc(p.name || '')}</td>
+              <td>${esc(p.pack)}</td>
+              <td>${esc(p.credits)}</td>
+              <td>${p.amount ? '$' + (Number(p.amount) / 100).toFixed(2) : 'N/A'}</td>
+              <td style="font-size:11px;">${esc(p.txnId || '')}</td>
+              <td>${esc(p.date ? p.date.slice(0, 16).replace('T', ' ') : '')}</td>
+            </tr>
+          `).join('');
+
+          html += `
+            <div style="margin-bottom:16px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <strong style="font-size:15px;">${esc(m.month)}</strong>
+                <span class="muted">${m.totalSales} sale${m.totalSales !== 1 ? 's' : ''} &mdash; $${m.totalRevenue} revenue</span>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Email</th>
+                    <th>Name</th>
+                    <th>Pack</th>
+                    <th>Credits</th>
+                    <th>Amount</th>
+                    <th>Txn ID</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+              </table>
+            </div>
+          `;
+        }
+        el.reportTableWrap.innerHTML = html;
+        el.reportStatus.textContent = `Report loaded: ${totalSales} purchase(s) across ${data.months.length} month(s).`;
+        el.reportStatus.className = 'status ok';
+      } catch (e) {
+        el.reportStatus.textContent = e.message;
+        el.reportStatus.className = 'status error';
+      }
+    }
+
+    el.loadReport.addEventListener('click', loadReport);
 
     el.prevPage.addEventListener('click', async () => {
       if (state.cursorStack.length === 0) return;

@@ -1,6 +1,7 @@
 // ── Shared Paddle helpers ────────────────────────────────
 const Redis = require('ioredis');
 const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 
 const PADDLE_ENV = process.env.PADDLE_ENV || 'sandbox';
 
@@ -137,9 +138,64 @@ async function paddleRequest(path, body) {
   return resp.json();
 }
 
+// ── Email notifications ───────────────────────────────────
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'elysiansoft.systems@gmail.com';
+
+function getMailTransport() {
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  if (!user || !pass) return null;
+  return nodemailer.createTransport({
+    service: 'gmail',
+    auth: { user, pass },
+  });
+}
+
+async function sendPurchaseNotification({ userName, userEmail, packLabel, credits, amount, currency, txnId }) {
+  const transport = getMailTransport();
+  if (!transport) {
+    console.warn('SMTP not configured, skipping purchase notification email');
+    return;
+  }
+  const date = new Date().toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'short', timeZone: 'UTC' });
+  const html = `
+    <div style="font-family:Segoe UI,Arial,sans-serif;max-width:560px;margin:0 auto;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
+      <div style="background:#1e40af;padding:20px 24px;color:#fff;">
+        <h2 style="margin:0;font-size:20px;">New Purchase</h2>
+      </div>
+      <div style="padding:24px;">
+        <table style="width:100%;border-collapse:collapse;font-size:14px;">
+          <tr><td style="padding:8px 0;color:#64748b;width:130px;">Customer</td><td style="padding:8px 0;font-weight:600;">${userName || 'N/A'}</td></tr>
+          <tr><td style="padding:8px 0;color:#64748b;">Email</td><td style="padding:8px 0;">${userEmail || 'N/A'}</td></tr>
+          <tr><td style="padding:8px 0;color:#64748b;">Pack</td><td style="padding:8px 0;font-weight:600;">${packLabel}</td></tr>
+          <tr><td style="padding:8px 0;color:#64748b;">Credits</td><td style="padding:8px 0;">${credits.toLocaleString()}</td></tr>
+          <tr><td style="padding:8px 0;color:#64748b;">Amount</td><td style="padding:8px 0;font-weight:600;">${currency ? currency.toUpperCase() + ' ' : '$'}${amount || 'N/A'}</td></tr>
+          <tr><td style="padding:8px 0;color:#64748b;">Transaction ID</td><td style="padding:8px 0;font-size:12px;">${txnId}</td></tr>
+          <tr><td style="padding:8px 0;color:#64748b;">Date (UTC)</td><td style="padding:8px 0;">${date}</td></tr>
+        </table>
+      </div>
+      <div style="background:#f8fafc;padding:14px 24px;font-size:12px;color:#94a3b8;text-align:center;">
+        Map Lead Scraper &mdash; Automated Purchase Notification
+      </div>
+    </div>
+  `;
+  try {
+    await transport.sendMail({
+      from: `"Map Lead Scraper" <${process.env.SMTP_USER}>`,
+      to: ADMIN_EMAIL,
+      subject: `New Purchase: ${packLabel} by ${userEmail || 'Unknown'}`,
+      html,
+    });
+    console.log(`Purchase notification sent for txn ${txnId}`);
+  } catch (err) {
+    console.error('Failed to send purchase notification:', err.message);
+  }
+}
+
 module.exports = {
   PADDLE_ENV, BASE_URL, PADDLE_API_KEY, PRICE_CREDITS, FREE_STARTER_CREDITS, CREDITS_EXPIRY_DAYS,
   cors, paddleRequest, getRedis, keys,
   getCredits, initUser, addCredits, deductCredits, isValidInstallId,
+  sendPurchaseNotification, ADMIN_EMAIL,
 };
 

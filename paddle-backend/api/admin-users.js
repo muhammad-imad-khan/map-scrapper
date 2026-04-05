@@ -249,6 +249,76 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ ok: true, email, deleted: removed > 0 });
     }
 
+    // ── Monthly sales report ──
+    if (action === 'monthlyReport') {
+      const targetMonth = (body.month || '').toString().trim(); // YYYY-MM format, optional
+      let cursor = '0';
+      const allPurchases = [];
+
+      // Scan all user keys to collect completed purchases
+      do {
+        const [nextCursor, foundKeys] = await redis.scan(cursor, 'MATCH', 'user:*', 'COUNT', 200);
+        cursor = nextCursor;
+        if (foundKeys.length === 0) continue;
+
+        const pipe = redis.pipeline();
+        foundKeys.forEach(k => pipe.get(k));
+        const results = await pipe.exec();
+
+        for (let i = 0; i < foundKeys.length; i++) {
+          const err = results[i] && results[i][0];
+          const raw = results[i] && results[i][1];
+          if (err || !raw) continue;
+          const user = safeParse(raw);
+          if (!user || !user.email || !Array.isArray(user.purchases)) continue;
+
+          for (const p of user.purchases) {
+            if (p.status !== 'completed') continue;
+            const date = p.completedAt || p.createdAt;
+            if (!date) continue;
+            const month = date.slice(0, 7); // YYYY-MM
+            if (targetMonth && month !== targetMonth) continue;
+            allPurchases.push({
+              email: user.email,
+              name: user.name || null,
+              pack: p.label || p.priceId || 'Unknown',
+              credits: p.credits || 0,
+              amount: p.amount || null,
+              currency: p.currency || null,
+              txnId: p.txnId || null,
+              date,
+              month,
+            });
+          }
+        }
+      } while (cursor !== '0');
+
+      // Aggregate by month
+      const months = {};
+      for (const p of allPurchases) {
+        if (!months[p.month]) {
+          months[p.month] = { month: p.month, totalSales: 0, totalRevenue: 0, purchases: [] };
+        }
+        months[p.month].totalSales++;
+        if (p.amount) months[p.month].totalRevenue += Number(p.amount) || 0;
+        months[p.month].purchases.push(p);
+      }
+
+      // Sort months descending
+      const sortedMonths = Object.values(months).sort((a, b) => b.month.localeCompare(a.month));
+
+      // If amounts are in minor units (cents), convert to dollars
+      for (const m of sortedMonths) {
+        m.totalRevenue = (m.totalRevenue / 100).toFixed(2);
+      }
+
+      return res.status(200).json({
+        ok: true,
+        totalPurchases: allPurchases.length,
+        months: sortedMonths,
+      });
+    }
+
     return res.status(400).json({ error: 'Invalid action.' });
   } catch (err) {
     console.error('admin-users error:', err);

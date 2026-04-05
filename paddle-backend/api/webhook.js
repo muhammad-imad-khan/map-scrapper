@@ -3,7 +3,7 @@
 // Auto-credits the user's account using installId from custom_data.
 // Deduplicates by transaction ID so replay attacks are harmless.
 const crypto = require('crypto');
-const { cors, PRICE_CREDITS, addCredits, getRedis, keys, isValidInstallId } = require('./_helpers');
+const { cors, PRICE_CREDITS, addCredits, getRedis, keys, isValidInstallId, sendPurchaseNotification } = require('./_helpers');
 
 // ── Webhook signature verification ─────────────────────
 function verifySignature(rawBody, signature, secret) {
@@ -91,6 +91,54 @@ module.exports = async function handler(req, res) {
 
     // ── Credit the user's account (atomic + set 7-day expiry) ──
     const result = await addCredits(installId, totalCredits, `purchase:${txnId}:${label}`);
+
+    // ── Update user purchase status + send email notification ──
+    const userEmail = txnData?.custom_data?.email;
+    if (userEmail) {
+      const userKey = `user:${userEmail}`;
+      const userRaw = await redis.get(userKey);
+      if (userRaw) {
+        const userData = JSON.parse(userRaw);
+        // Update matching pending purchase to 'completed'
+        if (Array.isArray(userData.purchases)) {
+          const pending = userData.purchases.find(p => p.txnId === txnId && p.status === 'pending');
+          if (pending) {
+            pending.status = 'completed';
+            pending.completedAt = new Date().toISOString();
+            pending.credits = totalCredits;
+            pending.amount = txnData?.details?.totals?.total || null;
+            pending.currency = txnData?.currency_code || null;
+          } else {
+            // No pending record (e.g. webhook arrived before checkout recorded it)
+            userData.purchases = userData.purchases || [];
+            userData.purchases.push({
+              priceId: items[0]?.price?.id || null,
+              installId,
+              status: 'completed',
+              createdAt: new Date().toISOString(),
+              completedAt: new Date().toISOString(),
+              txnId,
+              credits: totalCredits,
+              label,
+              amount: txnData?.details?.totals?.total || null,
+              currency: txnData?.currency_code || null,
+            });
+          }
+        }
+        await redis.set(userKey, JSON.stringify(userData));
+
+        // Send purchase notification email to admin
+        sendPurchaseNotification({
+          userName: userData.name,
+          userEmail,
+          packLabel: label,
+          credits: totalCredits,
+          amount: txnData?.details?.totals?.total ? (Number(txnData.details.totals.total) / 100).toFixed(2) : null,
+          currency: txnData?.currency_code,
+          txnId,
+        }).catch(() => {}); // fire-and-forget, don't block webhook response
+      }
+    }
 
     // ── Mark transaction as processed (dedup key, expires in 30 days) ──
     await redis.set(keys.txnDedup(txnId), JSON.stringify({
