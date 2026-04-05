@@ -479,6 +479,20 @@ function switchMethod(method) {
   tabCard.classList.toggle('active', method === 'card');
   bankMethod.classList.toggle('hidden', method !== 'bank');
   cardMethod.classList.toggle('hidden', method !== 'card');
+  if (method === 'card') updateCardState();
+}
+
+function updateCardState() {
+  const pack = PACKS[state.pack];
+  const hasRealPrice = pack && pack.priceId && !pack.priceId.includes('placeholder');
+  checkoutBtn.disabled = !hasRealPrice;
+  if (!hasRealPrice) {
+    checkoutStatus.style.display = 'block';
+    checkoutStatus.className = 'checkout-status pending';
+    checkoutStatus.textContent = 'Card payment for ' + (pack ? pack.name : 'this pack') + ' is coming soon. Use Bank Transfer for now.';
+  } else {
+    checkoutStatus.style.display = 'none';
+  }
 }
 
 tabBank.addEventListener('click', () => switchMethod('bank'));
@@ -493,6 +507,7 @@ function render() {
   renderSummary();
   renderMethods();
   syncUrl();
+  if (!cardMethod.classList.contains('hidden')) updateCardState();
 }
 
 countrySelect.addEventListener('change', () => {
@@ -509,6 +524,8 @@ currencySelect.addEventListener('change', () => {
 });
 
 checkoutBtn.addEventListener('click', () => {
+  const pack = PACKS[state.pack];
+  if (!pack || !pack.priceId || pack.priceId.includes('placeholder')) return;
   // Check auth first
   if (!localStorage.getItem('mls_auth_token')) {
     const returnUrl = '/payment/' + window.location.search;
