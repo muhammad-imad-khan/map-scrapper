@@ -275,6 +275,21 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
         sendResponse({ installId: iid });
         break;
       }
+
+      case 'GET_HISTORY': {
+        try {
+          const installId = await getInstallId();
+          const res = await fetch(`${BACKEND_URL}/api/credits?installId=${installId}&history=1`, {
+            headers: { 'X-Install-Id': installId },
+          });
+          if (!res.ok) throw new Error('Server error');
+          const data = await res.json();
+          sendResponse({ ok: true, history: data.history || [], credits: data.credits });
+        } catch {
+          sendResponse({ ok: false, history: [] });
+        }
+        break;
+      }
     }
   })();
   return true;

@@ -162,10 +162,11 @@ chrome.runtime.onMessage.addListener(msg => {
 
 // ── Tab switching (no inline handlers) ───────────────
 function switchTab(tab) {
-  ['scrape','shop'].forEach(t => {
+  ['scrape','shop','history'].forEach(t => {
     document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('active', t === tab);
     document.getElementById('panel' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('show', t === tab);
   });
+  if (tab === 'history') loadHistory();
 }
 document.querySelectorAll('.tab[data-tab]').forEach(btn => {
   btn.addEventListener('click', () => switchTab(btn.dataset.tab));
@@ -373,4 +374,59 @@ function showToast(msg, type = 'success') {
   document.body.appendChild(toast);
   setTimeout(() => toast.style.opacity = '0', 2800);
   setTimeout(() => toast.remove(), 3200);
+}
+
+// ── Credit History ────────────────────────────────────
+let historyLoaded = false;
+function loadHistory() {
+  const histList = document.getElementById('histList');
+  const histBal = document.getElementById('histBalance');
+  histBal.textContent = currentCredits.toLocaleString();
+
+  if (historyLoaded) return;
+  histList.innerHTML = '<div class="hist-loading">Loading history…</div>';
+
+  chrome.runtime.sendMessage({ type: 'GET_HISTORY' }, res => {
+    if (chrome.runtime.lastError || !res || !res.ok) {
+      histList.innerHTML = '<div class="hist-empty">Could not load history.</div>';
+      return;
+    }
+    historyLoaded = true;
+    const history = res.history || [];
+    if (!history.length) {
+      histList.innerHTML = '<div class="hist-empty">No transactions yet.<br>Purchase credits to get started!</div>';
+      return;
+    }
+    // Sort newest first
+    history.sort((a, b) => (b.at || '').localeCompare(a.at || ''));
+    histList.innerHTML = history.map(h => {
+      const isCredit = h.amount > 0;
+      const iconClass = h.type === 'admin-adjustment' || h.type === 'admin-set-credits' ? 'admin' : isCredit ? 'credit' : 'debit';
+      const icon = iconClass === 'admin' ? '🔧' : isCredit ? '💰' : '🔻';
+      const amountClass = isCredit ? 'pos' : 'neg';
+      const sign = isCredit ? '+' : '';
+      const reason = formatReason(h.type, h.reason);
+      const date = h.at ? new Date(h.at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+      return `<div class="hist-item">
+        <div class="hi-left">
+          <div class="hi-icon ${iconClass}">${icon}</div>
+          <div>
+            <div class="hi-reason">${x(reason)}</div>
+            <div class="hi-date">${x(date)}${h.balance != null ? ' · Bal: ' + h.balance : ''}</div>
+          </div>
+        </div>
+        <div class="hi-amount ${amountClass}">${sign}${h.amount}</div>
+      </div>`;
+    }).join('');
+  });
+}
+
+function formatReason(type, reason) {
+  if (type === 'credit') return reason || 'Credits added';
+  if (type === 'debit' || type === 'deduct') return 'Scraping usage';
+  if (type === 'admin-adjustment') return 'Admin adjustment';
+  if (type === 'admin-set-credits') return 'Credits set by admin';
+  if (type === 'starter') return 'Free starter credits';
+  if (reason && reason.startsWith('banktransfer:')) return 'Bank transfer purchase';
+  return reason || type || 'Transaction';
 }
