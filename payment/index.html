@@ -226,12 +226,12 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
             <div class="plan-price"><strong id="planPrice">$19</strong><span id="planPriceNote">One-time payment</span></div>
           </div>
 
-          <div>
+          <div class="switch-plan-group">
             <div class="plan-label" style="margin-bottom:12px">Switch plan</div>
             <div class="plan-packs" id="packOptions"></div>
           </div>
 
-          <div class="plan-points">
+          <div class="plan-points" id="planPoints">
             <div class="plan-point">1 credit = 1 successfully scraped lead.</div>
             <div class="plan-point">All packs include emails + social media handles.</div>
             <div class="plan-point">You must be signed in to complete your purchase.</div>
@@ -387,10 +387,13 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
   });
 })();
 
-const PACKS = {
+const CREDIT_PACKS = {
   pro:        { key:'pro',        name:'Pro Pack',        credits:500,  usdPrice:'$5',  perLead:'1¢ per lead · Emails + Socials', popular:true,  priceId:'pri_01kkwtx0kh2skzrzjbxgmgqngd' },
   enterprise: { key:'enterprise', name:'Enterprise Pack', credits:2500, usdPrice:'$25', perLead:'1¢ per lead · Emails + Socials', popular:false, priceId:'pri_01kkwtyfwvrwspy654f56h4n5d' },
 };
+const ONE_TIME_PACK = { key:'lifetime', name:'Lifetime License', credits:null, usdPrice:'$25', perLead:'One-time payment · Lifetime access', popular:true, priceId:'pri_01knfqkcbhqbnwhq5k1ace3sd9' };
+let PACKS = CREDIT_PACKS;
+let pricingMode = 'credit_based';
 
 const COUNTRY_DEFAULTS = {
   Pakistan: 'PKR',
@@ -404,9 +407,9 @@ const COUNTRY_DEFAULTS = {
   India: 'INR',
 };
 
-const PAYMENT_CONFIG_URL = window.location.hostname === 'localhost'
-  ? 'http://localhost:3000/api/payment-config'
-  : 'https://map-scraper-paddle-backend.vercel.app/api/payment-config';
+const BACKEND_BASE = window.location.hostname === 'localhost'
+  ? 'http://localhost:3000'
+  : 'https://map-scraper-paddle-backend.vercel.app';
 
 const packOptions = document.getElementById('packOptions');
 const countrySelect = document.getElementById('countrySelect');
@@ -456,11 +459,14 @@ function syncUrl() {
 
 function renderPackOptions() {
   packOptions.innerHTML = '';
-  Object.values(PACKS).forEach(pack => {
+  const isOneTime = pricingMode === 'one_time';
+  const packsToShow = isOneTime ? { lifetime: ONE_TIME_PACK } : CREDIT_PACKS;
+  Object.values(packsToShow).forEach(pack => {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = `pack-option${pack.popular ? ' pop' : ''}${state.pack === pack.key ? ' active' : ''}`;
-    button.innerHTML = `<span class="k">${pack.key}</span><span class="v">${pack.credits} credits</span><span class="m">${pack.usdPrice} · ${pack.perLead}</span>`;
+    const creditsText = pack.credits ? `${pack.credits} credits` : 'Lifetime';
+    button.innerHTML = `<span class="k">${pack.key}</span><span class="v">${creditsText}</span><span class="m">${pack.usdPrice} · ${pack.perLead}</span>`;
     button.addEventListener('click', () => {
       state.pack = pack.key;
       updateReferenceCode();
@@ -468,6 +474,28 @@ function renderPackOptions() {
     });
     packOptions.appendChild(button);
   });
+  
+  // Update plan points based on mode
+  const planPoints = document.getElementById('planPoints');
+  if (planPoints) {
+    if (isOneTime) {
+      planPoints.innerHTML = `
+        <div class="plan-point">Lifetime access to all scraping features.</div>
+        <div class="plan-point">One-time payment — never expires.</div>
+        <div class="plan-point">You must be signed in to complete your purchase.</div>`;
+    } else {
+      planPoints.innerHTML = `
+        <div class="plan-point">1 credit = 1 successfully scraped lead.</div>
+        <div class="plan-point">All packs include emails + social media handles.</div>
+        <div class="plan-point">You must be signed in to complete your purchase.</div>`;
+    }
+  }
+  
+  // Hide switch plan section if one-time mode
+  const switchPlanSection = document.querySelector('.switch-plan-group');
+  if (switchPlanSection) {
+    switchPlanSection.style.display = isOneTime ? 'none' : '';
+  }
 }
 
 function updateReferenceCode() {
@@ -477,11 +505,12 @@ function updateReferenceCode() {
 function renderSummary() {
   const pack = PACKS[state.pack];
   document.getElementById('planName').textContent = pack.name;
-  document.getElementById('planCredits').textContent = `${pack.credits} credits`;
+  const creditsText = pack.credits ? `${pack.credits} credits` : 'Lifetime access';
+  document.getElementById('planCredits').textContent = creditsText;
   document.getElementById('planPerLead').textContent = pack.perLead;
   document.getElementById('planCurrency').textContent = state.currency;
   document.getElementById('planPrice').textContent = pack.usdPrice;
-  document.getElementById('summaryPlan').textContent = `${pack.name} · ${pack.credits} credits`;
+  document.getElementById('summaryPlan').textContent = `${pack.name} · ${creditsText}`;
   document.getElementById('summaryCountry').textContent = state.country;
   document.getElementById('summaryCurrency').textContent = state.currency;
 }
@@ -563,6 +592,24 @@ document.getElementById('btDoneBtn').addEventListener('click', async () => {
     btn.textContent = 'Done — I\'ve Made the Transfer';
   }
 });
+
+async function loadPricingMode() {
+  try {
+    const res = await fetch(`${BACKEND_BASE}/api/pricing-config`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to load pricing mode');
+    const data = await res.json();
+    pricingMode = data.mode || 'credit_based';
+    PACKS = (pricingMode === 'one_time') ? { lifetime: ONE_TIME_PACK } : CREDIT_PACKS;
+    // Reset pack selection if current pack no longer available
+    if (!PACKS[state.pack]) {
+      state.pack = Object.keys(PACKS)[0];
+    }
+  } catch (e) {
+    console.error('loadPricingMode error:', e);
+    pricingMode = 'credit_based';
+    PACKS = CREDIT_PACKS;
+  }
+}
 
 async function loadCheckoutUrl() {}
 
@@ -652,8 +699,11 @@ if (!COUNTRY_DEFAULTS[state.country]) state.country = 'Pakistan';
 if (!Array.from(currencySelect.options).some(option => option.value === state.currency)) {
   state.currency = COUNTRY_DEFAULTS[state.country] || 'USD';
 }
-render();
-loadCheckoutUrl();
+loadPricingMode().then(() => {
+  render();
+  loadCheckoutUrl();
+});
+
 
 // ── Auto-detect country via timezone / geo ──
 (function detectCountry() {
