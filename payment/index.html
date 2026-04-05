@@ -418,6 +418,30 @@ const COUNTRY_DEFAULTS = {
   India: 'INR',
 };
 
+const CURRENCY_SYMBOLS = {
+  PKR: 'Rs',
+  USD: '$',
+  AED: 'AED ',
+  SAR: 'SAR ',
+  GBP: 'GBP ',
+  EUR: 'EUR ',
+  CAD: 'CAD ',
+  AUD: 'AUD ',
+  INR: 'Rs ',
+};
+
+const USD_EXCHANGE_RATES = {
+  PKR: 278,
+  USD: 1,
+  AED: 3.67,
+  SAR: 3.75,
+  GBP: 0.79,
+  EUR: 0.92,
+  CAD: 1.36,
+  AUD: 1.53,
+  INR: 83.4,
+};
+
 const BACKEND_BASE = window.location.hostname === 'localhost'
   ? 'http://localhost:3000'
   : 'https://map-scraper-paddle-backend.vercel.app';
@@ -468,6 +492,31 @@ function syncUrl() {
   window.history.replaceState({}, '', next);
 }
 
+function getNumericUsdPrice(priceText) {
+  const numeric = Number(String(priceText || '').replace(/[^0-9.]/g, ''));
+  return Number.isFinite(numeric) ? numeric : 0;
+}
+
+function formatCurrencyAmount(currency, amount) {
+  const symbol = CURRENCY_SYMBOLS[currency] || `${currency} `;
+  const rounded = amount >= 100 ? Math.round(amount) : amount.toFixed(2);
+  return `${symbol}${rounded}`;
+}
+
+function getDisplayPrice(priceText, currency) {
+  const usdAmount = getNumericUsdPrice(priceText);
+  if (!usdAmount) return priceText;
+  if (currency === 'USD') return `$${usdAmount.toFixed(2).replace(/\.00$/, '')}`;
+  const rate = USD_EXCHANGE_RATES[currency] || 1;
+  return formatCurrencyAmount(currency, usdAmount * rate);
+}
+
+function getPriceNote(pack, currency) {
+  if (currency === 'USD') return pack.perLead;
+  if (pricingMode === 'one_time') return `${pack.perLead} · Approx. ${currency} display`;
+  return `${pack.perLead} · Approx. ${currency} display`;
+}
+
 function renderPackOptions() {
   packOptions.innerHTML = '';
   const isOneTime = pricingMode === 'one_time';
@@ -477,7 +526,11 @@ function renderPackOptions() {
     button.type = 'button';
     button.className = `pack-option${pack.popular ? ' pop' : ''}${state.pack === pack.key ? ' active' : ''}`;
     const creditsText = pack.credits ? `${pack.credits} credits` : 'Lifetime';
-    button.innerHTML = `<span class="k">${pack.key}</span><span class="v">${creditsText}</span><span class="m">${pack.usdPrice} · ${pack.perLead}</span>`;
+    const optionPack = (pricingMode === 'one_time' && pack.key === 'lifetime' && state.country !== PAKISTAN_COUNTRY)
+      ? Object.assign({}, pack, { usdPrice: pack.intlPrice || pack.usdPrice })
+      : pack;
+    const localizedPrice = getDisplayPrice(optionPack.usdPrice, state.currency);
+    button.innerHTML = `<span class="k">${pack.key}</span><span class="v">${creditsText}</span><span class="m">${localizedPrice} · ${getPriceNote(optionPack, state.currency)}</span>`;
     button.addEventListener('click', () => {
       state.pack = pack.key;
       updateReferenceCode();
@@ -528,10 +581,14 @@ function renderSummary() {
   const pack = getActivePack();
   document.getElementById('planName').textContent = pack.name;
   const creditsText = pack.credits ? `${pack.credits} credits` : 'Lifetime access';
+  const localizedPrice = getDisplayPrice(pack.usdPrice, state.currency);
   document.getElementById('planCredits').textContent = creditsText;
-  document.getElementById('planPerLead').textContent = pack.perLead;
+  document.getElementById('planPerLead').textContent = getPriceNote(pack, state.currency);
   document.getElementById('planCurrency').textContent = state.currency;
-  document.getElementById('planPrice').textContent = pack.usdPrice;
+  document.getElementById('planPrice').textContent = localizedPrice;
+  document.getElementById('planPriceNote').textContent = state.currency === 'USD'
+    ? (pricingMode === 'one_time' ? 'One-time payment' : 'Charged once per pack')
+    : `Approx. ${state.currency} shown${state.country === PAKISTAN_COUNTRY ? '' : ' · checkout settles in USD'}`;
   document.getElementById('summaryPlan').textContent = `${pack.name} · ${creditsText}`;
   document.getElementById('summaryCountry').textContent = state.country;
   document.getElementById('summaryCurrency').textContent = state.currency;
