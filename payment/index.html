@@ -180,9 +180,9 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
       <a href="../about.html">About</a>
       <a href="../terms-and-conditions.html">Terms &amp; Conditions</a>
       <a href="../auth/" id="navAccountLink">Account</a>
-      <a href="../index.html#install" class="nav-cta">
+      <a href="../index.html#install" class="nav-cta" id="navCtaLink">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Add to Browser
+        <span id="navCtaTxt">Add to Browser</span>
       </a>
     </div>
     <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
@@ -794,6 +794,8 @@ if (!Array.from(currencySelect.options).some(option => option.value === state.cu
 loadPricingMode().then(() => {
   render();
   loadCheckoutUrl();
+  const navTxt = document.getElementById('navCtaTxt');
+  if (navTxt && pricingMode === 'one_time') navTxt.textContent = 'Buy Lifetime Access';
 });
 
 
