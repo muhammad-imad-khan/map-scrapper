@@ -1,6 +1,7 @@
 // GET  /api/admin-users  — paginate users / installs / stats / monthlyReport / bankTransfers
 // POST /api/admin-users  — admin actions (adjustCredits, setCredits, setExpiry,
 //   deleteUser, testEmail, approveBankTransfer, rejectBankTransfer)
+// v2 — read-only actions moved to GET query params
 // Auth: X-Admin-Key header or Authorization: Bearer <key>
 // Query:
 //   type=users|installs|stats|monthlyReport|bankTransfers (default: users)
