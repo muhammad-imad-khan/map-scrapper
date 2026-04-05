@@ -443,6 +443,7 @@
             <div class="stat-icon blue">&#x1F4E6;</div>
             <div class="stat-label">Total Installs</div>
             <div class="stat-value" id="statInstalls">-</div>
+            <div class="stat-sub" id="statInstallsSub" style="font-size:11px;color:var(--muted);"></div>
           </div>
           <div class="stat-card">
             <div class="stat-icon purple">&#x1F4B0;</div>
@@ -823,11 +824,12 @@ async function loadDashboardData() {
   if (dashLoaded) return;
   try {
     // Load all data in parallel
-    const [usersData, installsData, reportData, btData] = await Promise.all([
+    const [usersData, installsData, reportData, btData, statsData] = await Promise.all([
       callApi('/api/admin-users?type=users&limit=200&cursor=0'),
       callApi('/api/admin-users?type=installs&limit=200&cursor=0'),
       callApi('/api/admin-users', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action:'monthlyReport'}) }),
       callApi('/api/admin-users', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action:'listBankTransfers',status:'pending'}) }).catch(() => ({items:[]})),
+      callApi('/api/admin-users', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action:'getStats'}) }).catch(() => ({totalInstalls: 0})),
     ]);
 
     // Stats
@@ -835,6 +837,7 @@ async function loadDashboardData() {
     const installs = installsData.items || [];
     const months = reportData.months || [];
     const pending = btData.items || btData.transfers || [];
+    const totalInstalls = statsData.totalInstalls || 0;
 
     let totalRevenue = 0, totalSales = 0;
     for (const m of months) { totalSales += m.totalSales; totalRevenue += parseFloat(m.totalRevenue || 0); }
@@ -842,7 +845,8 @@ async function loadDashboardData() {
     const activeInstalls = installs.filter(i => i.subscriptionActive).length;
 
     document.getElementById('statUsers').textContent = users.length + (usersData.hasMore ? '+' : '');
-    document.getElementById('statInstalls').textContent = installs.length + (installsData.hasMore ? '+' : '');
+    document.getElementById('statInstalls').textContent = totalInstalls || (installs.length + (installsData.hasMore ? '+' : ''));
+    document.getElementById('statInstallsSub').textContent = activeInstalls + ' active now';
     document.getElementById('statRevenue').textContent = '$' + totalRevenue.toFixed(2);
     document.getElementById('statRevenueMonths').textContent = months.length + ' month(s)';
     document.getElementById('statSales').textContent = totalSales;
