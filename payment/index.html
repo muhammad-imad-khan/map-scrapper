@@ -798,12 +798,23 @@ checkoutBtn.addEventListener('click', () => {
     } else {
       throw new Error(data.error || 'Checkout unavailable. Please try again.');
     }
-  })
-  .catch(err => {
+  // Open Paddle inline overlay directly (client-side) — webhook receives customData
+  const userEmail = (JSON.parse(localStorage.getItem('mls_auth_user') || '{}').email) || '';
+  checkoutStatus.style.display = 'none';
+  checkoutBtn.disabled = true;
+  try {
+    Paddle.Checkout.open({
+      items: [{ priceId: pack.priceId, quantity: 1 }],
+      customData: { installId: state.installId, email: userEmail },
+      customer: userEmail ? { email: userEmail } : undefined,
+      settings: { displayMode: 'overlay', allowLogout: false },
+    });
+  } catch (err) {
+    checkoutStatus.style.display = 'block';
     checkoutStatus.className = 'checkout-status error';
-    checkoutStatus.textContent = err.message || 'Something went wrong. Please try again.';
-    checkoutBtn.disabled = false;
-  });
+    checkoutStatus.textContent = err.message || 'Could not open checkout. Please try again.';
+  }
+  checkoutBtn.disabled = false;
 });
 
 // ══════════════════════════════════════════════════════
