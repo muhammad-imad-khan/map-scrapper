@@ -16,7 +16,7 @@ const CREDITS_EXPIRY_DAYS = 7;
 // Two paid tiers — maps priceId → credits + label
 const PRICE_CREDITS = {
   [process.env.PRICE_PRO || 'pri_01kkwtx0kh2skzrzjbxgmgqngd']:        { credits: 500,  label: 'Pro Pack' },
-  [process.env.PRICE_ENTERPRISE || 'pri_enterprise_placeholder']:       { credits: 2500, label: 'Enterprise Pack' },
+  [process.env.PRICE_ENTERPRISE || 'pri_01kkwtyfwvrwspy654f56h4n5d']:       { credits: 2500, label: 'Enterprise Pack' },
 };
 
 // ── Redis singleton ───────────────────────────────────────
