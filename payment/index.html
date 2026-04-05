@@ -391,7 +391,18 @@ const CREDIT_PACKS = {
   pro:        { key:'pro',        name:'Pro Pack',        credits:500,  usdPrice:'$5',  perLead:'1¢ per lead · Emails + Socials', popular:true,  priceId:'pri_01kkwtx0kh2skzrzjbxgmgqngd' },
   enterprise: { key:'enterprise', name:'Enterprise Pack', credits:2500, usdPrice:'$25', perLead:'1¢ per lead · Emails + Socials', popular:false, priceId:'pri_01kkwtyfwvrwspy654f56h4n5d' },
 };
-const ONE_TIME_PACK = { key:'lifetime', name:'Lifetime License', credits:null, usdPrice:'$5.99', perLead:'One-time payment · Lifetime access', popular:true, priceId:'pri_01knfqkcbhqbnwhq5k1ace3sd9' };
+const PAKISTAN_COUNTRY = 'Pakistan';
+const ONE_TIME_PACK = {
+  key:'lifetime',
+  name:'Lifetime License',
+  credits:null,
+  usdPrice:'$5.99',
+  perLead:'One-time payment · Lifetime access',
+  popular:true,
+  priceId:'pri_01knfqkcbhqbnwhq5k1ace3sd9',
+  intlPrice:'$20',
+  intlPriceId:'pri_01knfsscfv6njhwwb40k8p6mwz'
+};
 let PACKS = CREDIT_PACKS;
 let pricingMode = 'credit_based';
 
@@ -502,8 +513,19 @@ function updateReferenceCode() {
   document.getElementById('referenceCode').textContent = `MLS-${state.pack.toUpperCase()}-${state.currency}`;
 }
 
-function renderSummary() {
+function getActivePack() {
   const pack = PACKS[state.pack];
+  if (!pack) return null;
+  if (pricingMode !== 'one_time' || pack.key !== 'lifetime') return pack;
+  if (state.country === PAKISTAN_COUNTRY) return pack;
+  return Object.assign({}, pack, {
+    usdPrice: pack.intlPrice || '$20',
+    priceId: pack.intlPriceId || 'pri_01knfsscfv6njhwwb40k8p6mwz',
+  });
+}
+
+function renderSummary() {
+  const pack = getActivePack();
   document.getElementById('planName').textContent = pack.name;
   const creditsText = pack.credits ? `${pack.credits} credits` : 'Lifetime access';
   document.getElementById('planCredits').textContent = creditsText;
@@ -528,7 +550,7 @@ function switchMethod(method) {
 }
 
 function updateCardState() {
-  const pack = PACKS[state.pack];
+  const pack = getActivePack();
   const hasRealPrice = pack && pack.priceId && !pack.priceId.includes('placeholder');
   checkoutBtn.disabled = !hasRealPrice;
   if (!hasRealPrice) {
@@ -562,7 +584,7 @@ document.getElementById('btDoneBtn').addEventListener('click', async () => {
   status.style.color = 'var(--muted)';
   status.textContent = '';
 
-  const pack = PACKS[state.pack];
+  const pack = getActivePack();
   const ref = document.getElementById('referenceCode')?.textContent || '';
 
   try {
@@ -599,6 +621,16 @@ async function loadPricingMode() {
     if (!res.ok) throw new Error('Failed to load pricing mode');
     const data = await res.json();
     pricingMode = data.mode || 'credit_based';
+    if (data.pricing && data.pricing.plans) {
+      if (data.pricing.plans.oneTime) {
+        ONE_TIME_PACK.usdPrice = data.pricing.plans.oneTime.price || ONE_TIME_PACK.usdPrice;
+        ONE_TIME_PACK.priceId = data.pricing.plans.oneTime.priceId || ONE_TIME_PACK.priceId;
+      }
+      if (data.pricing.plans.oneTimeIntl) {
+        ONE_TIME_PACK.intlPrice = data.pricing.plans.oneTimeIntl.price || ONE_TIME_PACK.intlPrice;
+        ONE_TIME_PACK.intlPriceId = data.pricing.plans.oneTimeIntl.priceId || ONE_TIME_PACK.intlPriceId;
+      }
+    }
     PACKS = (pricingMode === 'one_time') ? { lifetime: ONE_TIME_PACK } : CREDIT_PACKS;
     // Reset pack selection if current pack no longer available
     if (!PACKS[state.pack]) {
@@ -637,7 +669,7 @@ currencySelect.addEventListener('change', () => {
 });
 
 checkoutBtn.addEventListener('click', () => {
-  const pack = PACKS[state.pack];
+  const pack = getActivePack();
   if (!pack || !pack.priceId) return;
   // Check auth first
   if (!localStorage.getItem('mls_auth_token')) {
