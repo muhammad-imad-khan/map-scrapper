@@ -159,7 +159,14 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
 </style>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
-  Paddle.Initialize({ token: 'live_a5e44dc571f960aec1814cb19be' });
+  Paddle.Initialize({
+    token: 'live_a5e44dc571f960aec1814cb19be',
+    eventCallback: function(ev) {
+      if (ev && ev.name === 'checkout.completed') {
+        handlePaymentSuccess();
+      }
+    }
+  });
 </script>
 </head>
 <body>
@@ -351,6 +358,22 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
     </div>
   </div>
 </main>
+
+<!-- PAYMENT SUCCESS OVERLAY -->
+<div id="paySuccess" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.75);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:var(--s1);border:1px solid var(--b);border-radius:20px;padding:48px 40px;text-align:center;max-width:440px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,.5)">
+    <div style="width:64px;height:64px;border-radius:50%;background:var(--gd);border:1.5px solid var(--gb);display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h2 style="font-size:22px;font-weight:700;margin:0 0 8px">Payment Confirmed!</h2>
+    <p id="paySuccessMsg" style="font-size:14px;color:var(--t2);margin:0 0 24px;line-height:1.6">Verifying your purchase&hellip;</p>
+    <a id="payDownloadBtn" href="#" style="display:none;align-items:center;justify-content:center;gap:8px;padding:13px 28px;background:#22c55e;color:#000;font-weight:700;font-size:14px;border-radius:10px;text-decoration:none;margin-bottom:16px" onclick="handleDownloadClick(event)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download Extension ZIP
+    </a>
+    <p style="font-size:12px;color:var(--t3);margin:4px 0 0">You can also download anytime from <a href="../index.html#install" style="color:#22c55e;text-decoration:none">the homepage</a> after signing in.</p>
+  </div>
+</div>
 
 <footer>
   <div class="footer-inner">
@@ -763,9 +786,15 @@ checkoutBtn.addEventListener('click', () => {
       if (pricingMode === 'one_time' && pack.key === 'lifetime') {
         localStorage.setItem('mls_pending_zip_download', '1');
       }
-      checkoutStatus.className = 'checkout-status ready';
-      checkoutStatus.textContent = 'Redirecting to checkout…';
-      window.location.href = data.checkoutUrl;
+      if (data.txnId) {
+        checkoutStatus.style.display = 'none';
+        checkoutBtn.disabled = false;
+        Paddle.Checkout.open({ transactionId: data.txnId, settings: { displayMode: 'overlay' } });
+      } else {
+        checkoutStatus.className = 'checkout-status ready';
+        checkoutStatus.textContent = 'Redirecting to checkout…';
+        window.location.href = data.checkoutUrl;
+      }
     } else {
       throw new Error(data.error || 'Checkout unavailable. Please try again.');
     }
@@ -776,6 +805,74 @@ checkoutBtn.addEventListener('click', () => {
     checkoutBtn.disabled = false;
   });
 });
+
+// ══════════════════════════════════════════════════════
+//  POST-PAYMENT DOWNLOAD
+// ══════════════════════════════════════════════════════
+async function triggerZipDownload() {
+  const token = localStorage.getItem('mls_auth_token') || '';
+  const res = await fetch('/api/download-extension', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token }),
+  });
+  if (!res.ok) throw new Error('not_entitled');
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'maps-scraper-extension-v1.0.zip';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+async function handlePaymentSuccess() {
+  localStorage.removeItem('mls_pending_zip_download');
+  const overlay = document.getElementById('paySuccess');
+  const msg = document.getElementById('paySuccessMsg');
+  const btn = document.getElementById('payDownloadBtn');
+  overlay.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+
+  // Poll auth for entitlement — webhook may take a couple of seconds
+  let entitled = false;
+  const token = localStorage.getItem('mls_auth_token') || '';
+  for (let i = 0; i < 6; i++) {
+    await new Promise(r => setTimeout(r, i === 0 ? 2000 : 2500));
+    try {
+      const r = await fetch('https://map-scraper-paddle-backend.vercel.app/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'me', token }),
+      });
+      const d = await r.json();
+      if (d.entitlements && d.entitlements.zipDownload) { entitled = true; break; }
+    } catch (_) {}
+  }
+
+  if (entitled) {
+    msg.textContent = 'Download starting…';
+    btn.style.display = 'inline-flex';
+    try {
+      await triggerZipDownload();
+      msg.textContent = '\u2714 Download started! If it didn\'t begin automatically, click the button below.';
+    } catch (_) {
+      msg.textContent = 'Ready to download — click the button below.';
+    }
+  } else {
+    msg.textContent = 'Payment received! Use the button below to download your extension.';
+    btn.style.display = 'inline-flex';
+  }
+}
+
+function handleDownloadClick(e) {
+  e.preventDefault();
+  triggerZipDownload().catch(() => {
+    window.location.href = '../index.html#install';
+  });
+}
 
 document.getElementById('navBurger').addEventListener('click', () => {
   document.getElementById('navLinks').classList.toggle('open');
