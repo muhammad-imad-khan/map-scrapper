@@ -14,6 +14,7 @@ const SRC_DIR  = path.join(__dirname, 'maps-scraper-extension-v1.0');
 const DIST_DIR = path.join(__dirname, 'dist');
 const BUILD    = path.join(DIST_DIR, 'maps-scraper-extension-v1.0');
 const ZIP_NAME = 'maps-scraper-extension-v1.0.zip';
+const JS_OBFUSCATION_EXCLUDE = new Set(['background.js']);
 
 // ── Obfuscation config (Chrome-extension safe) ────────────
 const OBF_OPTIONS = {
@@ -47,10 +48,16 @@ for (const file of files) {
   const dest = path.join(BUILD, file);
 
   if (file.endsWith('.js')) {
-    console.log(`  Obfuscating ${file}...`);
     const code = fs.readFileSync(src, 'utf8');
-    const obfuscated = obfuscate(code, OBF_OPTIONS).getObfuscatedCode();
-    fs.writeFileSync(dest, obfuscated, 'utf8');
+
+    if (JS_OBFUSCATION_EXCLUDE.has(file)) {
+      console.log(`  Copying ${file} without obfuscation (executeScript-safe)...`);
+      fs.writeFileSync(dest, code, 'utf8');
+    } else {
+      console.log(`  Obfuscating ${file}...`);
+      const obfuscated = obfuscate(code, OBF_OPTIONS).getObfuscatedCode();
+      fs.writeFileSync(dest, obfuscated, 'utf8');
+    }
   } else {
     // Copy HTML, JSON, PNG as-is
     fs.copyFileSync(src, dest);

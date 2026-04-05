@@ -1196,7 +1196,7 @@ async function loadPricingMode() {
   status.textContent = 'Loading pricing mode...';
   status.className = 'status';
   try {
-    const data = await callApi('/api/payment-config?type=pricing');
+    const data = await callApi('/api/pricing-config');
     const mode = data && data.mode ? data.mode : 'credit_based';
     document.getElementById('pricingModeSelect').value = mode;
     status.textContent = `Current mode: ${mode === 'one_time' ? 'One-time purchase' : 'Credit-based'}`;
@@ -1248,7 +1248,7 @@ document.getElementById('savePricingMode').addEventListener('click', async () =>
   status.className = 'status';
 
   try {
-    await callApi('/api/payment-config', {
+    await callApi('/api/pricing-config', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'setPricingMode', mode }),
