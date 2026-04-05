@@ -321,7 +321,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
                 <span class="tag global">Powered by Paddle</span>
               </div>
               <p>Pay securely with your credit or debit card via Paddle's hosted checkout. All major cards accepted.</p>
-              <div id="checkoutStatus" class="checkout-status ready">Checkout is ready. Click below to open the secure payment page.</div>
+              <div id=\"checkoutStatus\" class=\"checkout-status\" style=\"display:none\"></div>
               <div class="actions" style="margin-top:14px">
                 <button id="checkoutBtn" class="btn-main">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
@@ -531,8 +531,9 @@ checkoutBtn.addEventListener('click', () => {
   }
   // Use backend API to create checkout with installId in custom_data
   checkoutBtn.disabled = true;
+  checkoutStatus.style.display = 'block';
   checkoutStatus.className = 'checkout-status pending';
-  checkoutStatus.textContent = 'Creating checkout session...';
+  checkoutStatus.textContent = 'Creating checkout session…';
   fetch('https://map-scraper-paddle-backend.vercel.app/api/checkout', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -541,14 +542,16 @@ checkoutBtn.addEventListener('click', () => {
   .then(r => r.json())
   .then(data => {
     if (data.checkoutUrl) {
+      checkoutStatus.className = 'checkout-status ready';
+      checkoutStatus.textContent = 'Redirecting to checkout…';
       window.location.href = data.checkoutUrl;
     } else {
-      throw new Error(data.error || 'Could not create checkout');
+      throw new Error(data.error || 'Checkout unavailable. Please try again.');
     }
   })
   .catch(err => {
     checkoutStatus.className = 'checkout-status error';
-    checkoutStatus.textContent = err.message || 'Checkout failed';
+    checkoutStatus.textContent = err.message || 'Something went wrong. Please try again.';
     checkoutBtn.disabled = false;
   });
 });
