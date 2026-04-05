@@ -14,6 +14,7 @@ const SRC_DIR  = path.join(__dirname, 'maps-scraper-extension-v1.0');
 const DIST_DIR = path.join(__dirname, 'dist');
 const BUILD    = path.join(DIST_DIR, 'maps-scraper-extension-v1.0');
 const ZIP_NAME = 'maps-scraper-extension-v1.0.zip';
+const API_ASSET_DIR = path.join(__dirname, 'api', '_assets');
 const JS_OBFUSCATION_EXCLUDE = new Set(['background.js']);
 
 // ── Obfuscation config (Chrome-extension safe) ────────────
@@ -67,6 +68,7 @@ for (const file of files) {
 // ── Create ZIP ────────────────────────────────────────────
 const zipPath = path.join(DIST_DIR, ZIP_NAME);
 if (fs.existsSync(zipPath)) fs.unlinkSync(zipPath);
+fs.mkdirSync(API_ASSET_DIR, { recursive: true });
 
 // Use PowerShell Compress-Archive
 execSync(
@@ -74,10 +76,10 @@ execSync(
   { stdio: 'inherit' }
 );
 
-// Also copy to project root (this is what the website serves for download)
-const rootZip = path.join(__dirname, ZIP_NAME);
-fs.copyFileSync(zipPath, rootZip);
+// Copy to the gated API asset folder for protected downloads
+const apiZip = path.join(API_ASSET_DIR, ZIP_NAME);
+fs.copyFileSync(zipPath, apiZip);
 
 console.log(`\n  ✓ Built: dist/${ZIP_NAME}`);
-console.log(`  ✓ Copied to: ${ZIP_NAME} (website download)`);
+console.log(`  ✓ Copied to: api/_assets/${ZIP_NAME} (gated website download)`);
 console.log(`    Size : ${(fs.statSync(zipPath).size / 1024).toFixed(1)} KB`);

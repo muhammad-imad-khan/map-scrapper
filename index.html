@@ -444,7 +444,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
       <a href="#how">How it works</a>
       <a href="#features">Features</a>
       <a href="#pricing">Pricing</a>
-      <a href="maps-scraper-extension-v1.0.zip" download>Download ZIP</a>
+      <a href="#" id="navZipDownload">Download ZIP</a>
       <a href="payment/">Payment</a>
       <a href="#faq">FAQ</a>
       <a href="about.html">About</a>
@@ -491,7 +491,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         <span id="heroCtaTxt">Add to Chrome — Free</span>
       </a>
-      <a class="btn-ghost" href="maps-scraper-extension-v1.0.zip" download id="heroZipDownload">Download ZIP</a>
+      <a class="btn-ghost" href="#" id="heroZipDownload">Download ZIP</a>
       <a class="btn-ghost" href="#how">Watch it scrape →</a>
     </div>
     <p class="hero-note" id="heroNoteText"><strong>3 free credits</strong> on install · 1 credit = 1 lead · Bought credits never expire</p>
@@ -1397,25 +1397,37 @@ function detect() {
   if (isChrome) return 'chrome'; return 'unknown';
 }
 const detected = detect();
+var activePricingMode = 'credit_based';
+var authState = { loaded: false, user: null, purchases: [], entitlements: { lifetimeAccess: false, zipDownload: false } };
+var autoDownloadAttempted = false;
 
 function applyBrowser(br) {
   const info = BR[br] || BR.chrome;
+  const lockedOneTime = activePricingMode === 'one_time' && !hasUnlockedZip();
+  const unlockedOneTime = activePricingMode === 'one_time' && hasUnlockedZip();
   ['heroCta','navCtaBtn','installBtn','ctaBtn'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     el.style.opacity = info.ok ? '1' : '0.5';
     el.style.pointerEvents = info.ok ? 'auto' : 'none';
   });
-  const txtIds = { heroCtaTxt: info.btn, navCtaTxt: info.ok ? 'Add to Browser' : 'Coming Soon', installBtnTxt: info.btn, ctaBtnTxt: info.btn };
+  const primaryText = lockedOneTime ? 'Buy Lifetime Access' : (unlockedOneTime ? `Download for ${info.name}` : info.btn);
+  const navText = info.ok ? (lockedOneTime ? 'Unlock Access' : (unlockedOneTime ? 'Download ZIP' : 'Add to Browser')) : 'Coming Soon';
+  const txtIds = { heroCtaTxt: primaryText, navCtaTxt: navText, installBtnTxt: primaryText, ctaBtnTxt: primaryText };
   Object.entries(txtIds).forEach(([id, txt]) => { const el = document.getElementById(id); if (el) el.textContent = txt; });
   document.getElementById('bclBrowser').textContent = info.name + ' detected';
-  document.getElementById('bclH').textContent = info.ok ? `Install on ${info.name} — Free` : `${info.name} — Coming Soon`;
-  document.getElementById('bclS').textContent = info.sub;
+  document.getElementById('bclH').textContent = info.ok ? (lockedOneTime ? `Unlock on ${info.name}` : (unlockedOneTime ? `Download on ${info.name}` : `Install on ${info.name} — Free`)) : `${info.name} — Coming Soon`;
+  document.getElementById('bclS').textContent = lockedOneTime
+    ? 'Complete the lifetime purchase first. After payment confirmation, the ZIP unlocks for direct download.'
+    : (unlockedOneTime ? 'Your purchase is verified. The extension ZIP downloads directly with the install guide.' : info.sub);
+  const navZip = document.getElementById('navZipDownload');
+  const heroZip = document.getElementById('heroZipDownload');
+  if (navZip) navZip.style.display = lockedOneTime ? 'none' : '';
+  if (heroZip) heroZip.style.display = lockedOneTime ? 'none' : '';
   document.querySelectorAll('.b-card').forEach(c => c.classList.remove('sel'));
   const card = document.getElementById('bbc-' + br);
   if (card) card.classList.add('sel');
 }
-applyBrowser(detected);
 
 document.querySelectorAll('.b-card').forEach(card => {
   card.addEventListener('click', e => {
@@ -1428,10 +1440,11 @@ document.querySelectorAll('.b-card').forEach(card => {
 // ══════════════════════════════════════════════════════
 //  INSTALL MODAL
 // ══════════════════════════════════════════════════════
-const ZIP_URL = 'maps-scraper-extension-v1.0.zip';
+const DOWNLOAD_ENDPOINT = '/api/download-extension';
 const BACKEND_BASE = 'https://map-scraper-paddle-backend.vercel.app';
 
 function applyPricingMode(mode, pricing) {
+  activePricingMode = mode || 'credit_based';
   const isOneTime = mode === 'one_time';
   const oneTimePrice = (pricing && pricing.plans && pricing.plans.oneTime && pricing.plans.oneTime.price) || '$5.99';
   const setText = (id, text) => {
@@ -1478,6 +1491,8 @@ function applyPricingMode(mode, pricing) {
     setText('proFeat5', 'Credits never expire');
     setText('proCardButton', 'Buy Pro →');
   }
+
+  applyBrowser(detected);
 }
 
 async function loadPricingMode() {
@@ -1491,14 +1506,66 @@ async function loadPricingMode() {
   }
 }
 
-loadPricingMode();
-
-function triggerDownload() {
-  const a = Object.assign(document.createElement('a'), { href: ZIP_URL, download: 'maps-scraper-extension-v1.0.zip' });
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+function hasUnlockedZip() {
+  return activePricingMode !== 'one_time' || !!(authState.entitlements && authState.entitlements.zipDownload);
 }
 
-function openInstallModal() {
+async function loadAuthState() {
+  const token = localStorage.getItem('mls_auth_token');
+  if (!token) {
+    authState = { loaded: true, user: null, purchases: [], entitlements: { lifetimeAccess: false, zipDownload: false } };
+    applyBrowser(detected);
+    return;
+  }
+
+  try {
+    const resp = await fetch(`${BACKEND_BASE}/api/auth`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'me', token }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || 'Session expired');
+    authState = {
+      loaded: true,
+      user: data.user || null,
+      purchases: Array.isArray(data.purchases) ? data.purchases : [],
+      entitlements: data.entitlements || { lifetimeAccess: false, zipDownload: false },
+    };
+  } catch {
+    authState = { loaded: true, user: null, purchases: [], entitlements: { lifetimeAccess: false, zipDownload: false } };
+  }
+
+  applyBrowser(detected);
+}
+
+async function triggerDownload() {
+  const token = localStorage.getItem('mls_auth_token') || '';
+  const resp = await fetch(DOWNLOAD_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token }),
+  });
+
+  if (!resp.ok) {
+    let message = 'Download unavailable.';
+    try {
+      const data = await resp.json();
+      if (data && data.error) message = data.error;
+    } catch {}
+    throw new Error(message);
+  }
+
+  const blob = await resp.blob();
+  const url = URL.createObjectURL(blob);
+  const a = Object.assign(document.createElement('a'), { href: url, download: 'maps-scraper-extension-v1.0.zip' });
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+async function openInstallModal() {
   const modal = document.getElementById('installModal');
   const spinner = document.getElementById('dlSpinner');
   const check   = document.getElementById('dlCheck');
@@ -1510,8 +1577,13 @@ function openInstallModal() {
   modal.classList.add('show');
   document.body.style.overflow = 'hidden';
   spinner.style.display = 'block'; check.style.display = 'none';
-  triggerDownload();
-  setTimeout(() => { spinner.style.display = 'none'; check.style.display = 'block'; }, 1800);
+  try {
+    await triggerDownload();
+    setTimeout(() => { spinner.style.display = 'none'; check.style.display = 'block'; }, 1800);
+  } catch (err) {
+    closeInstallModal();
+    window.alert(err.message || 'Download unavailable.');
+  }
 }
 function closeInstallModal() {
   document.getElementById('installModal').classList.remove('show');
@@ -1537,12 +1609,30 @@ function updateInstallBtnState() {
 }
 termsCheck.addEventListener('change', updateInstallBtnState);
 
+function requestLifetimePurchase() {
+  localStorage.setItem('mls_pending_zip_download', '1');
+  const paymentPath = '/payment/?pack=lifetime';
+  if (!localStorage.getItem('mls_auth_token')) {
+    window.location.href = 'auth/?redirect=' + encodeURIComponent(paymentPath);
+    return;
+  }
+  window.location.href = paymentPath.slice(1);
+}
+
 function handleInstallClick(e) {
   e.preventDefault();
   if (!termsCheck.checked) {
     termsError.style.display = 'block';
     document.getElementById('termsCheckLabel').style.borderColor = 'rgba(248,113,113,.4)';
     document.getElementById('install').scrollIntoView({ behavior:'smooth' });
+    return;
+  }
+  if (activePricingMode === 'one_time') {
+    if (!hasUnlockedZip()) {
+      requestLifetimePurchase();
+      return;
+    }
+    openInstallModal();
     return;
   }
   // Show email modal first, then install modal
@@ -1554,6 +1644,15 @@ function handleInstallClick(e) {
 
 function proceedToInstall() {
   document.getElementById('emailModal').classList.remove('show');
+  openInstallModal();
+}
+
+function handleDirectDownloadClick(e) {
+  e.preventDefault();
+  if (activePricingMode === 'one_time' && !hasUnlockedZip()) {
+    requestLifetimePurchase();
+    return;
+  }
   openInstallModal();
 }
 
@@ -1589,20 +1688,39 @@ document.getElementById('emailModal').addEventListener('click', e => {
 document.querySelectorAll('#heroCta,#navCtaBtn,#installBtn,#ctaBtn').forEach(btn => {
   btn.addEventListener('click', handleInstallClick);
 });
+document.getElementById('navZipDownload').addEventListener('click', handleDirectDownloadClick);
+document.getElementById('heroZipDownload').addEventListener('click', handleDirectDownloadClick);
 document.getElementById('modalClose').addEventListener('click', closeInstallModal);
 document.getElementById('reDownload').addEventListener('click', () => {
-  triggerDownload();
-  document.getElementById('reDownload').textContent = '✓ Downloading…';
-  setTimeout(() => { document.getElementById('reDownload').textContent = '↓ Re-download ZIP'; }, 2500);
+  triggerDownload()
+    .then(() => {
+      document.getElementById('reDownload').textContent = '✓ Downloading…';
+      setTimeout(() => { document.getElementById('reDownload').textContent = '↓ Re-download ZIP'; }, 2500);
+    })
+    .catch(err => window.alert(err.message || 'Download unavailable.'));
 });
 document.getElementById('installModal').addEventListener('click', e => {
   if (e.target === document.getElementById('installModal')) closeInstallModal();
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeInstallModal(); });
 
+function maybeAutoDownloadPurchasedZip() {
+  if (autoDownloadAttempted) return;
+  if (localStorage.getItem('mls_pending_zip_download') !== '1') return;
+  if (!hasUnlockedZip()) return;
+  autoDownloadAttempted = true;
+  localStorage.removeItem('mls_pending_zip_download');
+  openInstallModal();
+}
+
 // ══════════════════════════════════════════════════════
 //  NAV + MISC
 // ══════════════════════════════════════════════════════
+Promise.all([loadPricingMode(), loadAuthState()]).then(() => {
+  applyBrowser(detected);
+  maybeAutoDownloadPurchasedZip();
+});
+
 window.addEventListener('scroll', () => {
   document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 36);
 }, { passive:true });

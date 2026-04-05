@@ -703,6 +703,9 @@ checkoutBtn.addEventListener('click', () => {
   .then(r => r.json())
   .then(data => {
     if (data.checkoutUrl) {
+      if (pricingMode === 'one_time' && pack.key === 'lifetime') {
+        localStorage.setItem('mls_pending_zip_download', '1');
+      }
       checkoutStatus.className = 'checkout-status ready';
       checkoutStatus.textContent = 'Redirecting to checkout…';
       window.location.href = data.checkoutUrl;
