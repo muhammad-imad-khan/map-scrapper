@@ -56,7 +56,10 @@ async function exec(tabId, fn, args = []) {
   try {
     const res = await chrome.scripting.executeScript({ target: { tabId }, func: fn, args });
     return res?.[0]?.result ?? null;
-  } catch { return null; }
+  } catch (e) {
+    console.error('[exec] Script injection failed:', e.message, 'tabId:', tabId);
+    return null;
+  }
 }
 
 // ── Install ID (unique per browser install, used as RLS key) ──
@@ -347,11 +350,27 @@ async function runScraper(query, requestedMax, startCredits) {
     // Wait for results to actually appear in the DOM (up to 15s)
     state.status = 'Waiting for Maps results to load…';
     broadcast('STATE', state);
+
+    // Test that script injection works at all
+    const canExec = await exec(tabId, () => 'ping');
+    console.log('[Scraper] exec test:', canExec);
+    if (canExec !== 'ping') {
+      // Script injection failed — try getting tab info
+      const tab = await chrome.tabs.get(tabId).catch(() => null);
+      console.error('[Scraper] Cannot inject scripts. Tab URL:', tab?.url, 'Status:', tab?.status);
+      throw new Error('Cannot access Google Maps page. Check extension permissions.');
+    }
+
+    // Log the actual page URL for debugging
+    const pageUrl = await exec(tabId, () => location.href);
+    console.log('[Scraper] Maps page URL:', pageUrl);
+
     let hasResults = false;
     for (let w = 0; w < 10; w++) {
       hasResults = await exec(tabId, () => {
         return document.querySelectorAll('a[href*="/maps/place/"], a.hfpxzc').length > 0;
       });
+      console.log('[Scraper] hasResults check', w, ':', hasResults);
       if (hasResults) break;
       await sleep(1500);
     }
