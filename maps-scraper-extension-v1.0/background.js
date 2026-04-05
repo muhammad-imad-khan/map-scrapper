@@ -325,21 +325,56 @@ async function runScraper(query, requestedMax, startCredits) {
     state.tabId = tabId;
 
     await waitForTab(tabId);
-    await sleep(4000);
+    await sleep(3000);
 
-    // Dismiss consent dialog
-    await exec(tabId, () => {
-      const btn = document.querySelector('button[aria-label*="Accept all"], form[action*="consent"] button');
-      if (btn) btn.click();
-    });
-    await sleep(600);
+    // Dismiss consent / cookie dialogs (try multiple times)
+    for (let c = 0; c < 3; c++) {
+      const dismissed = await exec(tabId, () => {
+        // Google consent dialog
+        const accept = document.querySelector('button[aria-label*="Accept all"]')
+          || document.querySelector('form[action*="consent"] button')
+          || document.querySelector('button[jsname="b3VHJd"]');
+        if (accept) { accept.click(); return 'consent'; }
+        // Cookie banner
+        const cookie = document.querySelector('[aria-label*="cookie"] button, .cookie-consent button');
+        if (cookie) { cookie.click(); return 'cookie'; }
+        return null;
+      });
+      if (dismissed) { await sleep(1500); } else { break; }
+    }
+    await sleep(1500);
+
+    // Wait for results to actually appear in the DOM (up to 15s)
+    state.status = 'Waiting for Maps results to load…';
+    broadcast('STATE', state);
+    let hasResults = false;
+    for (let w = 0; w < 10; w++) {
+      hasResults = await exec(tabId, () => {
+        return document.querySelectorAll('a[href*="/maps/place/"], a.hfpxzc').length > 0;
+      });
+      if (hasResults) break;
+      await sleep(1500);
+    }
 
     // Collect listing URLs
     state.status = 'Collecting listings from results…';
     broadcast('STATE', state);
     const urls = await collectUrls(tabId, maxResults);
     state.total = urls.length;
-    if (!urls.length) throw new Error('No listings found. Try a different query.');
+    if (!urls.length) {
+      // Get diagnostic info
+      const diag = await exec(tabId, () => ({
+        url: location.href,
+        title: document.title,
+        bodyLen: document.body?.innerHTML?.length || 0,
+        allLinks: document.querySelectorAll('a').length,
+        placeLinks: document.querySelectorAll('a[href*="/maps/place/"]').length,
+        hfpxzc: document.querySelectorAll('a.hfpxzc').length,
+        feeds: document.querySelectorAll('div[role="feed"]').length,
+      }));
+      console.error('[Scraper] No listings. Diagnostics:', JSON.stringify(diag));
+      throw new Error('No listings found. Try a different query.');
+    }
 
     broadcast('STATE', { ...state, status: `Found ${urls.length} listings. Starting…` });
     await sleep(400);
@@ -415,7 +450,8 @@ async function runScraper(query, requestedMax, startCredits) {
 async function collectUrls(tabId, max) {
   const seen = new Set();
   let att = 0;
-  while (seen.size < max && att < 40) {
+  const maxAttempts = Math.min(max * 3, 60); // scale with requested results
+  while (seen.size < max && att < maxAttempts) {
     const found = await exec(tabId, () => {
       // Try multiple selectors — Google Maps changes DOM frequently
       const links = [
