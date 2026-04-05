@@ -311,6 +311,21 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
                 <div class="detail-row"><span>Reference</span><strong id="referenceCode">MLS-PRO-PKR</strong></div>
               </div>
               <div class="note">After transfer, share your payment proof with <a href="mailto:elysiansoft.systems@gmail.com" style="color:#22c55e;text-decoration:none">elysiansoft.systems@gmail.com</a> so your credits can be issued manually.</div>
+              <div style="margin-top:14px">
+                <div style="margin-bottom:10px">
+                  <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px">Your Email (for receiving credits)</label>
+                  <input type="email" id="btEmail" placeholder="you@example.com" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;outline:none" />
+                </div>
+                <div style="margin-bottom:10px">
+                  <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px">Your Name</label>
+                  <input type="text" id="btName" placeholder="Your name" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;outline:none" />
+                </div>
+                <button id="btDoneBtn" class="btn-main" style="width:100%">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                  Done — I've Made the Transfer
+                </button>
+                <div id="btStatus" style="margin-top:8px;font-size:13px;min-height:18px"></div>
+              </div>
             </div>
           </div>
 
@@ -497,6 +512,56 @@ function updateCardState() {
 
 tabBank.addEventListener('click', () => switchMethod('bank'));
 tabCard.addEventListener('click', () => switchMethod('card'));
+
+// ── Bank Transfer "Done" button ──
+document.getElementById('btDoneBtn').addEventListener('click', async () => {
+  const email = document.getElementById('btEmail').value.trim();
+  const name = document.getElementById('btName').value.trim();
+  const status = document.getElementById('btStatus');
+  const btn = document.getElementById('btDoneBtn');
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    status.style.color = 'var(--danger, #f87171)';
+    status.textContent = 'Please enter a valid email address.';
+    document.getElementById('btEmail').focus();
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+  status.style.color = 'var(--muted)';
+  status.textContent = '';
+
+  const pack = PACKS[state.pack];
+  const ref = document.getElementById('referenceCode')?.textContent || '';
+
+  try {
+    const res = await fetch('https://map-scraper-paddle-backend.vercel.app/api/bank-transfer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pack: pack ? pack.name : state.pack,
+        email,
+        name,
+        installId: state.installId || null,
+        reference: ref,
+      }),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      status.style.color = 'var(--accent, #22c55e)';
+      status.textContent = '✓ ' + (data.message || 'Transfer recorded! Admin will verify and activate your credits shortly.');
+      btn.textContent = '✓ Submitted';
+    } else {
+      throw new Error(data.error || 'Failed');
+    }
+  } catch (e) {
+    status.style.color = 'var(--danger, #f87171)';
+    status.textContent = 'Error: ' + (e.message || 'Network error. Try again.');
+    btn.disabled = false;
+    btn.textContent = 'Done — I\'ve Made the Transfer';
+  }
+});
 
 async function loadCheckoutUrl() {}
 

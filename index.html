@@ -843,6 +843,29 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
 </footer>
 
 <!-- INSTALL MODAL -->
+<!-- EMAIL COLLECTION MODAL -->
+<div id="emailModal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--modal-bg);border:1px solid rgba(255,255,255,.13);border-radius:20px;width:100%;max-width:440px;overflow:hidden;box-shadow:var(--shadow-modal);animation:modalIn .35s cubic-bezier(.34,1.56,.64,1) both">
+    <div style="padding:28px 24px 20px;text-align:center">
+      <div style="font-size:38px;margin-bottom:12px">📧</div>
+      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--t);margin-bottom:6px">One more step!</div>
+      <div style="font-size:13px;color:var(--t5);line-height:1.6;margin-bottom:20px">Enter your email to get <strong style="color:var(--g)">exclusive offers</strong>, credit deals &amp; product updates.</div>
+      <div style="text-align:left;margin-bottom:10px">
+        <label style="font-size:10px;color:var(--t5);text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:4px">Name (optional)</label>
+        <input id="dlName" type="text" placeholder="Your name" style="width:100%;background:var(--s2);border:1px solid var(--bhi);border-radius:8px;padding:10px 14px;color:var(--t);font-size:14px;outline:none;font-family:inherit" />
+      </div>
+      <div style="text-align:left;margin-bottom:6px">
+        <label style="font-size:10px;color:var(--t5);text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:4px">Email address</label>
+        <input id="dlEmail" type="email" placeholder="you@example.com" style="width:100%;background:var(--s2);border:1px solid var(--bhi);border-radius:8px;padding:10px 14px;color:var(--t);font-size:14px;outline:none;font-family:inherit" />
+      </div>
+      <div id="dlEmailMsg" style="font-size:12px;min-height:18px;margin:6px 0;color:#f87171"></div>
+      <button id="dlEmailSubmit" style="width:100%;padding:12px;background:var(--g);color:#000;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px">Continue to Download →</button>
+      <button id="dlEmailSkip" style="width:100%;padding:9px;background:transparent;color:var(--t5);border:1px solid var(--bhi);border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit">Skip for now</button>
+    </div>
+  </div>
+</div>
+<style>#emailModal.show{display:flex!important}</style>
+
 <div id="installModal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px">
   <div id="installModalBox" style="background:#0f0f1a;border:1px solid rgba(255,255,255,.13);border-radius:20px;width:100%;max-width:560px;overflow:hidden;box-shadow:0 48px 140px rgba(0,0,0,.7);animation:modalIn .35s cubic-bezier(.34,1.56,.64,1) both">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 22px 18px;border-bottom:1px solid rgba(255,255,255,.07)">
@@ -1458,8 +1481,50 @@ function handleInstallClick(e) {
     document.getElementById('install').scrollIntoView({ behavior:'smooth' });
     return;
   }
+  // Show email modal first, then install modal
+  const emailModal = document.getElementById('emailModal');
+  emailModal.classList.add('show');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('dlEmail').focus();
+}
+
+function proceedToInstall() {
+  document.getElementById('emailModal').classList.remove('show');
   openInstallModal();
 }
+
+document.getElementById('dlEmailSubmit').addEventListener('click', () => {
+  const email = document.getElementById('dlEmail').value.trim();
+  const name = document.getElementById('dlName').value.trim();
+  const msg = document.getElementById('dlEmailMsg');
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    msg.textContent = 'Please enter a valid email address.';
+    msg.style.color = '#f87171';
+    document.getElementById('dlEmail').focus();
+    return;
+  }
+  const btn = document.getElementById('dlEmailSubmit');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  msg.textContent = '';
+  fetch('https://map-scraper-paddle-backend.vercel.app/api/credits', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Install-Id': 'web-' + Date.now() },
+    body: JSON.stringify({ action: 'saveEmail', email, name }),
+  })
+  .then(r => r.json())
+  .then(() => { proceedToInstall(); })
+  .catch(() => { proceedToInstall(); })
+  .finally(() => { btn.disabled = false; btn.textContent = 'Continue to Download →'; });
+});
+
+document.getElementById('dlEmailSkip').addEventListener('click', () => {
+  proceedToInstall();
+});
+
+document.getElementById('emailModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('emailModal')) proceedToInstall();
+});
 
 document.querySelectorAll('#heroCta,#navCtaBtn,#installBtn,#ctaBtn').forEach(btn => {
   btn.addEventListener('click', handleInstallClick);

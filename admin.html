@@ -167,6 +167,7 @@
         <button id="tabUsers" class="tab active">Users</button>
         <button id="tabInstalls" class="tab">Installs</button>
         <button id="tabReport" class="tab">Monthly Report</button>
+        <button id="tabBankTransfers" class="tab">Bank Transfers</button>
         <button id="refresh" class="ok">Refresh</button>
         <button id="testEmail" class="warn" style="margin-left:auto;">Send Test Email</button>
       </div>
@@ -198,6 +199,25 @@
       <div id="reportStatus" class="status"></div>
       <div id="reportSummary" style="display:flex;gap:16px;margin:10px 0;flex-wrap:wrap;"></div>
       <div id="reportTableWrap"></div>
+    </div>
+
+    <!-- Bank Transfers Section -->
+    <div class="card" id="bankTransferSection" style="display:none;">
+      <h2 style="margin:0 0 6px;font-size:18px;">Bank Transfer Requests</h2>
+      <div class="muted" style="margin-bottom:10px;">Review, approve, or reject manual bank transfer payments.</div>
+      <div class="row" style="margin-bottom:10px;">
+        <div>
+          <label>Status Filter</label>
+          <select id="btStatusFilter" style="width:160px;">
+            <option value="pending" selected>Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+        <button id="loadBankTransfers" class="primary" style="align-self:end;">Load</button>
+      </div>
+      <div id="btStatus" class="status"></div>
+      <div id="btTableWrap"></div>
     </div>
   </div>
 
@@ -232,6 +252,7 @@
       tabUsers: document.getElementById('tabUsers'),
       tabInstalls: document.getElementById('tabInstalls'),
       tabReport: document.getElementById('tabReport'),
+      tabBankTransfers: document.getElementById('tabBankTransfers'),
       refresh: document.getElementById('refresh'),
       status: document.getElementById('status'),
       tableWrap: document.getElementById('tableWrap'),
@@ -244,6 +265,11 @@
       reportStatus: document.getElementById('reportStatus'),
       reportSummary: document.getElementById('reportSummary'),
       reportTableWrap: document.getElementById('reportTableWrap'),
+      bankTransferSection: document.getElementById('bankTransferSection'),
+      btStatusFilter: document.getElementById('btStatusFilter'),
+      loadBankTransfers: document.getElementById('loadBankTransfers'),
+      btStatus: document.getElementById('btStatus'),
+      btTableWrap: document.getElementById('btTableWrap'),
     };
 
     function setStatus(msg, kind) {
@@ -495,7 +521,9 @@
       el.tabUsers.classList.add('active');
       el.tabInstalls.classList.remove('active');
       el.tabReport.classList.remove('active');
+      el.tabBankTransfers.classList.remove('active');
       el.reportSection.style.display = 'none';
+      el.bankTransferSection.style.display = 'none';
       el.tableWrap.parentElement.style.display = '';
       try {
         await reloadFromStart();
@@ -509,7 +537,9 @@
       el.tabInstalls.classList.add('active');
       el.tabUsers.classList.remove('active');
       el.tabReport.classList.remove('active');
+      el.tabBankTransfers.classList.remove('active');
       el.reportSection.style.display = 'none';
+      el.bankTransferSection.style.display = 'none';
       el.tableWrap.parentElement.style.display = '';
       try {
         await reloadFromStart();
@@ -522,9 +552,23 @@
       el.tabReport.classList.add('active');
       el.tabUsers.classList.remove('active');
       el.tabInstalls.classList.remove('active');
+      el.tabBankTransfers.classList.remove('active');
       el.tableWrap.parentElement.style.display = 'none';
       el.reportSection.style.display = '';
+      el.bankTransferSection.style.display = 'none';
       setStatus('');
+    });
+
+    el.tabBankTransfers.addEventListener('click', () => {
+      el.tabBankTransfers.classList.add('active');
+      el.tabUsers.classList.remove('active');
+      el.tabInstalls.classList.remove('active');
+      el.tabReport.classList.remove('active');
+      el.tableWrap.parentElement.style.display = 'none';
+      el.reportSection.style.display = 'none';
+      el.bankTransferSection.style.display = '';
+      setStatus('');
+      loadBankTransfers();
     });
 
     async function loadReport() {
@@ -616,6 +660,124 @@
     }
 
     el.loadReport.addEventListener('click', loadReport);
+
+    // ── Bank Transfers ──
+    async function loadBankTransfers() {
+      const status = el.btStatusFilter.value;
+      el.btStatus.textContent = 'Loading...';
+      el.btStatus.className = 'status';
+      el.btTableWrap.innerHTML = '';
+      try {
+        const data = await callApi('/api/admin-users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'listBankTransfers', status }),
+        });
+        const items = data.transfers || [];
+        if (items.length === 0) {
+          el.btStatus.textContent = 'No ' + status + ' transfers found.';
+          return;
+        }
+        const isPending = status === 'pending';
+        const rows = items.map(t => `
+          <tr>
+            <td style="font-size:11px;"><code>${esc(t.id)}</code></td>
+            <td>${esc(t.email)}</td>
+            <td>${esc(t.name || '')}</td>
+            <td>${esc(t.pack)}</td>
+            <td>${esc(t.reference || '')}</td>
+            <td>${esc(t.installId || '')}</td>
+            <td style="font-size:11px;">${esc(t.createdAt ? t.createdAt.slice(0,16).replace('T',' ') : '')}</td>
+            <td class="actions">${isPending ? `
+              <button class="ok" data-act="bt-approve" data-bt='${esc(JSON.stringify({id:t.id,installId:t.installId||'',pack:t.pack}))}'>Approve</button>
+              <button class="danger" data-act="bt-reject" data-btid="${esc(t.id)}">Reject</button>
+            ` : `<span class="muted">${esc(status)}</span>`}</td>
+          </tr>
+        `).join('');
+
+        el.btTableWrap.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Pack</th>
+                <th>Reference</th>
+                <th>Install ID</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        `;
+
+        el.btTableWrap.querySelectorAll('button[data-act="bt-approve"]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const info = JSON.parse(btn.dataset.bt);
+            approveBankTransfer(info.id, info.installId, info.pack);
+          });
+        });
+        el.btTableWrap.querySelectorAll('button[data-act="bt-reject"]').forEach(btn => {
+          btn.addEventListener('click', () => rejectBankTransfer(btn.dataset.btid));
+        });
+
+        el.btStatus.textContent = items.length + ' transfer(s) loaded.';
+        el.btStatus.className = 'status ok';
+      } catch (e) {
+        el.btStatus.textContent = e.message;
+        el.btStatus.className = 'status error';
+      }
+    }
+
+    async function approveBankTransfer(btId, installId, pack) {
+      const useInstallId = promptValue('Install ID to grant credits to:', installId);
+      if (useInstallId === null) return;
+      const packCredits = pack === 'enterprise' ? 2500 : 500;
+      const raw = promptValue('Credits to grant:', String(packCredits));
+      if (raw === null) return;
+      const credits = Number(raw);
+      if (!Number.isInteger(credits) || credits <= 0) {
+        el.btStatus.textContent = 'Credits must be a positive integer.';
+        el.btStatus.className = 'status error';
+        return;
+      }
+      try {
+        el.btStatus.textContent = 'Approving...';
+        await callApi('/api/admin-users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'approveBankTransfer', btId, installId: useInstallId, credits }),
+        });
+        el.btStatus.textContent = 'Transfer approved! ' + credits + ' credits granted.';
+        el.btStatus.className = 'status ok';
+        loadBankTransfers();
+      } catch (e) {
+        el.btStatus.textContent = e.message;
+        el.btStatus.className = 'status error';
+      }
+    }
+
+    async function rejectBankTransfer(btId) {
+      if (!window.confirm('Reject transfer ' + btId + '?')) return;
+      try {
+        el.btStatus.textContent = 'Rejecting...';
+        await callApi('/api/admin-users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'rejectBankTransfer', btId }),
+        });
+        el.btStatus.textContent = 'Transfer rejected.';
+        el.btStatus.className = 'status ok';
+        loadBankTransfers();
+      } catch (e) {
+        el.btStatus.textContent = e.message;
+        el.btStatus.className = 'status error';
+      }
+    }
+
+    el.loadBankTransfers.addEventListener('click', loadBankTransfers);
 
     // ── Test Email ──
     document.getElementById('testEmail').addEventListener('click', async () => {
