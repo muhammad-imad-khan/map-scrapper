@@ -1,8 +1,8 @@
 // POST /api/checkout
 // Creates a Paddle transaction and returns the checkout URL.
-// Body: { priceId: "pri_...", installId: "uuid" }
-// The installId is stored as custom_data so the webhook knows who to credit.
-const { cors, paddleRequest, PADDLE_API_KEY, isValidInstallId, initUser } = require('./_helpers');
+// Body: { priceId: "pri_...", installId: "uuid", token: "auth_token" }
+// Requires auth. Links payment to user email via custom_data.
+const { cors, paddleRequest, PADDLE_API_KEY, isValidInstallId, initUser, getRedis } = require('./_helpers');
 
 module.exports = async function handler(req, res) {
   cors(res);
@@ -13,7 +13,20 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: 'PADDLE_API_KEY not configured' });
   }
 
-  const { priceId, installId } = req.body || {};
+  const { priceId, installId, token } = req.body || {};
+
+  // ── Verify auth token ──
+  if (!token || typeof token !== 'string') {
+    return res.status(401).json({ error: 'Please sign in to complete your purchase.' });
+  }
+  const redis = getRedis();
+  const sessionRaw = await redis.get(`session:${token}`);
+  if (!sessionRaw) {
+    return res.status(401).json({ error: 'Session expired. Please sign in again.' });
+  }
+  const session = JSON.parse(sessionRaw);
+  const userEmail = session.email;
+
   if (!priceId || !priceId.startsWith('pri_')) {
     return res.status(400).json({ error: 'Missing or invalid priceId' });
   }
@@ -25,11 +38,27 @@ module.exports = async function handler(req, res) {
   await initUser(installId);
 
   try {
-    // Create a transaction via Paddle API with custom_data containing installId
+    // Create a transaction via Paddle API with custom_data containing installId + user email
     const data = await paddleRequest('/transactions', {
       items: [{ price_id: priceId, quantity: 1 }],
-      custom_data: { installId },
+      custom_data: { installId, email: userEmail },
     });
+
+    // Record checkout attempt on user profile
+    const userKey = `user:${userEmail}`;
+    const userRaw = await redis.get(userKey);
+    if (userRaw) {
+      const userData = JSON.parse(userRaw);
+      if (!userData.purchases) userData.purchases = [];
+      userData.purchases.push({
+        priceId,
+        installId,
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        txnId: data?.data?.id || null,
+      });
+      await redis.set(userKey, JSON.stringify(userData));
+    }
 
     if (data?.data?.checkout?.url) {
       return res.status(200).json({ checkoutUrl: data.data.checkout.url });

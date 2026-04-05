@@ -549,10 +549,11 @@ checkoutBtn.addEventListener('click', () => {
   checkoutStatus.style.display = 'block';
   checkoutStatus.className = 'checkout-status pending';
   checkoutStatus.textContent = 'Creating checkout session…';
+  const authToken = localStorage.getItem('mls_auth_token');
   fetch('https://map-scraper-paddle-backend.vercel.app/api/checkout', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ priceId: pack.priceId, installId: state.installId }),
+    body: JSON.stringify({ priceId: pack.priceId, installId: state.installId, token: authToken }),
   })
   .then(r => r.json())
   .then(data => {
