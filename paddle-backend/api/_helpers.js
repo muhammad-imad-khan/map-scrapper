@@ -70,12 +70,13 @@ async function initUser(installId) {
     if (expiry && Date.now() > parseInt(expiry, 10)) {
       await redis.set(keys.credits(installId), 0);
       await redis.del(keys.expiry(installId));
-      return { credits: 0, expired: true, expiresAt: null };
+      return { credits: 0, expired: true, expiresAt: null, isNew: false };
     }
     return {
       credits: parseInt(existing, 10),
       expired: false,
       expiresAt: expiry ? parseInt(expiry, 10) : null,
+      isNew: false,
     };
   }
   // New user: grant starter credits (no expiry on free credits)
@@ -83,7 +84,7 @@ async function initUser(installId) {
   await redis.set(keys.install(installId), JSON.stringify({
     createdAt: new Date().toISOString(),
   }));
-  return { credits: FREE_STARTER_CREDITS, expired: false, expiresAt: null };
+  return { credits: FREE_STARTER_CREDITS, expired: false, expiresAt: null, isNew: true };
 }
 
 async function addCredits(installId, amount, reason) {
@@ -192,10 +193,47 @@ async function sendPurchaseNotification({ userName, userEmail, packLabel, credit
   }
 }
 
+async function sendInstallNotification({ installId }) {
+  const transport = getMailTransport();
+  if (!transport) {
+    console.warn('SMTP not configured, skipping install notification email');
+    return;
+  }
+  const date = new Date().toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'short', timeZone: 'UTC' });
+  const html = `
+    <div style="font-family:Segoe UI,Arial,sans-serif;max-width:560px;margin:0 auto;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
+      <div style="background:#7c3aed;padding:20px 24px;color:#fff;">
+        <h2 style="margin:0;font-size:20px;">New Free Installation</h2>
+      </div>
+      <div style="padding:24px;">
+        <table style="width:100%;border-collapse:collapse;font-size:14px;">
+          <tr><td style="padding:8px 0;color:#64748b;width:130px;">Install ID</td><td style="padding:8px 0;font-size:12px;">${installId}</td></tr>
+          <tr><td style="padding:8px 0;color:#64748b;">Free Credits</td><td style="padding:8px 0;font-weight:600;">${FREE_STARTER_CREDITS}</td></tr>
+          <tr><td style="padding:8px 0;color:#64748b;">Date (UTC)</td><td style="padding:8px 0;">${date}</td></tr>
+        </table>
+      </div>
+      <div style="background:#f8fafc;padding:14px 24px;font-size:12px;color:#94a3b8;text-align:center;">
+        Map Lead Scraper &mdash; New Install Notification
+      </div>
+    </div>
+  `;
+  try {
+    await transport.sendMail({
+      from: `"Map Lead Scraper" <${process.env.SMTP_USER}>`,
+      to: ADMIN_EMAIL,
+      subject: `New Free Install: ${installId.slice(0, 8)}...`,
+      html,
+    });
+    console.log(`Install notification sent for ${installId}`);
+  } catch (err) {
+    console.error('Failed to send install notification:', err.message);
+  }
+}
+
 module.exports = {
   PADDLE_ENV, BASE_URL, PADDLE_API_KEY, PRICE_CREDITS, FREE_STARTER_CREDITS, CREDITS_EXPIRY_DAYS,
   cors, paddleRequest, getRedis, keys,
   getCredits, initUser, addCredits, deductCredits, isValidInstallId,
-  sendPurchaseNotification, ADMIN_EMAIL,
+  sendPurchaseNotification, sendInstallNotification, ADMIN_EMAIL,
 };
 

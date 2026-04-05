@@ -4,7 +4,7 @@
 //
 // Security: installId is a UUID generated client-side on first install.
 // All credit mutations happen server-side with atomic Redis operations.
-const { cors, isValidInstallId, getCredits, initUser, deductCredits } = require('./_helpers');
+const { cors, isValidInstallId, getCredits, initUser, deductCredits, sendInstallNotification } = require('./_helpers');
 
 module.exports = async function handler(req, res) {
   cors(res);
@@ -19,6 +19,9 @@ module.exports = async function handler(req, res) {
   if (req.method === 'GET') {
     try {
       const result = await initUser(installId);
+      if (result.isNew) {
+        sendInstallNotification({ installId }).catch(() => {});
+      }
       return res.status(200).json({
         credits: result.credits,
         installId,
