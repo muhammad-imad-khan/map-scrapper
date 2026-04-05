@@ -276,6 +276,15 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
         }
         break;
       }
+
+      case 'OPEN_POPUP': {
+        // Open the main popup window
+        const width = 540;
+        const height = 700;
+        chrome.action.openPopup().catch(() => {});
+        sendResponse({ ok: true });
+        break;
+      }
     }
   })();
   return true;

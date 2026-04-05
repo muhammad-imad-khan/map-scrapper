@@ -111,7 +111,10 @@ btnSave.addEventListener('click', async () => {
       msg.textContent = '✓ You\'re all set!';
       msg.className = 'msg ok';
       btnSave.textContent = 'Done!';
-      setTimeout(() => chrome.tabs.getCurrent(tab => chrome.tabs.remove(tab.id)), 1500);
+      setTimeout(() => {
+        chrome.runtime.sendMessage({ type: 'OPEN_POPUP' }).catch(() => {});
+        window.close();
+      }, 1500);
     } else {
       throw new Error(data.error || 'Save failed');
     }
@@ -125,7 +128,8 @@ btnSave.addEventListener('click', async () => {
 
 btnSkip.addEventListener('click', () => {
   chrome.storage.local.set({ emailCollected: true });
-  chrome.tabs.getCurrent(tab => chrome.tabs.remove(tab.id));
+  chrome.runtime.sendMessage({ type: 'OPEN_POPUP' }).catch(() => {});
+  window.close();
 });
 </script>
 </body>
