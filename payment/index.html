@@ -769,36 +769,10 @@ checkoutBtn.addEventListener('click', () => {
     }
     state.installId = webId;
   }
-  // Use backend API to create checkout with installId in custom_data
-  checkoutBtn.disabled = true;
-  checkoutStatus.style.display = 'block';
-  checkoutStatus.className = 'checkout-status pending';
-  checkoutStatus.textContent = 'Creating checkout session…';
-  const authToken = localStorage.getItem('mls_auth_token');
-  fetch('https://map-scraper-paddle-backend.vercel.app/api/checkout', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ priceId: pack.priceId, installId: state.installId, token: authToken }),
-  })
-  .then(r => r.json())
-  .then(data => {
-    if (data.checkoutUrl) {
-      if (pricingMode === 'one_time' && pack.key === 'lifetime') {
-        localStorage.setItem('mls_pending_zip_download', '1');
-      }
-      if (data.txnId) {
-        checkoutStatus.style.display = 'none';
-        checkoutBtn.disabled = false;
-        Paddle.Checkout.open({ transactionId: data.txnId, settings: { displayMode: 'overlay' } });
-      } else {
-        checkoutStatus.className = 'checkout-status ready';
-        checkoutStatus.textContent = 'Redirecting to checkout…';
-        window.location.href = data.checkoutUrl;
-      }
-    } else {
-      throw new Error(data.error || 'Checkout unavailable. Please try again.');
-    }
   // Open Paddle inline overlay directly (client-side) — webhook receives customData
+  if (pricingMode === 'one_time' && pack.key === 'lifetime') {
+    localStorage.setItem('mls_pending_zip_download', '1');
+  }
   const userEmail = (JSON.parse(localStorage.getItem('mls_auth_user') || '{}').email) || '';
   checkoutStatus.style.display = 'none';
   checkoutBtn.disabled = true;
