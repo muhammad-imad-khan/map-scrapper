@@ -30,7 +30,8 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "viewer.html"
+        "viewer.html",
+        "welcome.html"
       ],
       "matches": [
         "<all_urls>"

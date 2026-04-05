@@ -11,6 +11,13 @@
 // ── CONFIG ───────────────────────────────────────────────────
 const BACKEND_URL = 'https://map-scraper-paddle-backend.vercel.app';
 
+// ── Open welcome page on first install ───────────────────────
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason === 'install') {
+    chrome.tabs.create({ url: chrome.runtime.getURL('welcome.html') });
+  }
+});
+
 const CREDIT_PACKS = [
     { id: 'pri_01kkwtx0kh2skzrzjbxgmgqngd', label: 'Pro Pack',        credits: 500,  price: '$5', popular: true },
     { id: 'pri_enterprise_placeholder',      label: 'Enterprise Pack',  credits: 2500, price: '$25', popular: false },

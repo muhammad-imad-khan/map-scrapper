@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcome to Maps Lead Scraper</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;font-family:-apple-system,'Segoe UI',system-ui,sans-serif;background:#09090f;color:#d8d8e8;display:flex;align-items:center;justify-content:center}
+.card{max-width:440px;width:100%;margin:32px auto;background:#17171f;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:40px 32px;text-align:center}
+.icon{font-size:48px;margin-bottom:16px}
+h1{font-size:22px;font-weight:700;color:#fff;margin-bottom:6px}
+.sub{font-size:14px;color:#52526a;line-height:1.6;margin-bottom:24px}
+.sub strong{color:#d8d8e8}
+.features{display:flex;gap:12px;margin-bottom:28px;text-align:left}
+.feat{flex:1;background:#1e1e28;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px 12px}
+.feat-icon{font-size:20px;margin-bottom:6px}
+.feat-title{font-size:12px;font-weight:700;color:#fff;margin-bottom:2px}
+.feat-desc{font-size:11px;color:#52526a;line-height:1.4}
+.form-group{margin-bottom:12px;text-align:left}
+label{display:block;font-size:10px;color:#52526a;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
+input{width:100%;background:#1e1e28;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:11px 14px;color:#d8d8e8;font-size:14px;outline:none;font-family:inherit;transition:border-color .15s}
+input:focus{border-color:rgba(34,197,94,.45)}
+input::placeholder{color:#52526a}
+.msg{font-size:12px;min-height:18px;margin:8px 0;font-family:'Courier New',monospace}
+.msg.ok{color:#22c55e}.msg.err{color:#f87171}
+.btn{width:100%;padding:13px;background:#22c55e;color:#000;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s;margin-bottom:8px}
+.btn:hover{background:#16a34a}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-skip{width:100%;padding:10px;background:transparent;color:#52526a;border:1px solid rgba(255,255,255,0.07);border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit}
+.btn-skip:hover{border-color:rgba(255,255,255,0.15)}
+.credits-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:20px;padding:6px 14px;font-size:13px;color:#22c55e;font-weight:600;margin-bottom:20px}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="icon">🗺️</div>
+  <h1>Welcome to Maps Lead Scraper!</h1>
+  <div class="sub">Scrape Google Maps leads to CSV in one click.<br>You've been granted free starter credits:</div>
+  <div class="credits-badge">🪙 3 Free Credits</div>
+
+  <div class="features">
+    <div class="feat">
+      <div class="feat-icon">⚡</div>
+      <div class="feat-title">One-Click Scrape</div>
+      <div class="feat-desc">Search, scrape, export. It's that simple.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">📊</div>
+      <div class="feat-title">Rich Data</div>
+      <div class="feat-desc">Emails, phone, ratings, hours, socials & more.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">💳</div>
+      <div class="feat-title">Pay Per Lead</div>
+      <div class="feat-desc">No subscriptions. Buy credits when you need them.</div>
+    </div>
+  </div>
+
+  <div style="text-align:left;margin-bottom:6px;">
+    <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:12px;">Enter your email for exclusive deals & low-credit alerts:</div>
+  </div>
+
+  <div class="form-group">
+    <label>Name (optional)</label>
+    <input type="text" id="nameInput" placeholder="Your name" />
+  </div>
+  <div class="form-group">
+    <label>Email address</label>
+    <input type="email" id="emailInput" placeholder="you@example.com" />
+  </div>
+  <div class="msg" id="msg"></div>
+  <button class="btn" id="btnSave">Get Started →</button>
+  <button class="btn-skip" id="btnSkip">Skip for now</button>
+</div>
+
+<script>
+const btnSave = document.getElementById('btnSave');
+const btnSkip = document.getElementById('btnSkip');
+const emailInput = document.getElementById('emailInput');
+const nameInput = document.getElementById('nameInput');
+const msg = document.getElementById('msg');
+
+btnSave.addEventListener('click', async () => {
+  const email = emailInput.value.trim();
+  const name = nameInput.value.trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    msg.textContent = 'Please enter a valid email address.';
+    msg.className = 'msg err';
+    emailInput.focus();
+    return;
+  }
+  btnSave.disabled = true;
+  btnSave.textContent = 'Saving…';
+  msg.textContent = '';
+  try {
+    const res = await new Promise(resolve => {
+      chrome.runtime.sendMessage({ type: 'GET_INSTALL_ID' }, resolve);
+    });
+    const installId = res?.installId;
+    if (!installId) throw new Error('No install ID');
+
+    const resp = await fetch('https://map-scraper-paddle-backend.vercel.app/api/credits', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Install-Id': installId },
+      body: JSON.stringify({ action: 'saveEmail', email, name }),
+    });
+    const data = await resp.json();
+    if (data.ok) {
+      chrome.storage.local.set({ emailCollected: true, userEmail: email, userName: name });
+      msg.textContent = '✓ You\'re all set!';
+      msg.className = 'msg ok';
+      btnSave.textContent = 'Done!';
+      setTimeout(() => window.close(), 1500);
+    } else {
+      throw new Error(data.error || 'Save failed');
+    }
+  } catch (e) {
+    msg.textContent = e.message || 'Network error. Try again.';
+    msg.className = 'msg err';
+    btnSave.disabled = false;
+    btnSave.textContent = 'Get Started →';
+  }
+});
+
+btnSkip.addEventListener('click', () => {
+  chrome.storage.local.set({ emailCollected: true });
+  window.close();
+});
+</script>
+</body>
+</html>
