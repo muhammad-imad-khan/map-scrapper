@@ -860,7 +860,6 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
       </div>
       <div id="dlEmailMsg" style="font-size:12px;min-height:18px;margin:6px 0;color:#f87171"></div>
       <button id="dlEmailSubmit" style="width:100%;padding:12px;background:var(--g);color:#000;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px">Continue to Download →</button>
-      <button id="dlEmailSkip" style="width:100%;padding:9px;background:transparent;color:var(--t5);border:1px solid var(--bhi);border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit">Skip for now</button>
     </div>
   </div>
 </div>
@@ -1516,10 +1515,6 @@ document.getElementById('dlEmailSubmit').addEventListener('click', () => {
   .then(() => { proceedToInstall(); })
   .catch(() => { proceedToInstall(); })
   .finally(() => { btn.disabled = false; btn.textContent = 'Continue to Download →'; });
-});
-
-document.getElementById('dlEmailSkip').addEventListener('click', () => {
-  proceedToInstall();
 });
 
 document.getElementById('emailModal').addEventListener('click', e => {
