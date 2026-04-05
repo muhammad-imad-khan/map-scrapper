@@ -898,6 +898,46 @@ function handleDownloadClick(e) {
   });
 }
 
+function startPendingZipAutoDownloadPollingOnPayment() {
+  if (localStorage.getItem('mls_pending_zip_download') !== '1') return;
+  const token = localStorage.getItem('mls_auth_token') || '';
+  if (!token) return;
+  let attempts = 0;
+  const maxAttempts = 18; // ~90s at 5s interval
+  checkoutStatus.style.display = 'block';
+  checkoutStatus.className = 'checkout-status pending';
+  checkoutStatus.textContent = 'Verifying payment and preparing your download…';
+  const timer = setInterval(async () => {
+    attempts += 1;
+    try {
+      const r = await fetch('https://map-scraper-paddle-backend.vercel.app/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'me', token }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (r.ok && d.entitlements && d.entitlements.zipDownload) {
+        clearInterval(timer);
+        localStorage.removeItem('mls_pending_zip_download');
+        checkoutStatus.className = 'checkout-status ready';
+        checkoutStatus.textContent = 'Payment verified. Download starting…';
+        try {
+          await triggerZipDownload();
+        } catch (_) {
+          checkoutStatus.className = 'checkout-status error';
+          checkoutStatus.textContent = 'Verified, but automatic download failed. Use homepage install to download.';
+        }
+        return;
+      }
+    } catch (_) {}
+    if (attempts >= maxAttempts) {
+      clearInterval(timer);
+      checkoutStatus.className = 'checkout-status pending';
+      checkoutStatus.innerHTML = 'Payment received. Download will unlock shortly. <a href="../index.html#install" style="color:var(--g);font-weight:700;text-decoration:underline">Open install page</a>.';
+    }
+  }, 5000);
+}
+
 document.getElementById('navBurger').addEventListener('click', () => {
   document.getElementById('navLinks').classList.toggle('open');
 });
@@ -917,6 +957,7 @@ loadPricingMode().then(() => {
   loadCheckoutUrl();
   const navTxt = document.getElementById('navCtaTxt');
   if (navTxt && pricingMode === 'one_time') navTxt.textContent = 'Buy Lifetime Access';
+  startPendingZipAutoDownloadPollingOnPayment();
 });
 
 

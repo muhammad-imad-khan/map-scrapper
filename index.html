@@ -1746,12 +1746,36 @@ function maybeAutoDownloadPurchasedZip() {
   openInstallModal();
 }
 
+function startPendingZipAutoDownloadPolling() {
+  if (localStorage.getItem('mls_pending_zip_download') !== '1') return;
+  let attempts = 0;
+  const maxAttempts = 18; // ~90s at 5s interval
+  const timer = setInterval(() => {
+    attempts += 1;
+    loadAuthState()
+      .then(() => {
+        maybeAutoDownloadPurchasedZip();
+        if (autoDownloadAttempted || localStorage.getItem('mls_pending_zip_download') !== '1') {
+          clearInterval(timer);
+          return;
+        }
+        if (attempts >= maxAttempts) {
+          clearInterval(timer);
+        }
+      })
+      .catch(() => {
+        if (attempts >= maxAttempts) clearInterval(timer);
+      });
+  }, 5000);
+}
+
 // ══════════════════════════════════════════════════════
 //  NAV + MISC
 // ══════════════════════════════════════════════════════
 Promise.all([loadPricingMode(), loadAuthState()]).then(() => {
   applyBrowser(detected);
   maybeAutoDownloadPurchasedZip();
+  startPendingZipAutoDownloadPolling();
 });
 
 window.addEventListener('scroll', () => {
