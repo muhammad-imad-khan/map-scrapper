@@ -440,7 +440,7 @@ function getParams() {
   }
   if (country && COUNTRY_DEFAULTS[country]) state.country = country;
   if (currency) state.currency = currency.toUpperCase();
-  if (installId && /^[a-f0-9-]{36}$/i.test(installId)) state.installId = installId;
+  if (installId && /^[a-zA-Z0-9_-]{8,64}$/.test(installId)) state.installId = installId;
   if (!state.currency) state.currency = COUNTRY_DEFAULTS[state.country] || 'USD';
 }
 

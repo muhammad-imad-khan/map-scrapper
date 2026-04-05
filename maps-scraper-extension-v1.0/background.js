@@ -19,8 +19,8 @@ chrome.runtime.onInstalled.addListener((details) => {
 });
 
 const CREDIT_PACKS = [
-    { id: 'pri_01kkwtx0kh2skzrzjbxgmgqngd', label: 'Pro Pack',        credits: 500,  price: '$5', popular: true },
-    { id: 'pri_enterprise_placeholder',      label: 'Enterprise Pack',  credits: 2500, price: '$25', popular: false },
+    { id: 'pri_01kkwtx0kh2skzrzjbxgmgqngd', slug: 'pro',        label: 'Pro Pack',        credits: 500,  price: '$5', popular: true },
+    { id: 'pri_enterprise_placeholder',      slug: 'enterprise',  label: 'Enterprise Pack',  credits: 2500, price: '$25', popular: false },
 ];
 const COST_PER_RESULT = 1;
 
@@ -224,26 +224,11 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
       }
 
       case 'OPEN_PACK': {
-        // Create a Paddle hosted checkout session via backend
         const pack = CREDIT_PACKS.find(p => p.id === msg.packId);
         if (!pack) { sendResponse({ ok: false }); break; }
-        try {
-          const installId = await getInstallId();
-          const res  = await fetch(`${BACKEND_URL}/api/checkout`, {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ priceId: pack.id, installId }),
-          });
-          const data = await res.json();
-          if (data.checkoutUrl) {
-            chrome.tabs.create({ url: data.checkoutUrl });
-          } else {
-            chrome.tabs.create({ url: `https://map-scrapper-five.vercel.app/payment/?pack=${pack.id}&installId=${installId}` });
-          }
-        } catch {
-          const installId = await getInstallId().catch(() => '');
-          chrome.tabs.create({ url: `https://map-scrapper-five.vercel.app/payment/?pack=${pack.id}&installId=${installId}` });
-        }
+        const installId = await getInstallId().catch(() => '');
+        // Open payment page directly with installId so credits get linked
+        chrome.tabs.create({ url: `https://map-scrapper-five.vercel.app/payment/?pack=${pack.slug}&installId=${installId}` });
         sendResponse({ ok: true });
         break;
       }
