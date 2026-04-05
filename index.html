@@ -709,10 +709,10 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           <span id="installBtnTxt">Install — Free</span>
         </a>
-        <div style="font-size:11.5px;color:var(--t3);text-align:center">3 free credits · No sign-up</div>
+        <div id="installCreditNote" style="font-size:11.5px;color:var(--t3);text-align:center">3 free credits · No sign-up</div>
       </div>
     </div>
-    <div class="after-install rev">
+    <div class="after-install rev" id="afterInstallSection">
       <div class="ai-label">After installing — 3 steps</div>
       <div class="ai-steps">
         <div class="ai-step"><span class="ai-num">1</span><span class="ai-txt">Pin the extension: click the puzzle 🧩 icon in your toolbar → pin <strong style="color:var(--t)">Maps Lead Scraper</strong></span></div>
@@ -823,7 +823,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
 <div class="container">
   <div class="cta-band rev">
     <h2>Start collecting leads<br><em>in the next 60 seconds</em></h2>
-    <p>3 free credits on install · No sign-up · No credit card</p>
+    <p id="ctaBandSub">3 free credits on install · No sign-up · No credit card</p>
     <div class="cta-band-btns">
       <a class="btn-main" id="ctaBtn" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span id="ctaBtnTxt">Add to Chrome — Free</span></a>
       <a class="btn-ghost" href="#pricing">View Pricing</a>
@@ -1427,6 +1427,33 @@ function applyBrowser(br) {
   document.querySelectorAll('.b-card').forEach(c => c.classList.remove('sel'));
   const card = document.getElementById('bbc-' + br);
   if (card) card.classList.add('sel');
+
+  // Show/hide free-install UX based on pricing mode
+  const isOT = activePricingMode === 'one_time';
+  const termsLabelEl = document.getElementById('termsCheckLabel');
+  const creditNoteEl = document.getElementById('installCreditNote');
+  const afterInstallEl = document.getElementById('afterInstallSection');
+  const ctaBandSubEl = document.getElementById('ctaBandSub');
+  if (termsLabelEl) termsLabelEl.style.display = isOT ? 'none' : '';
+  if (creditNoteEl) creditNoteEl.style.display = isOT ? 'none' : '';
+  if (afterInstallEl) {
+    if (isOT) {
+      afterInstallEl.querySelector('.ai-label').textContent = 'After purchasing \u2014 3 steps';
+      afterInstallEl.querySelector('.ai-steps').innerHTML =
+        '<div class="ai-step"><span class="ai-num">1</span><span class="ai-txt">Click <strong style="color:var(--g)">Buy Lifetime Access</strong> and complete the one-time payment</span></div>' +
+        '<div class="ai-step"><span class="ai-num">2</span><span class="ai-txt">Return to this page \u2014 your download unlocks automatically</span></div>' +
+        '<div class="ai-step"><span class="ai-num">3</span><span class="ai-txt">Install the ZIP in your browser and start scraping leads</span></div>';
+    } else {
+      afterInstallEl.querySelector('.ai-label').textContent = 'After installing \u2014 3 steps';
+      afterInstallEl.querySelector('.ai-steps').innerHTML =
+        '<div class="ai-step"><span class="ai-num">1</span><span class="ai-txt">Pin the extension: click the puzzle \ud83e\udde9 icon in your toolbar \u2192 pin <strong style="color:var(--t)">Maps Lead Scraper</strong></span></div>' +
+        '<div class="ai-step"><span class="ai-num">2</span><span class="ai-txt">Click the map pin icon \u2014 the popup opens with <strong style="color:var(--g)">3 free credits</strong> ready</span></div>' +
+        '<div class="ai-step"><span class="ai-num">3</span><span class="ai-txt">Type your first search and click <strong style="color:var(--g)">\u25b6 Start Scraping</strong></span></div>';
+    }
+  }
+  if (ctaBandSubEl) ctaBandSubEl.textContent = isOT
+    ? 'One-time purchase \u00b7 Lifetime access \u00b7 No subscription'
+    : '3 free credits on install \u00b7 No sign-up \u00b7 No credit card';
 }
 
 document.querySelectorAll('.b-card').forEach(card => {
@@ -1596,6 +1623,12 @@ const termsError = document.getElementById('termsError');
 const installBtnEl = document.getElementById('installBtn');
 
 function updateInstallBtnState() {
+  if (activePricingMode === 'one_time') {
+    installBtnEl.style.opacity = '1';
+    installBtnEl.style.pointerEvents = 'auto';
+    termsError.style.display = 'none';
+    return;
+  }
   if (termsCheck.checked) {
     installBtnEl.style.opacity = '1';
     installBtnEl.style.pointerEvents = 'auto';
@@ -1621,18 +1654,18 @@ function requestLifetimePurchase() {
 
 function handleInstallClick(e) {
   e.preventDefault();
-  if (!termsCheck.checked) {
-    termsError.style.display = 'block';
-    document.getElementById('termsCheckLabel').style.borderColor = 'rgba(248,113,113,.4)';
-    document.getElementById('install').scrollIntoView({ behavior:'smooth' });
-    return;
-  }
   if (activePricingMode === 'one_time') {
     if (!hasUnlockedZip()) {
       requestLifetimePurchase();
       return;
     }
     openInstallModal();
+    return;
+  }
+  if (!termsCheck.checked) {
+    termsError.style.display = 'block';
+    document.getElementById('termsCheckLabel').style.borderColor = 'rgba(248,113,113,.4)';
+    document.getElementById('install').scrollIntoView({ behavior:'smooth' });
     return;
   }
   // Show email modal first, then install modal
