@@ -449,6 +449,7 @@ function syncUrl() {
   params.set('pack', state.pack);
   params.set('country', state.country);
   params.set('currency', state.currency);
+  if (state.installId) params.set('installId', state.installId);
   const next = `${window.location.pathname}?${params.toString()}`;
   window.history.replaceState({}, '', next);
 }
