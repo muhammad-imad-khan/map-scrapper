@@ -1,0 +1,1171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Map Scrapper Admin</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #131a2e;
+      --panel-2: #1a2340;
+      --line: #2a355c;
+      --text: #ecf1ff;
+      --muted: #9aa9d4;
+      --accent: #4ade80;
+      --danger: #fb7185;
+      --warn: #f59e0b;
+    }
+    [data-theme="light"] {
+      --bg: #f4f6fb;
+      --panel: #ffffff;
+      --panel-2: #eaecf3;
+      --line: #d2d5e0;
+      --text: #1e1e2e;
+      --muted: #5a6480;
+      --accent: #16a34a;
+      --danger: #e11d48;
+      --warn: #d97706;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Segoe UI, Arial, sans-serif;
+      background: radial-gradient(circle at top right, #1a2850 0%, var(--bg) 40%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    [data-theme="light"] body {
+      background: radial-gradient(circle at top right, #dde4f0 0%, var(--bg) 40%);
+    }
+
+    /* ── LOGIN SCREEN ── */
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      background: var(--bg);
+    }
+    .login-box {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 36px 32px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 24px 80px rgba(0,0,0,.4);
+    }
+    .login-box h1 {
+      font-size: 22px;
+      margin: 0 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .login-box h1 .lock-icon { font-size: 20px; }
+    .login-box .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 24px;
+    }
+    .login-field {
+      margin-bottom: 16px;
+    }
+    .login-field label {
+      font-size: 12px;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .login-field input {
+      width: 100%;
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .login-field input:focus {
+      border-color: #4ade80;
+    }
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      background: #2563eb;
+      color: #fff;
+      border: 1px solid #3b82f6;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+      margin-top: 4px;
+    }
+    .login-btn:hover { background: #1d4ed8; }
+    .login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .login-error {
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: rgba(251,113,133,.1);
+      border: 1px solid rgba(251,113,133,.25);
+      border-radius: 8px;
+      color: var(--danger);
+      font-size: 13px;
+      display: none;
+    }
+    .login-error.visible { display: block; }
+    .session-info {
+      margin-top: 16px;
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* ── DASHBOARD (hidden until authenticated) ── */
+    .dashboard { display: none; }
+    .dashboard.visible { display: block; }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    h1 { margin: 0 0 8px; font-size: 22px; }
+    .muted { color: var(--muted); font-size: 13px; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+    .row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 4px; }
+    input, select {
+      width: 100%;
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px 10px;
+    }
+    button {
+      background: #2a3b75;
+      color: var(--text);
+      border: 1px solid #3a4e94;
+      border-radius: 8px;
+      padding: 9px 12px;
+      cursor: pointer;
+    }
+    button.primary { background: #2563eb; border-color: #3b82f6; }
+    button.ok { background: #166534; border-color: #22c55e; }
+    button.warn { background: #7c2d12; border-color: #f59e0b; }
+    button.danger { background: #7f1d1d; border-color: #fb7185; }
+    [data-theme="light"] button { background: #e0e3ed; border-color: #c4c7d4; color: var(--text); }
+    [data-theme="light"] button.primary { background: #2563eb; border-color: #3b82f6; color: #fff; }
+    [data-theme="light"] button.ok { background: #166534; border-color: #22c55e; color: #fff; }
+    [data-theme="light"] button.warn { background: #92400e; border-color: #f59e0b; color: #fff; }
+    [data-theme="light"] button.danger { background: #9f1239; border-color: #fb7185; color: #fff; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .tabs { display: flex; gap: 8px; margin-top: 10px; }
+    .tab.active { border-color: #60a5fa; background: #1f3a8a; }
+    .status {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--muted);
+      min-height: 18px;
+    }
+    .status.error { color: var(--danger); }
+    .status.ok { color: var(--accent); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 9px 6px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { color: var(--muted); font-weight: 600; }
+    .actions button { margin-right: 6px; margin-bottom: 6px; }
+    .pager { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+    code { color: #93c5fd; }
+    [data-theme="light"] code { color: #2563eb; }
+    .theme-toggle{position:fixed;top:16px;right:16px;z-index:100;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:7px 9px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);transition:border-color .25s}
+    .theme-toggle:hover{border-color:var(--accent)}
+    .theme-toggle svg{width:18px;height:18px}
+    [data-theme="light"] .theme-toggle .ic-moon{display:none}
+    [data-theme="light"] .theme-toggle .ic-sun{display:inline}
+    .theme-toggle .ic-sun{display:none}
+    .theme-toggle .ic-moon{display:inline}
+    .session-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 14px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .session-bar .timer { font-family: monospace; color: var(--accent); }
+    .session-bar .lock-btn {
+      margin-left: auto;
+      background: #7f1d1d;
+      border-color: #fb7185;
+      color: #fff;
+      padding: 5px 12px;
+      font-size: 12px;
+    }
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      .pager { flex-direction: column; gap: 8px; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ LOGIN GATE ═══ -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-box">
+      <h1><span class="lock-icon">🔒</span> Admin Access</h1>
+      <div class="subtitle">Enter your credentials to access the admin dashboard.</div>
+      <div class="login-field">
+        <label>Backend API URL</label>
+        <input id="loginApiBase" type="url" placeholder="https://paddle-backend-silk.vercel.app" autocomplete="url" />
+      </div>
+      <div class="login-field">
+        <label>Admin API Key</label>
+        <input id="loginAdminKey" type="password" placeholder="Enter your admin key" autocomplete="off" />
+      </div>
+      <button class="login-btn" id="loginBtn">Authenticate</button>
+      <div class="login-error" id="loginError"></div>
+      <div class="session-info">Session expires after 30 minutes of inactivity.</div>
+    </div>
+  </div>
+
+  <!-- ═══ DASHBOARD (hidden until authenticated) ═══ -->
+  <div class="dashboard" id="dashboard">
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+      <svg class="ic-sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg class="ic-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+    </button>
+
+    <div class="wrap">
+      <!-- Session Bar -->
+      <div class="session-bar">
+        <span>🔐 Admin Session Active</span>
+        <span>•</span>
+        <span>Timeout in: <span class="timer" id="sessionTimer">30:00</span></span>
+        <button class="lock-btn" id="lockBtn">🔒 Lock</button>
+      </div>
+
+      <div class="card">
+        <h1>Admin Panel</h1>
+        <div class="muted">Manage registered users and install subscriptions from one place.</div>
+        <div class="grid" style="margin-top:10px;">
+          <div>
+            <label>Backend API Base URL</label>
+            <input id="apiBase" placeholder="https://paddle-backend-silk.vercel.app" disabled />
+          </div>
+          <div>
+            <label>Page Size</label>
+            <select id="pageSize">
+              <option>10</option>
+              <option selected>25</option>
+              <option>50</option>
+              <option>100</option>
+              <option>200</option>
+            </select>
+          </div>
+          <div class="row">
+            <button id="testConn">Test Connection</button>
+          </div>
+        </div>
+        <div class="tabs">
+          <button id="tabUsers" class="tab active">Users</button>
+          <button id="tabInstalls" class="tab">Installs</button>
+          <button id="tabReport" class="tab">Monthly Report</button>
+          <button id="tabBankTransfers" class="tab">Bank Transfers</button>
+          <button id="refresh" class="ok">Refresh</button>
+          <button id="testEmail" class="warn" style="margin-left:auto;">Send Test Email</button>
+        </div>
+        <div id="status" class="status"></div>
+      </div>
+
+      <div class="card">
+        <div id="tableWrap"></div>
+        <div class="pager">
+          <div id="cursorInfo" class="muted"></div>
+          <div class="row">
+            <button id="prevPage">Previous</button>
+            <button id="nextPage">Next</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Monthly Report Section -->
+      <div class="card" id="reportSection" style="display:none;">
+        <h2 style="margin:0 0 6px;font-size:18px;">Monthly Sales Report</h2>
+        <div class="muted" style="margin-bottom:10px;">Revenue and purchase breakdown by month.</div>
+        <div class="row" style="margin-bottom:10px;">
+          <div>
+            <label>Filter Month (optional)</label>
+            <input type="month" id="reportMonth" style="width:180px;" />
+          </div>
+          <button id="loadReport" class="primary" style="align-self:end;">Load Report</button>
+        </div>
+        <div id="reportStatus" class="status"></div>
+        <div id="reportSummary" style="display:flex;gap:16px;margin:10px 0;flex-wrap:wrap;"></div>
+        <div id="reportTableWrap"></div>
+      </div>
+
+      <!-- Bank Transfers Section -->
+      <div class="card" id="bankTransferSection" style="display:none;">
+        <h2 style="margin:0 0 6px;font-size:18px;">Bank Transfer Requests</h2>
+        <div class="muted" style="margin-bottom:10px;">Review, approve, or reject manual bank transfer payments.</div>
+        <div class="row" style="margin-bottom:10px;">
+          <div>
+            <label>Status Filter</label>
+            <select id="btStatusFilter" style="width:160px;">
+              <option value="pending" selected>Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+          <button id="loadBankTransfers" class="primary" style="align-self:end;">Load</button>
+        </div>
+        <div id="btStatus" class="status"></div>
+        <div id="btTableWrap"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ═══════════════════════════════════════════════
+       SESSION MANAGEMENT & AUTHENTICATION
+       ═══════════════════════════════════════════════ */
+    const SESSION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
+    const SESSION_KEY = '__admin_session';
+
+    function getSession() {
+      try {
+        const raw = sessionStorage.getItem(SESSION_KEY);
+        if (!raw) return null;
+        const sess = JSON.parse(raw);
+        if (!sess.apiBase || !sess.adminKey || !sess.expiresAt) return null;
+        if (Date.now() > sess.expiresAt) {
+          sessionStorage.removeItem(SESSION_KEY);
+          return null;
+        }
+        return sess;
+      } catch {
+        return null;
+      }
+    }
+
+    function saveSession(apiBase, adminKey) {
+      const sess = {
+        apiBase: apiBase,
+        adminKey: adminKey,
+        expiresAt: Date.now() + SESSION_TIMEOUT_MS,
+        createdAt: Date.now(),
+      };
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(sess));
+      return sess;
+    }
+
+    function refreshSession() {
+      const sess = getSession();
+      if (!sess) return null;
+      sess.expiresAt = Date.now() + SESSION_TIMEOUT_MS;
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(sess));
+      return sess;
+    }
+
+    function destroySession() {
+      sessionStorage.removeItem(SESSION_KEY);
+    }
+
+    /* ── Validate admin key against backend ── */
+    async function validateAdminKey(apiBase, adminKey) {
+      const base = apiBase.replace(/\/$/, '');
+      const resp = await fetch(base + '/api/admin-users?type=users&limit=1&cursor=0', {
+        headers: { 'X-Admin-Key': adminKey },
+      });
+      if (resp.status === 401) throw new Error('Invalid admin key.');
+      if (resp.status === 500) {
+        const data = await resp.json().catch(() => null);
+        throw new Error((data && data.error) || 'Server error. Check your API URL.');
+      }
+      if (!resp.ok) throw new Error('Connection failed (HTTP ' + resp.status + ').');
+      return true;
+    }
+
+    /* ═══════════════════════════════════════════════
+       LOGIN FLOW
+       ═══════════════════════════════════════════════ */
+    const loginOverlay = document.getElementById('loginOverlay');
+    const dashboardEl = document.getElementById('dashboard');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginError = document.getElementById('loginError');
+    const loginApiBase = document.getElementById('loginApiBase');
+    const loginAdminKey = document.getElementById('loginAdminKey');
+
+    // Pre-fill API base from any previous session (URL only, not key)
+    const prevBase = localStorage.getItem('admin_api_base');
+    if (prevBase) loginApiBase.value = prevBase;
+
+    loginBtn.addEventListener('click', handleLogin);
+    loginAdminKey.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleLogin(); });
+
+    async function handleLogin() {
+      const apiBase = loginApiBase.value.trim();
+      const adminKey = loginAdminKey.value.trim();
+
+      if (!apiBase) return showLoginError('Please enter the backend API URL.');
+      if (!adminKey) return showLoginError('Please enter the admin API key.');
+
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Authenticating...';
+      hideLoginError();
+
+      try {
+        await validateAdminKey(apiBase, adminKey);
+        // Save API base to localStorage for convenience (NOT the key)
+        localStorage.setItem('admin_api_base', apiBase);
+        // Save full session to sessionStorage
+        saveSession(apiBase, adminKey);
+        showDashboard();
+      } catch (err) {
+        showLoginError(err.message);
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Authenticate';
+      }
+    }
+
+    function showLoginError(msg) {
+      loginError.textContent = msg;
+      loginError.classList.add('visible');
+    }
+
+    function hideLoginError() {
+      loginError.textContent = '';
+      loginError.classList.remove('visible');
+    }
+
+    function showDashboard() {
+      loginOverlay.style.display = 'none';
+      dashboardEl.classList.add('visible');
+      initDashboard();
+      startSessionTimer();
+    }
+
+    function lockDashboard() {
+      destroySession();
+      dashboardEl.classList.remove('visible');
+      loginOverlay.style.display = 'flex';
+      loginAdminKey.value = '';
+      stopSessionTimer();
+    }
+
+    /* ═══════════════════════════════════════════════
+       SESSION TIMER
+       ═══════════════════════════════════════════════ */
+    let sessionTimerInterval = null;
+    const sessionTimerEl = document.getElementById('sessionTimer');
+
+    function startSessionTimer() {
+      stopSessionTimer();
+      updateTimerDisplay();
+      sessionTimerInterval = setInterval(() => {
+        const sess = getSession();
+        if (!sess) {
+          lockDashboard();
+          return;
+        }
+        updateTimerDisplay();
+      }, 1000);
+    }
+
+    function stopSessionTimer() {
+      if (sessionTimerInterval) {
+        clearInterval(sessionTimerInterval);
+        sessionTimerInterval = null;
+      }
+    }
+
+    function updateTimerDisplay() {
+      const sess = getSession();
+      if (!sess) {
+        sessionTimerEl.textContent = '00:00';
+        return;
+      }
+      const remaining = Math.max(0, sess.expiresAt - Date.now());
+      const mins = Math.floor(remaining / 60000);
+      const secs = Math.floor((remaining % 60000) / 1000);
+      sessionTimerEl.textContent = String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+
+      if (remaining <= 0) lockDashboard();
+    }
+
+    // Refresh session on user activity
+    ['click', 'keydown', 'scroll'].forEach(evt => {
+      document.addEventListener(evt, () => {
+        if (dashboardEl.classList.contains('visible')) {
+          refreshSession();
+        }
+      }, { passive: true });
+    });
+
+    // Lock button
+    document.getElementById('lockBtn').addEventListener('click', lockDashboard);
+
+    /* ═══════════════════════════════════════════════
+       THEME
+       ═══════════════════════════════════════════════ */
+    (function(){
+      const t = localStorage.getItem('mls_theme') || (matchMedia('(prefers-color-scheme:light)').matches ? 'light' : 'dark');
+      document.documentElement.setAttribute('data-theme', t);
+      const btn = document.getElementById('themeToggle');
+      if (btn) btn.addEventListener('click', () => {
+        const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('mls_theme', next);
+      });
+    })();
+
+    /* ═══════════════════════════════════════════════
+       DASHBOARD LOGIC
+       ═══════════════════════════════════════════════ */
+    const state = {
+      type: 'users',
+      currentCursor: '0',
+      cursorStack: [],
+      nextCursor: '0',
+      hasMore: false,
+      items: []
+    };
+
+    const el = {
+      apiBase: document.getElementById('apiBase'),
+      pageSize: document.getElementById('pageSize'),
+      testConn: document.getElementById('testConn'),
+      tabUsers: document.getElementById('tabUsers'),
+      tabInstalls: document.getElementById('tabInstalls'),
+      tabReport: document.getElementById('tabReport'),
+      tabBankTransfers: document.getElementById('tabBankTransfers'),
+      refresh: document.getElementById('refresh'),
+      status: document.getElementById('status'),
+      tableWrap: document.getElementById('tableWrap'),
+      cursorInfo: document.getElementById('cursorInfo'),
+      prevPage: document.getElementById('prevPage'),
+      nextPage: document.getElementById('nextPage'),
+      reportSection: document.getElementById('reportSection'),
+      reportMonth: document.getElementById('reportMonth'),
+      loadReport: document.getElementById('loadReport'),
+      reportStatus: document.getElementById('reportStatus'),
+      reportSummary: document.getElementById('reportSummary'),
+      reportTableWrap: document.getElementById('reportTableWrap'),
+      bankTransferSection: document.getElementById('bankTransferSection'),
+      btStatusFilter: document.getElementById('btStatusFilter'),
+      loadBankTransfers: document.getElementById('loadBankTransfers'),
+      btStatus: document.getElementById('btStatus'),
+      btTableWrap: document.getElementById('btTableWrap'),
+    };
+
+    function setStatus(msg, kind) {
+      el.status.textContent = msg || '';
+      el.status.className = 'status' + (kind ? ' ' + kind : '');
+    }
+
+    function getSessionCredentials() {
+      const sess = getSession();
+      if (!sess) {
+        lockDashboard();
+        throw new Error('Session expired.');
+      }
+      return sess;
+    }
+
+    async function callApi(path, options = {}) {
+      const sess = getSessionCredentials();
+      const base = sess.apiBase.replace(/\/$/, '');
+      const headers = Object.assign({ 'X-Admin-Key': sess.adminKey }, options.headers || {});
+      const res = await fetch(base + path, Object.assign({}, options, { headers }));
+      const text = await res.text();
+      let data = null;
+      try { data = text ? JSON.parse(text) : null; } catch { data = null; }
+
+      if (res.status === 401) {
+        lockDashboard();
+        throw new Error('Session invalid. Please log in again.');
+      }
+      if (!res.ok) {
+        const msg = (data && data.error) ? data.error : (text || ('HTTP ' + res.status));
+        throw new Error(msg);
+      }
+      return data;
+    }
+
+    async function fetchPage(cursor) {
+      const limit = Number(el.pageSize.value || 25);
+      const data = await callApi(`/api/admin-users?type=${state.type}&limit=${limit}&cursor=${encodeURIComponent(cursor)}`);
+      state.currentCursor = cursor;
+      state.nextCursor = data.cursor;
+      state.hasMore = Boolean(data.hasMore);
+      state.items = Array.isArray(data.items) ? data.items : [];
+      renderTable();
+      renderPager();
+    }
+
+    function renderPager() {
+      el.cursorInfo.textContent = `Type: ${state.type} | Current cursor: ${state.currentCursor} | Next cursor: ${state.nextCursor} | Rows: ${state.items.length}`;
+      el.prevPage.disabled = state.cursorStack.length === 0;
+      el.nextPage.disabled = !state.hasMore;
+    }
+
+    function promptValue(message, initial) {
+      const v = window.prompt(message, initial);
+      return v === null ? null : v.trim();
+    }
+
+    async function onUserDelete(email) {
+      if (!window.confirm('Delete user ' + email + '?')) return;
+      try {
+        await callApi('/api/admin-users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'deleteUser', email })
+        });
+        setStatus('Deleted user ' + email + '.', 'ok');
+        await fetchPage(state.currentCursor);
+      } catch (e) {
+        setStatus(e.message, 'error');
+      }
+    }
+
+    async function onInstallAdjust(installId) {
+      const raw = promptValue('Enter credit delta (e.g. 50 or -20):', '50');
+      if (raw === null) return;
+      const delta = Number(raw);
+      if (!Number.isInteger(delta) || delta === 0) {
+        setStatus('Delta must be a non-zero integer.', 'error');
+        return;
+      }
+      try {
+        await callApi('/api/admin-users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'adjustCredits', installId, delta, reason: 'admin-panel' })
+        });
+        setStatus('Adjusted ' + installId + ' by ' + delta + '.', 'ok');
+        await fetchPage(state.currentCursor);
+      } catch (e) {
+        setStatus(e.message, 'error');
+      }
+    }
+
+    async function onInstallSetCredits(installId) {
+      const raw = promptValue('Set exact credits:', '100');
+      if (raw === null) return;
+      const credits = Number(raw);
+      if (!Number.isInteger(credits) || credits < 0) {
+        setStatus('Credits must be an integer >= 0.', 'error');
+        return;
+      }
+      try {
+        await callApi('/api/admin-users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'setCredits', installId, credits })
+        });
+        setStatus('Set credits for ' + installId + ' to ' + credits + '.', 'ok');
+        await fetchPage(state.currentCursor);
+      } catch (e) {
+        setStatus(e.message, 'error');
+      }
+    }
+
+    async function onInstallSetExpiry(installId) {
+      const raw = promptValue('Set expiry in ISO format (or empty to clear):', '');
+      if (raw === null) return;
+      try {
+        await callApi('/api/admin-users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'setExpiry', installId, expiresAt: raw || null })
+        });
+        setStatus('Updated expiry for ' + installId + '.', 'ok');
+        await fetchPage(state.currentCursor);
+      } catch (e) {
+        setStatus(e.message, 'error');
+      }
+    }
+
+    function esc(str) {
+      return String(str === null || str === undefined ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function renderTable() {
+      if (state.type === 'users') {
+        const rows = state.items.map(u => `
+          <tr>
+            <td><code>${esc(u.email)}</code></td>
+            <td>${esc(u.name || '')}</td>
+            <td>${esc(u.createdAt || '')}</td>
+            <td>${esc(u.purchasesCount)}</td>
+            <td class="actions">
+              <button class="danger" data-act="del-user" data-email="${esc(u.email)}">Delete</button>
+            </td>
+          </tr>
+        `).join('');
+
+        el.tableWrap.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Created</th>
+                <th>Purchases</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>${rows || '<tr><td colspan="5" class="muted">No rows</td></tr>'}</tbody>
+          </table>
+        `;
+      } else {
+        const rows = state.items.map(i => `
+          <tr>
+            <td><code>${esc(i.installId)}</code></td>
+            <td>${esc(i.credits)}</td>
+            <td>${esc(i.subscriptionActive ? 'Yes' : 'No')}</td>
+            <td>${esc(i.expiresAt || '')}</td>
+            <td>${esc(i.txnCount)}</td>
+            <td class="actions">
+              <button class="ok" data-act="adj" data-id="${esc(i.installId)}">Adjust</button>
+              <button class="warn" data-act="set-credits" data-id="${esc(i.installId)}">Set Credits</button>
+              <button data-act="set-expiry" data-id="${esc(i.installId)}">Set/Clear Expiry</button>
+            </td>
+          </tr>
+        `).join('');
+
+        el.tableWrap.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>Install ID</th>
+                <th>Credits</th>
+                <th>Active</th>
+                <th>Expires</th>
+                <th>Txn Count</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>${rows || '<tr><td colspan="6" class="muted">No rows</td></tr>'}</tbody>
+          </table>
+        `;
+      }
+
+      el.tableWrap.querySelectorAll('button[data-act="del-user"]').forEach(btn => {
+        btn.addEventListener('click', () => onUserDelete(btn.dataset.email));
+      });
+      el.tableWrap.querySelectorAll('button[data-act="adj"]').forEach(btn => {
+        btn.addEventListener('click', () => onInstallAdjust(btn.dataset.id));
+      });
+      el.tableWrap.querySelectorAll('button[data-act="set-credits"]').forEach(btn => {
+        btn.addEventListener('click', () => onInstallSetCredits(btn.dataset.id));
+      });
+      el.tableWrap.querySelectorAll('button[data-act="set-expiry"]').forEach(btn => {
+        btn.addEventListener('click', () => onInstallSetExpiry(btn.dataset.id));
+      });
+    }
+
+    async function reloadFromStart() {
+      state.currentCursor = '0';
+      state.cursorStack = [];
+      await fetchPage('0');
+    }
+
+    async function testConnection() {
+      try {
+        setStatus('Testing connection...', '');
+        await callApi('/api/admin-users?type=users&limit=1&cursor=0');
+        setStatus('Connection successful.', 'ok');
+      } catch (e) {
+        setStatus(e.message, 'error');
+      }
+    }
+
+    function initDashboard() {
+      const sess = getSession();
+      if (!sess) return;
+
+      el.apiBase.value = sess.apiBase;
+      el.pageSize.value = localStorage.getItem('admin_page_size') || '25';
+      renderTable();
+      renderPager();
+    }
+
+    el.testConn.addEventListener('click', testConnection);
+
+    el.pageSize.addEventListener('change', () => {
+      localStorage.setItem('admin_page_size', el.pageSize.value);
+    });
+
+    el.refresh.addEventListener('click', async () => {
+      try {
+        setStatus('Refreshing...', '');
+        await reloadFromStart();
+        setStatus('Loaded.', 'ok');
+      } catch (e) {
+        setStatus(e.message, 'error');
+      }
+    });
+
+    el.tabUsers.addEventListener('click', async () => {
+      state.type = 'users';
+      el.tabUsers.classList.add('active');
+      el.tabInstalls.classList.remove('active');
+      el.tabReport.classList.remove('active');
+      el.tabBankTransfers.classList.remove('active');
+      el.reportSection.style.display = 'none';
+      el.bankTransferSection.style.display = 'none';
+      el.tableWrap.parentElement.style.display = '';
+      try {
+        await reloadFromStart();
+      } catch (e) {
+        setStatus(e.message, 'error');
+      }
+    });
+
+    el.tabInstalls.addEventListener('click', async () => {
+      state.type = 'installs';
+      el.tabInstalls.classList.add('active');
+      el.tabUsers.classList.remove('active');
+      el.tabReport.classList.remove('active');
+      el.tabBankTransfers.classList.remove('active');
+      el.reportSection.style.display = 'none';
+      el.bankTransferSection.style.display = 'none';
+      el.tableWrap.parentElement.style.display = '';
+      try {
+        await reloadFromStart();
+      } catch (e) {
+        setStatus(e.message, 'error');
+      }
+    });
+
+    el.tabReport.addEventListener('click', () => {
+      el.tabReport.classList.add('active');
+      el.tabUsers.classList.remove('active');
+      el.tabInstalls.classList.remove('active');
+      el.tabBankTransfers.classList.remove('active');
+      el.tableWrap.parentElement.style.display = 'none';
+      el.reportSection.style.display = '';
+      el.bankTransferSection.style.display = 'none';
+      setStatus('');
+    });
+
+    el.tabBankTransfers.addEventListener('click', () => {
+      el.tabBankTransfers.classList.add('active');
+      el.tabUsers.classList.remove('active');
+      el.tabInstalls.classList.remove('active');
+      el.tabReport.classList.remove('active');
+      el.tableWrap.parentElement.style.display = 'none';
+      el.reportSection.style.display = 'none';
+      el.bankTransferSection.style.display = '';
+      setStatus('');
+      loadBankTransfersData();
+    });
+
+    async function loadReport() {
+      const month = el.reportMonth.value || '';
+      el.reportStatus.textContent = 'Loading report...';
+      el.reportStatus.className = 'status';
+      el.reportSummary.innerHTML = '';
+      el.reportTableWrap.innerHTML = '';
+      try {
+        const data = await callApi('/api/admin-users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'monthlyReport', month }),
+        });
+
+        if (!data.months || data.months.length === 0) {
+          el.reportStatus.textContent = 'No purchases found for the selected period.';
+          el.reportStatus.className = 'status';
+          return;
+        }
+
+        let totalSales = 0;
+        let totalRevenue = 0;
+        for (const m of data.months) {
+          totalSales += m.totalSales;
+          totalRevenue += parseFloat(m.totalRevenue);
+        }
+        el.reportSummary.innerHTML = `
+          <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:14px 18px;min-width:140px;">
+            <div class="muted" style="font-size:11px;margin-bottom:4px;">Total Purchases</div>
+            <div style="font-size:22px;font-weight:700;">${totalSales}</div>
+          </div>
+          <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:14px 18px;min-width:140px;">
+            <div class="muted" style="font-size:11px;margin-bottom:4px;">Total Revenue</div>
+            <div style="font-size:22px;font-weight:700;color:var(--accent);">$${totalRevenue.toFixed(2)}</div>
+          </div>
+          <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:14px 18px;min-width:140px;">
+            <div class="muted" style="font-size:11px;margin-bottom:4px;">Months</div>
+            <div style="font-size:22px;font-weight:700;">${data.months.length}</div>
+          </div>
+        `;
+
+        let html = '';
+        for (const m of data.months) {
+          const rows = m.purchases.map(p => `
+            <tr>
+              <td>${esc(p.email)}</td>
+              <td>${esc(p.name || '')}</td>
+              <td>${esc(p.pack)}</td>
+              <td>${esc(p.credits)}</td>
+              <td>${p.amount ? '$' + (Number(p.amount) / 100).toFixed(2) : 'N/A'}</td>
+              <td style="font-size:11px;">${esc(p.txnId || '')}</td>
+              <td>${esc(p.date ? p.date.slice(0, 16).replace('T', ' ') : '')}</td>
+            </tr>
+          `).join('');
+
+          html += `
+            <div style="margin-bottom:16px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <strong style="font-size:15px;">${esc(m.month)}</strong>
+                <span class="muted">${m.totalSales} sale${m.totalSales !== 1 ? 's' : ''} &mdash; $${m.totalRevenue} revenue</span>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Email</th>
+                    <th>Name</th>
+                    <th>Pack</th>
+                    <th>Credits</th>
+                    <th>Amount</th>
+                    <th>Txn ID</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+              </table>
+            </div>
+          `;
+        }
+        el.reportTableWrap.innerHTML = html;
+        el.reportStatus.textContent = `Report loaded: ${totalSales} purchase(s) across ${data.months.length} month(s).`;
+        el.reportStatus.className = 'status ok';
+      } catch (e) {
+        el.reportStatus.textContent = e.message;
+        el.reportStatus.className = 'status error';
+      }
+    }
+
+    el.loadReport.addEventListener('click', loadReport);
+
+    // ── Bank Transfers ──
+    async function loadBankTransfersData() {
+      const status = el.btStatusFilter.value;
+      el.btStatus.textContent = 'Loading...';
+      el.btStatus.className = 'status';
+      el.btTableWrap.innerHTML = '';
+      try {
+        const data = await callApi('/api/admin-users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'listBankTransfers', status }),
+        });
+        const items = data.transfers || data.items || [];
+        if (items.length === 0) {
+          el.btStatus.textContent = 'No ' + status + ' transfers found.';
+          return;
+        }
+        const isPending = status === 'pending';
+        const rows = items.map(t => `
+          <tr>
+            <td style="font-size:11px;"><code>${esc(t.id)}</code></td>
+            <td>${esc(t.email)}</td>
+            <td>${esc(t.name || '')}</td>
+            <td>${esc(t.pack)}</td>
+            <td>${esc(t.reference || '')}</td>
+            <td>${esc(t.installId || '')}</td>
+            <td style="font-size:11px;">${esc(t.createdAt ? t.createdAt.slice(0,16).replace('T',' ') : '')}</td>
+            <td class="actions">${isPending ? `
+              <button class="ok" data-act="bt-approve" data-bt='${esc(JSON.stringify({id:t.id,installId:t.installId||'',pack:t.pack}))}'>Approve</button>
+              <button class="danger" data-act="bt-reject" data-btid="${esc(t.id)}">Reject</button>
+            ` : `<span class="muted">${esc(status)}</span>`}</td>
+          </tr>
+        `).join('');
+
+        el.btTableWrap.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Pack</th>
+                <th>Reference</th>
+                <th>Install ID</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        `;
+
+        el.btTableWrap.querySelectorAll('button[data-act="bt-approve"]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const info = JSON.parse(btn.dataset.bt);
+            approveBankTransfer(info.id, info.installId, info.pack);
+          });
+        });
+        el.btTableWrap.querySelectorAll('button[data-act="bt-reject"]').forEach(btn => {
+          btn.addEventListener('click', () => rejectBankTransfer(btn.dataset.btid));
+        });
+
+        el.btStatus.textContent = items.length + ' transfer(s) loaded.';
+        el.btStatus.className = 'status ok';
+      } catch (e) {
+        el.btStatus.textContent = e.message;
+        el.btStatus.className = 'status error';
+      }
+    }
+
+    async function approveBankTransfer(btId, installId, pack) {
+      const useInstallId = promptValue('Install ID to grant credits to:', installId);
+      if (useInstallId === null) return;
+      const packCredits = pack === 'enterprise' ? 2500 : 500;
+      const raw = promptValue('Credits to grant:', String(packCredits));
+      if (raw === null) return;
+      const credits = Number(raw);
+      if (!Number.isInteger(credits) || credits <= 0) {
+        el.btStatus.textContent = 'Credits must be a positive integer.';
+        el.btStatus.className = 'status error';
+        return;
+      }
+      try {
+        el.btStatus.textContent = 'Approving...';
+        await callApi('/api/admin-users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'approveBankTransfer', btId, installId: useInstallId, credits }),
+        });
+        el.btStatus.textContent = 'Transfer approved! ' + credits + ' credits granted.';
+        el.btStatus.className = 'status ok';
+        loadBankTransfersData();
+      } catch (e) {
+        el.btStatus.textContent = e.message;
+        el.btStatus.className = 'status error';
+      }
+    }
+
+    async function rejectBankTransfer(btId) {
+      if (!window.confirm('Reject transfer ' + btId + '?')) return;
+      try {
+        el.btStatus.textContent = 'Rejecting...';
+        await callApi('/api/admin-users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'rejectBankTransfer', btId }),
+        });
+        el.btStatus.textContent = 'Transfer rejected.';
+        el.btStatus.className = 'status ok';
+        loadBankTransfersData();
+      } catch (e) {
+        el.btStatus.textContent = e.message;
+        el.btStatus.className = 'status error';
+      }
+    }
+
+    el.loadBankTransfers.addEventListener('click', loadBankTransfersData);
+
+    // ── Test Email ──
+    document.getElementById('testEmail').addEventListener('click', async () => {
+      const btn = document.getElementById('testEmail');
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+      setStatus('Sending test email...', '');
+      try {
+        const data = await callApi('/api/admin-users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'testEmail' }),
+        });
+        setStatus(data.message || 'Test email sent!', 'ok');
+      } catch (e) {
+        setStatus('Email failed: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Send Test Email';
+      }
+    });
+
+    el.prevPage.addEventListener('click', async () => {
+      if (state.cursorStack.length === 0) return;
+      const prev = state.cursorStack.pop();
+      try {
+        await fetchPage(prev);
+      } catch (e) {
+        setStatus(e.message, 'error');
+      }
+    });
+
+    el.nextPage.addEventListener('click', async () => {
+      if (!state.hasMore) return;
+      state.cursorStack.push(state.currentCursor);
+      try {
+        await fetchPage(state.nextCursor);
+      } catch (e) {
+        setStatus(e.message, 'error');
+      }
+    });
+
+    /* ═══════════════════════════════════════════════
+       AUTO-LOGIN CHECK ON PAGE LOAD
+       ═══════════════════════════════════════════════ */
+    (function checkExistingSession() {
+      const sess = getSession();
+      if (sess) {
+        showDashboard();
+      }
+    })();
+  </script>
+</body>
+</html>
