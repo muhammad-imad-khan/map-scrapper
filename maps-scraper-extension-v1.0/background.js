@@ -22,7 +22,7 @@ const CREDIT_PACKS = [
     { id: 'pri_01kkwtx0kh2skzrzjbxgmgqngd', slug: 'pro',        label: 'Pro Pack',        credits: 500,  price: '$5', popular: true },
     { id: 'pri_enterprise_placeholder',      slug: 'enterprise',  label: 'Enterprise Pack',  credits: 2500, price: '$25', popular: false },
 ];
-const ONE_TIME_PACK = { id: 'pri_01knfqkcbhqbnwhq5k1ace3sd9', slug: 'lifetime', label: 'Lifetime License', price: '$25', popular: true };
+const ONE_TIME_PACK = { id: 'pri_01knfqkcbhqbnwhq5k1ace3sd9', slug: 'lifetime', label: 'Lifetime License', price: '$5.99', popular: true };
 const COST_PER_RESULT = 1;
 const PRICING_MODE_CREDIT = 'credit_based';
 const PRICING_MODE_ONE_TIME = 'one_time';

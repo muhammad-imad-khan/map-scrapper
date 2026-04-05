@@ -1433,7 +1433,7 @@ const BACKEND_BASE = 'https://map-scraper-paddle-backend.vercel.app';
 
 function applyPricingMode(mode, pricing) {
   const isOneTime = mode === 'one_time';
-  const oneTimePrice = (pricing && pricing.plans && pricing.plans.oneTime && pricing.plans.oneTime.price) || '$25';
+  const oneTimePrice = (pricing && pricing.plans && pricing.plans.oneTime && pricing.plans.oneTime.price) || '$5.99';
   const setText = (id, text) => {
     const el = document.getElementById(id);
     if (el) el.innerHTML = text;
