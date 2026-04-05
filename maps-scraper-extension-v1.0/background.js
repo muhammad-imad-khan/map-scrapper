@@ -60,6 +60,15 @@ async function exec(tabId, fn, args = []) {
   }
 }
 
+async function execWithRetry(tabId, fn, args = [], retries = 4, delayMs = 1000) {
+  for (let i = 0; i < retries; i++) {
+    const result = await exec(tabId, fn, args);
+    if (result !== null) return result;
+    if (i < retries - 1) await sleep(delayMs);
+  }
+  return null;
+}
+
 // ── Install ID (unique per browser install, used as RLS key) ──
 
 function generateUUID() {
@@ -276,15 +285,6 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
         }
         break;
       }
-
-      case 'OPEN_POPUP': {
-        // Open the main popup window
-        const width = 540;
-        const height = 700;
-        chrome.action.openPopup().catch(() => {});
-        sendResponse({ ok: true });
-        break;
-      }
     }
   })();
   return true;
@@ -365,14 +365,14 @@ async function runScraper(query, requestedMax, startCredits) {
     state.status = 'Waiting for Maps results to load…';
     broadcast('STATE', state);
 
-    // Test that script injection works at all
-    const canExec = await exec(tabId, () => 'ping');
+    // Test that script injection works at all (with retries for startup race conditions)
+    const canExec = await execWithRetry(tabId, () => 'ping');
     console.log('[Scraper] exec test:', canExec);
     if (canExec !== 'ping') {
       // Script injection failed — try getting tab info
       const tab = await chrome.tabs.get(tabId).catch(() => null);
       console.error('[Scraper] Cannot inject scripts. Tab URL:', tab?.url, 'Status:', tab?.status);
-      throw new Error('Cannot access Google Maps page. Check extension permissions.');
+      throw new Error('Failed to initialize Google Maps tab for scraping. Reload the extension and try again.');
     }
 
     // Log the actual page URL for debugging
