@@ -1,17 +1,17 @@
-// ═══════════════════════════════════════════════════════════
-//  Maps Lead Scraper v2 — Background Service Worker
+﻿// ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+//  Maps Lead Scraper v2 ÔÇö Background Service Worker
 //  Monetization: SERVER-SIDE CREDIT SYSTEM (Paddle + Redis)
-//  • New installs: 3 free starter credits (server-granted)
-//  • Each scraped result costs 1 credit (server-deducted)
-//  • 500 cr / $10 — emails + social media (Pro)
-//  • 2500 cr / $25 — emails + social media (Enterprise)
-//  • Each install has a unique installId (UUID) for RLS
-// ═══════════════════════════════════════════════════════════
+//  ÔÇó New installs: 3 free starter credits (server-granted)
+//  ÔÇó Each scraped result costs 1 credit (server-deducted)
+//  ÔÇó 500 cr / $10 ÔÇö emails + social media (Pro)
+//  ÔÇó 2500 cr / $25 ÔÇö emails + social media (Enterprise)
+//  ÔÇó Each install has a unique installId (UUID) for RLS
+// ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
 
-// ── CONFIG ───────────────────────────────────────────────────
+// ÔöÇÔöÇ CONFIG ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 const BACKEND_URL = 'https://map-scraper-paddle-backend.vercel.app';
 
-// ── Open welcome page on first install ───────────────────────
+// ÔöÇÔöÇ Open welcome page on first install ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
     chrome.tabs.create({ url: chrome.runtime.getURL('welcome.html') });
@@ -22,14 +22,18 @@ const CREDIT_PACKS = [
     { id: 'pri_01kkwtx0kh2skzrzjbxgmgqngd', slug: 'pro',        label: 'Pro Pack',        credits: 500,  price: '$5', popular: true },
     { id: 'pri_enterprise_placeholder',      slug: 'enterprise',  label: 'Enterprise Pack',  credits: 2500, price: '$25', popular: false },
 ];
+const ONE_TIME_PACK = { id: 'pri_01knfqkcbhqbnwhq5k1ace3sd9', slug: 'lifetime', label: 'Lifetime License', price: '$25', popular: true };
 const COST_PER_RESULT = 1;
+const PRICING_MODE_CREDIT = 'credit_based';
+const PRICING_MODE_ONE_TIME = 'one_time';
 
-// ─────────────────────────────────────────────────────────
+// ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 let state = {
   running: false, results: [], progress: 0, total: 0,
   status: 'idle', tabId: null, credits: 0
 };
+let pricingMode = PRICING_MODE_CREDIT;
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -60,16 +64,18 @@ async function exec(tabId, fn, args = []) {
   }
 }
 
-async function execWithRetry(tabId, fn, args = [], retries = 4, delayMs = 1000) {
-  for (let i = 0; i < retries; i++) {
+async function execWithRetry(tabId, fn, args = [], maxAttempts = 4, delayMs = 1000) {
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const result = await exec(tabId, fn, args);
     if (result !== null) return result;
-    if (i < retries - 1) await sleep(delayMs);
+    if (attempt < maxAttempts - 1) {
+      await sleep(delayMs);
+    }
   }
   return null;
 }
 
-// ── Install ID (unique per browser install, used as RLS key) ──
+// ÔöÇÔöÇ Install ID (unique per browser install, used as RLS key) ÔöÇÔöÇ
 
 function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
@@ -92,7 +98,7 @@ async function getInstallId() {
   });
 }
 
-// ── Server-side credit operations ──────────────────────────
+// ÔöÇÔöÇ Server-side credit operations ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 async function getCredits() {
   try {
@@ -118,7 +124,7 @@ async function getCredits() {
 }
 
 async function setCredits(n) {
-  // Only update local cache — server is the source of truth
+  // Only update local cache ÔÇö server is the source of truth
   const val = Math.max(0, n);
   await chrome.storage.local.set({ credits: val });
   broadcast('CREDITS_UPDATE', { credits: val });
@@ -143,7 +149,32 @@ async function deductCredit() {
   }
 }
 
-// ── License / credit pack redemption (kept for manual codes) ──
+async function getPricingMode() {
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/payment-config?type=pricing`);
+    if (res.ok) {
+      const data = await res.json();
+      const mode = data && data.mode;
+      if (mode === PRICING_MODE_ONE_TIME || mode === PRICING_MODE_CREDIT) {
+        pricingMode = mode;
+        await chrome.storage.local.set({ pricingMode: mode });
+        return mode;
+      }
+    }
+  } catch {}
+
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['pricingMode'], (d) => {
+      const mode = d.pricingMode;
+      if (mode === PRICING_MODE_ONE_TIME || mode === PRICING_MODE_CREDIT) {
+        pricingMode = mode;
+      }
+      resolve(pricingMode);
+    });
+  });
+}
+
+// ÔöÇÔöÇ License / credit pack redemption (kept for manual codes) ÔöÇÔöÇ
 
 async function verifyLicense(key) {
   if (!key || key.length < 8) return false;
@@ -193,7 +224,7 @@ async function getUsedCodes() {
   return new Promise(r => chrome.storage.local.get(['usedCodes'], d => r(d.usedCodes || [])));
 }
 
-// ── Message router ─────────────────────────────────────────
+// ÔöÇÔöÇ Message router ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   (async () => {
@@ -221,17 +252,33 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
 
       case 'GET_STATE': {
         const credits = await getCredits();
-        sendResponse({ ...state, credits, packs: CREDIT_PACKS, costPerResult: COST_PER_RESULT });
+        const mode = await getPricingMode();
+        const packs = mode === PRICING_MODE_ONE_TIME ? [ONE_TIME_PACK] : CREDIT_PACKS;
+        sendResponse({ ...state, credits, packs, costPerResult: COST_PER_RESULT, pricingMode: mode });
         break;
       }
 
       case 'GET_PACKS': {
-        sendResponse({ packs: CREDIT_PACKS });
+        const mode = await getPricingMode();
+        const packs = mode === PRICING_MODE_ONE_TIME ? [ONE_TIME_PACK] : CREDIT_PACKS;
+        sendResponse({ packs });
+        break;
+      }
+
+      case 'GET_PRICING_MODE': {
+        const mode = await getPricingMode();
+        sendResponse({ pricingMode: mode });
         break;
       }
 
       case 'OPEN_PACK': {
-        const pack = CREDIT_PACKS.find(p => p.id === msg.packId);
+        const mode = await getPricingMode();
+        let pack;
+        if (mode === PRICING_MODE_ONE_TIME) {
+          pack = ONE_TIME_PACK;
+        } else {
+          pack = CREDIT_PACKS.find(p => p.id === msg.packId);
+        }
         if (!pack) { sendResponse({ ok: false }); break; }
         const installId = await getInstallId().catch(() => '');
         // Open payment page directly with installId so credits get linked
@@ -285,12 +332,24 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
         }
         break;
       }
+
+      case 'OPEN_POPUP': {
+        // Open the main popup window
+        const width = 540;
+        const height = 700;
+        chrome.action.openPopup().catch(() => {});
+        sendResponse({ ok: true });
+        break;
+      }
     }
   })();
   return true;
 });
 
-// ── Main scraper ───────────────────────────────────────────
+// Prime pricing mode cache in the background.
+getPricingMode().catch(() => {});
+
+// ÔöÇÔöÇ Main scraper ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 async function runScraper(query, requestedMax, startCredits) {
   // Cap max by available credits
@@ -299,7 +358,7 @@ async function runScraper(query, requestedMax, startCredits) {
 
   state = {
     running: true, results: [], progress: 0, total: 0,
-    status: 'Opening Google Maps…', tabId: null,
+    status: 'Opening Google MapsÔÇª', tabId: null,
     credits: startCredits
   };
   broadcast('STATE', state);
@@ -344,7 +403,7 @@ async function runScraper(query, requestedMax, startCredits) {
             || [...dialog.querySelectorAll('button')].find(b => /not now|no thanks|skip|stay signed out|maybe later|close|dismiss/i.test(b.textContent));
           if (dismissBtn) { dismissBtn.click(); return 'dialog-dismiss'; }
         }
-        // "Sign in" bottom bar (not a full overlay — just hide it)
+        // "Sign in" bottom bar (not a full overlay ÔÇö just hide it)
         const signInBar = document.querySelector('.kwuIFd, .PwqnGe');
         if (signInBar) { signInBar.style.display = 'none'; return 'signin-bar-hidden'; }
         // Generic dismiss buttons (be very specific to avoid closing results)
@@ -362,14 +421,23 @@ async function runScraper(query, requestedMax, startCredits) {
     await sleep(2000);
 
     // Wait for results to actually appear in the DOM (up to 15s)
-    state.status = 'Waiting for Maps results to load…';
+    state.status = 'Waiting for Maps results to loadÔÇª';
     broadcast('STATE', state);
 
-    // Test that script injection works at all (with retries for startup race conditions)
-    const canExec = await execWithRetry(tabId, () => 'ping');
+    // Test that script injection works, then try one hard refresh recovery before failing.
+    let canExec = await execWithRetry(tabId, () => 'ping');
     console.log('[Scraper] exec test:', canExec);
     if (canExec !== 'ping') {
-      // Script injection failed — try getting tab info
+      console.warn('[Scraper] Initial script injection failed. Reloading tab and retrying...');
+      await chrome.tabs.reload(tabId, { bypassCache: true }).catch(() => {});
+      await waitForTab(tabId, 20000);
+      await sleep(1200);
+      canExec = await execWithRetry(tabId, () => 'ping', [], 5, 1200);
+      console.log('[Scraper] exec test after reload:', canExec);
+    }
+
+    if (canExec !== 'ping') {
+      // Script injection failed ÔÇö try getting tab info
       const tab = await chrome.tabs.get(tabId).catch(() => null);
       console.error('[Scraper] Cannot inject scripts. Tab URL:', tab?.url, 'Status:', tab?.status);
       throw new Error('Failed to initialize Google Maps tab for scraping. Reload the extension and try again.');
@@ -380,7 +448,7 @@ async function runScraper(query, requestedMax, startCredits) {
     console.log('[Scraper] Maps page URL:', pageUrl);
 
     // Wait for results to load (up to 40 seconds)
-    state.status = 'Waiting for results to load…';
+    state.status = 'Waiting for results to loadÔÇª';
     broadcast('STATE', state);
     
     let hasResults = false;
@@ -404,13 +472,13 @@ async function runScraper(query, requestedMax, startCredits) {
     }
 
     // Collect listing URLs (or prep for card-click fallback)
-    state.status = 'Collecting listings from results…';
+    state.status = 'Collecting listings from resultsÔÇª';
     broadcast('STATE', state);
     const urls = await collectUrls(tabId, maxResults);
     state.total = urls.length || maxResults;
     if (!urls.length) {
       // Fallback mode: scrape by clicking result cards directly in the left panel.
-      state.status = 'URL selectors failed. Switching to card-click mode…';
+      state.status = 'URL selectors failed. Switching to card-click modeÔÇª';
       broadcast('STATE', state);
       await sleep(900);
 
@@ -455,13 +523,13 @@ async function runScraper(query, requestedMax, startCredits) {
       chrome.tabs.remove(state.tabId).catch(() => {});
       const finalCredits = await getCredits();
       state.running = false; state.tabId = null; state.credits = finalCredits;
-      state.status = `Done — ${state.results.length} listings. ${finalCredits} credits remaining.`;
+      state.status = `Done ÔÇö ${state.results.length} listings. ${finalCredits} credits remaining.`;
       if (state.results.length > 0) await autoExportAndView(state.results, query);
       broadcast('DONE', { ...state });
       return;
     }
 
-    broadcast('STATE', { ...state, status: `Found ${urls.length} listings. Starting…` });
+    broadcast('STATE', { ...state, status: `Found ${urls.length} listings. StartingÔÇª` });
     await sleep(400);
 
     // Scrape each listing
@@ -476,7 +544,7 @@ async function runScraper(query, requestedMax, startCredits) {
       }
 
       state.progress = i + 1;
-      state.status = `[${currentCredits} cr] Extracting ${i + 1} / ${urls.length}…`;
+      state.status = `[${currentCredits} cr] Extracting ${i + 1} / ${urls.length}ÔÇª`;
       broadcast('STATE', state);
 
       try {
@@ -496,7 +564,7 @@ async function runScraper(query, requestedMax, startCredits) {
 
         // Fetch email + socials from business website
         if (data.website && data.website !== 'N/A') {
-            state.status = `Finding email for "${data.name}"…`;
+            state.status = `Finding email for "${data.name}"ÔÇª`;
             broadcast('STATE', state);
             const webData = await fetchWebsiteData(data.website, true);
             data.email = webData.email;
@@ -513,9 +581,9 @@ async function runScraper(query, requestedMax, startCredits) {
     chrome.tabs.remove(state.tabId).catch(() => {});
     const finalCredits = await getCredits();
     state.running = false; state.tabId = null; state.credits = finalCredits;
-    state.status = `Done — ${state.results.length} listings. ${finalCredits} credits remaining.`;
+    state.status = `Done ÔÇö ${state.results.length} listings. ${finalCredits} credits remaining.`;
 
-    // ── Auto-export CSV + open viewer tab ──
+    // ÔöÇÔöÇ Auto-export CSV + open viewer tab ÔöÇÔöÇ
     if (state.results.length > 0) {
       await autoExportAndView(state.results, query);
     }
@@ -543,7 +611,7 @@ async function scrapeByClickingResults(tabId, maxResults) {
     }
 
     state.progress = successCount + 1;
-    state.status = `[${currentCredits} cr] Scraping result ${successCount + 1} / ${maxResults}…`;
+    state.status = `[${currentCredits} cr] Scraping result ${successCount + 1} / ${maxResults}ÔÇª`;
     broadcast('STATE', state);
 
     const clicked = await exec(tabId, () => {
@@ -638,7 +706,7 @@ async function scrapeByClickingResults(tabId, maxResults) {
 
     // Fetch email/socials if website exists
     if (data.website && data.website !== 'N/A') {
-      state.status = `Finding email for "${data.name}"…`;
+      state.status = `Finding email for "${data.name}"ÔÇª`;
       broadcast('STATE', state);
       try {
         const webData = await fetchWebsiteData(data.website, true);
@@ -672,7 +740,7 @@ async function scrapeByClickingResults(tabId, maxResults) {
   console.log('[Scraper] Card-click mode completed:', successCount, 'results after', attempts, 'attempts');
 }
 
-// ── URL Collector ──────────────────────────────────────────
+// ÔöÇÔöÇ URL Collector ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 async function collectUrls(tabId, max) {
   const seen = new Set();
@@ -786,7 +854,7 @@ async function collectUrls(tabId, max) {
   return [...seen].slice(0, max);
 }
 
-// ── Detail extractor (injected into Maps page) ─────────────
+// ÔöÇÔöÇ Detail extractor (injected into Maps page) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 function extractDetails() {
   const $ = s => document.querySelector(s);
@@ -864,7 +932,7 @@ function extractDetails() {
   return { name, rating, website, email: 'N/A', phone, address, hours, category, socials: 'N/A' };
 }
 
-// ── Website data fetcher (email + social media) ────────────
+// ÔöÇÔöÇ Website data fetcher (email + social media) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 async function fetchWebsiteData(url, includeSocials) {
   const BL = ['example','domain','sentry','wixpress','schema','noreply','@2x','.png','.jpg','.svg'];
@@ -932,7 +1000,7 @@ async function fetchWebsiteData(url, includeSocials) {
   }
 }
 
-// ── Auto Export & Open Viewer ──────────────────────────────
+// ÔöÇÔöÇ Auto Export & Open Viewer ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 function resultsToCSV(rows) {
   const COLS  = ['Name','Website','Email','Social Media','Rating','Opening Hours','Phone','Address','Category'];
@@ -969,7 +1037,7 @@ async function autoExportAndView(results, query) {
     await chrome.downloads.download({
       url:      dataUrl,
       filename: filename,
-      saveAs:   false    // silent — goes straight to Downloads
+      saveAs:   false    // silent ÔÇö goes straight to Downloads
     });
 
     // 3. Open viewer tab
@@ -980,6 +1048,6 @@ async function autoExportAndView(results, query) {
 
   } catch (e) {
     console.warn('[AutoExport] Error:', e);
-    // Don't block — DONE still fires even if export fails
+    // Don't block ÔÇö DONE still fires even if export fails
   }
 }

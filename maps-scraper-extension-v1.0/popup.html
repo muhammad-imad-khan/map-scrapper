@@ -218,8 +218,8 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   <div class="overlay-sheet">
     <div class="ov-handle"></div>
     <div class="ov-icon">💳</div>
-    <div class="ov-title">You're out of credits</div>
-    <div class="ov-sub">Each scraped result costs <strong>1 credit</strong>.<br>Top up to keep scraping.</div>
+    <div class="ov-title" id="noCreditsTitle">You're out of credits</div>
+    <div class="ov-sub" id="noCreditsSub">Each scraped result costs <strong>1 credit</strong>.<br>Top up to keep scraping.</div>
     <div class="ov-packs" id="ovPacks">
       <!-- injected by JS -->
     </div>
@@ -237,18 +237,18 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
       </svg>
     </div>
     <div class="credit-info">
-      <div class="credit-label">Your Credits</div>
+      <div class="credit-label" id="creditLabel">Your Credits</div>
       <div class="credit-count" id="creditCount">—</div>
-      <div class="credit-sub">1 credit = 1 result</div>
+      <div class="credit-sub" id="creditSub">1 credit = 1 result</div>
     </div>
   </div>
-  <button class="btn-topup" id="btnTopup">+ Buy Credits</button>
+  <button class="btn-topup" id="btnTopup"><span id="btnTopupText">+ Buy Credits</span></button>
 </div>
 
 <!-- TABS -->
 <div class="tabs">
   <button class="tab active" id="tabScrape" data-tab="scrape"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg> Scrape</button>
-  <button class="tab" id="tabShop" data-tab="shop"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg> Buy Credits</button>
+  <button class="tab" id="tabShop" data-tab="shop"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg> <span id="tabShopText">Buy Credits</span></button>
   <button class="tab" id="tabHistory" data-tab="history"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> History</button>
 </div>
 
@@ -302,8 +302,8 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 <!-- SHOP PANEL -->
 <div class="panel" id="panelShop">
   <div class="shop-header">
-    <div class="shop-title">Buy Credits</div>
-    <div class="shop-sub">Credits never expire · 1 credit = 1 scraped result</div>
+    <div class="shop-title" id="shopTitle">Buy Credits</div>
+    <div class="shop-sub" id="shopSub">Credits never expire · 1 credit = 1 scraped result</div>
   </div>
 
   <div class="pack-grid" id="packGrid">
@@ -344,5 +344,6 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 </div>
 
 <script src="popup.js"></script>
+<script src="pricing-mode.js"></script>
 </body>
 </html>

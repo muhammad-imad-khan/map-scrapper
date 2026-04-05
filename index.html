@@ -468,7 +468,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
 <!-- HERO -->
 <section class="hero" id="home">
   <div class="container">
-    <div class="hero-kicker"><span class="kd"></span><span class="kt">3 FREE CREDITS ON INSTALL — NO SIGN-UP REQUIRED</span></div>
+    <div class="hero-kicker"><span class="kd"></span><span class="kt" id="heroKickerText">3 FREE CREDITS ON INSTALL — NO SIGN-UP REQUIRED</span></div>
     <h1 class="hero-h1">
       <span class="acc">Google Maps</span> Leads<br>
       <span class="line2">Into Your Spreadsheet.</span>
@@ -494,7 +494,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
       <a class="btn-ghost" href="maps-scraper-extension-v1.0.zip" download id="heroZipDownload">Download ZIP</a>
       <a class="btn-ghost" href="#how">Watch it scrape →</a>
     </div>
-    <p class="hero-note"><strong>3 free credits</strong> on install · 1 credit = 1 lead · Bought credits never expire</p>
+    <p class="hero-note" id="heroNoteText"><strong>3 free credits</strong> on install · 1 credit = 1 lead · Bought credits never expire</p>
     <div class="compat-pills">
       <span style="font-size:11.5px;color:var(--t3)">Works on</span>
       <span class="cp"><svg width="13" height="13" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#4285f4"/><circle cx="12" cy="12" r="4.5" fill="white"/><path d="M12 0a12 12 0 0110.39 6H12V0z" fill="#ea4335"/><path d="M2.54 6A12 12 0 0012 24V12L2.54 6z" fill="#34a853"/><path d="M21.46 18A12 12 0 012.54 6L12 12l9.46-6z" fill="#fbbc05"/></svg> Chrome</span>
@@ -726,15 +726,15 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
 <!-- PRICING -->
 <section class="section price-s" id="pricing">
   <div class="container">
-    <div class="rev"><div class="sk">Pricing</div><h2 class="sh">Pay per lead.<br><em>Not per month.</em></h2><p class="ss">Buy credits once — they never expire. No subscription. No monthly fees.</p></div>
-    <div class="free-strip rev">
-      <div class="fs-l"><div class="fs-h">Start for free — no card needed</div><div class="fs-s">Every install gets <strong>3 free credits</strong> automatically. No sign-up. Just install and go.</div></div>
-      <div class="fs-n">3 <span>free credits</span></div>
+    <div class="rev"><div class="sk">Pricing</div><h2 class="sh" id="pricingHeading">Pay per lead.<br><em>Not per month.</em></h2><p class="ss" id="pricingSubtitle">Buy credits once — they never expire. No subscription. No monthly fees.</p></div>
+    <div class="free-strip rev" id="freeStrip">
+      <div class="fs-l"><div class="fs-h" id="freeStripTitle">Start for free — no card needed</div><div class="fs-s" id="freeStripSubtitle">Every install gets <strong>3 free credits</strong> automatically. No sign-up. Just install and go.</div></div>
+      <div class="fs-n" id="freeStripNumber">3 <span>free credits</span></div>
     </div>
     <div class="p-grid rev">
 
       <!-- FREE -->
-      <div class="p-card" tabindex="0">
+      <div class="p-card" tabindex="0" id="freePlanCard">
         <div class="p-card-ico" style="background:rgba(148,148,176,.1);border:1px solid rgba(148,148,176,.2)">🆓</div>
         <div class="p-creds">3 <span>cr</span></div>
         <div class="p-lbl">Free Starter</div>
@@ -755,22 +755,22 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
       <div class="p-card pop" data-payment-pack="pro" tabindex="0" role="link" aria-label="Open payment page for Pro Pack">
         <div class="pop-tag">POPULAR</div>
         <div class="p-card-ico" style="background:var(--gd);border:1px solid var(--gb)">⚡</div>
-        <div class="p-creds">500 <span>cr</span></div>
-        <div class="p-lbl">Pro Pack</div>
-        <div class="p-price">$5</div>
-        <div class="p-per">1¢ per lead</div>
+        <div class="p-creds" id="proCardCredits">500 <span>cr</span></div>
+        <div class="p-lbl" id="proCardLabel">Pro Pack</div>
+        <div class="p-price" id="proCardPrice">$5</div>
+        <div class="p-per" id="proCardPer">1¢ per lead</div>
         <ul class="p-feats">
-          <li>500 scraping credits</li>
+          <li id="proFeat1">500 scraping credits</li>
           <li>All basic data columns</li>
           <li><strong style="color:var(--g)">✓ Email auto-finder</strong></li>
           <li style="opacity:.4;text-decoration:line-through">Social media handles — Enterprise</li>
-          <li>Credits never expire</li>
+          <li id="proFeat5">Credits never expire</li>
         </ul>
-        <a href="payment/?pack=pro" class="btn-p">Buy Pro →</a>
+        <a href="payment/?pack=pro" class="btn-p" id="proCardButton">Buy Pro →</a>
       </div>
 
       <!-- ENTERPRISE -->
-      <div class="p-card" data-payment-pack="enterprise" tabindex="0" role="link" aria-label="Open payment page for Enterprise Pack" style="border-color:rgba(167,139,250,.25);background:linear-gradient(135deg,rgba(167,139,250,.07),rgba(167,139,250,.02))">
+      <div class="p-card" data-payment-pack="enterprise" id="enterprisePlanCard" tabindex="0" role="link" aria-label="Open payment page for Enterprise Pack" style="border-color:rgba(167,139,250,.25);background:linear-gradient(135deg,rgba(167,139,250,.07),rgba(167,139,250,.02))">
         <div class="pop-tag" style="background:#a78bfa">BEST VALUE</div>
         <div class="p-card-ico" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2)">🚀</div>
         <div class="p-creds">2500 <span>cr</span></div>
@@ -1429,6 +1429,69 @@ document.querySelectorAll('.b-card').forEach(card => {
 //  INSTALL MODAL
 // ══════════════════════════════════════════════════════
 const ZIP_URL = 'maps-scraper-extension-v1.0.zip';
+const BACKEND_BASE = 'https://map-scraper-paddle-backend.vercel.app';
+
+function applyPricingMode(mode, pricing) {
+  const isOneTime = mode === 'one_time';
+  const oneTimePrice = (pricing && pricing.plans && pricing.plans.oneTime && pricing.plans.oneTime.price) || '$25';
+  const setText = (id, text) => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = text;
+  };
+
+  const freeStrip = document.getElementById('freeStrip');
+  const freeCard = document.getElementById('freePlanCard');
+  const enterpriseCard = document.getElementById('enterprisePlanCard');
+
+  if (isOneTime) {
+    setText('heroKickerText', 'ONE-TIME PURCHASE AVAILABLE — NO MONTHLY FEES');
+    setText('heroNoteText', '<strong>Pay once</strong> for lifetime access · No recurring billing');
+    setText('pricingHeading', 'One-Time Purchase.<br><em>Lifetime access.</em>');
+    setText('pricingSubtitle', 'Single payment. No subscription. No recurring charges.');
+
+    if (freeStrip) freeStrip.style.display = 'none';
+    if (freeCard) freeCard.style.display = 'none';
+    if (enterpriseCard) enterpriseCard.style.display = 'none';
+
+    setText('proCardCredits', 'Lifetime <span>access</span>');
+    setText('proCardLabel', 'Lifetime License');
+    setText('proCardPrice', oneTimePrice);
+    setText('proCardPer', 'One-time payment');
+    setText('proFeat1', 'Unlimited scraping access');
+    setText('proFeat5', 'Lifetime updates included');
+    setText('proCardButton', 'Buy Lifetime →');
+  } else {
+    setText('heroKickerText', '3 FREE CREDITS ON INSTALL — NO SIGN-UP REQUIRED');
+    setText('heroNoteText', '<strong>3 free credits</strong> on install · 1 credit = 1 lead · Bought credits never expire');
+    setText('pricingHeading', 'Pay per lead.<br><em>Not per month.</em>');
+    setText('pricingSubtitle', 'Buy credits once — they never expire. No subscription. No monthly fees.');
+
+    if (freeStrip) freeStrip.style.display = '';
+    if (freeCard) freeCard.style.display = '';
+    if (enterpriseCard) enterpriseCard.style.display = '';
+
+    setText('proCardCredits', '500 <span>cr</span>');
+    setText('proCardLabel', 'Pro Pack');
+    setText('proCardPrice', '$5');
+    setText('proCardPer', '1¢ per lead');
+    setText('proFeat1', '500 scraping credits');
+    setText('proFeat5', 'Credits never expire');
+    setText('proCardButton', 'Buy Pro →');
+  }
+}
+
+async function loadPricingMode() {
+  try {
+    const resp = await fetch(`${BACKEND_BASE}/api/payment-config?type=pricing`, { cache: 'no-store' });
+    if (!resp.ok) throw new Error('pricing config not available');
+    const data = await resp.json();
+    applyPricingMode(data.mode || 'credit_based', data.pricing || null);
+  } catch {
+    applyPricingMode('credit_based', null);
+  }
+}
+
+loadPricingMode();
 
 function triggerDownload() {
   const a = Object.assign(document.createElement('a'), { href: ZIP_URL, download: 'maps-scraper-extension-v1.0.zip' });
@@ -1508,7 +1571,7 @@ document.getElementById('dlEmailSubmit').addEventListener('click', () => {
   btn.disabled = true;
   btn.textContent = 'Saving…';
   msg.textContent = '';
-  fetch('https://map-scraper-paddle-backend.vercel.app/api/credits', {
+  fetch(`${BACKEND_BASE}/api/credits`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-Install-Id': 'web-' + Date.now() },
     body: JSON.stringify({ action: 'saveEmail', email, name }),

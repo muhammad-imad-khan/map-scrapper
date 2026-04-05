@@ -621,6 +621,19 @@
               <div style="margin-top:6px;">Storage: sessionStorage (cleared on close)</div>
             </div>
           </div>
+          <div class="card">
+            <div class="card-title">Pricing Mode</div>
+            <div class="card-subtitle" style="margin-bottom:14px;">Choose one-time purchase or credit-based pricing</div>
+            <div class="form-group" style="margin-bottom:12px;">
+              <label for="pricingModeSelect">Mode</label>
+              <select id="pricingModeSelect" style="width:100%;">
+                <option value="credit_based">Credit-based</option>
+                <option value="one_time">One-time purchase</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" id="savePricingMode">Save Pricing Mode</button>
+            <div id="pricingModeStatus" class="status"></div>
+          </div>
         </div>
       </div>
 
@@ -1175,6 +1188,23 @@ function loadToolsPage() {
   if (sess) {
     document.getElementById('toolsApiUrl').textContent = sess.apiBase;
   }
+  loadPricingMode();
+}
+
+async function loadPricingMode() {
+  const status = document.getElementById('pricingModeStatus');
+  status.textContent = 'Loading pricing mode...';
+  status.className = 'status';
+  try {
+    const data = await callApi('/api/payment-config?type=pricing');
+    const mode = data && data.mode ? data.mode : 'credit_based';
+    document.getElementById('pricingModeSelect').value = mode;
+    status.textContent = `Current mode: ${mode === 'one_time' ? 'One-time purchase' : 'Credit-based'}`;
+    status.className = 'status ok';
+  } catch (e) {
+    status.textContent = e.message;
+    status.className = 'status error';
+  }
 }
 
 document.getElementById('testConn').addEventListener('click', async () => {
@@ -1204,6 +1234,33 @@ document.getElementById('testEmail').addEventListener('click', async () => {
     document.getElementById('emailStatus').className = 'status error';
   } finally {
     btn.disabled = false; btn.textContent = '\u2709\uFE0F Send Test Email';
+  }
+});
+
+document.getElementById('savePricingMode').addEventListener('click', async () => {
+  const btn = document.getElementById('savePricingMode');
+  const status = document.getElementById('pricingModeStatus');
+  const mode = document.getElementById('pricingModeSelect').value;
+
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+  status.textContent = 'Updating pricing mode...';
+  status.className = 'status';
+
+  try {
+    await callApi('/api/payment-config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'setPricingMode', mode }),
+    });
+    status.textContent = `Pricing mode updated to ${mode === 'one_time' ? 'One-time purchase' : 'Credit-based'}.`;
+    status.className = 'status ok';
+  } catch (e) {
+    status.textContent = e.message;
+    status.className = 'status error';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save Pricing Mode';
   }
 });
 
