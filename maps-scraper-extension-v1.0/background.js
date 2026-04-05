@@ -151,7 +151,7 @@ async function deductCredit() {
 
 async function getPricingMode() {
   try {
-    const res = await fetch(`${BACKEND_URL}/api/payment-config?type=pricing`);
+    const res = await fetch(`${BACKEND_URL}/api/pricing-config`);
     if (res.ok) {
       const data = await res.json();
       const mode = data && data.mode;
