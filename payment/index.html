@@ -779,25 +779,31 @@ checkoutBtn.addEventListener('click', () => {
     localStorage.setItem('mls_pending_zip_download', '1');
   }
   const authToken = localStorage.getItem('mls_auth_token') || '';
-  const userEmail = (JSON.parse(localStorage.getItem('mls_auth_user') || '{}').email) || '';
   pendingCheckout = { priceId: pack.priceId, installId: state.installId, token: authToken };
   paddleFallbackTried = false;
-  checkoutStatus.style.display = 'none';
+  checkoutStatus.style.display = 'block';
+  checkoutStatus.className = 'checkout-status pending';
+  checkoutStatus.textContent = 'Creating secure checkout…';
   checkoutBtn.disabled = true;
-  try {
-    const checkoutConfig = {
-      items: [{ priceId: pack.priceId, quantity: 1 }],
-      customData: { installId: state.installId, email: userEmail },
-      settings: { displayMode: 'overlay', allowLogout: false },
-    };
-    if (userEmail) checkoutConfig.customer = { email: userEmail };
-    Paddle.Checkout.open(checkoutConfig);
-  } catch (err) {
-    checkoutStatus.style.display = 'block';
+  fetch('https://map-scraper-paddle-backend.vercel.app/api/checkout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(pendingCheckout),
+  })
+  .then(async (res) => {
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.checkoutUrl) {
+      throw new Error(data.detail || data.error || 'Could not create checkout.');
+    }
+    checkoutStatus.className = 'checkout-status ready';
+    checkoutStatus.textContent = 'Redirecting to checkout…';
+    window.location.href = data.checkoutUrl;
+  })
+  .catch((err) => {
     checkoutStatus.className = 'checkout-status error';
-    checkoutStatus.textContent = err.message || 'Could not open checkout. Please try again.';
-  }
-  checkoutBtn.disabled = false;
+    checkoutStatus.textContent = err.message || 'Checkout failed. Please try again.';
+    checkoutBtn.disabled = false;
+  });
 });
 
 async function handlePaddleCheckoutError() {
