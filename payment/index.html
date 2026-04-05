@@ -98,6 +98,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--nav-scroll)
 .detail-row span{font-size:12px;color:var(--t3);font-family:var(--mono);text-transform:uppercase;letter-spacing:1px}
 .detail-row strong{font-size:14px;color:var(--t);text-align:right}
 .method-grid{display:grid;gap:16px}
+.method-tabs{display:flex;border:1px solid var(--b);border-radius:14px;overflow:hidden;margin-bottom:20px;background:var(--s2)}
+.method-tab{flex:1;padding:14px;background:transparent;border:none;color:var(--t3);font-size:14px;font-weight:600;cursor:pointer;font-family:var(--body);transition:background .2s,color .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.method-tab.active{background:var(--gd);color:var(--g);border-bottom:2px solid var(--g)}
+.method-tab:hover:not(.active){color:var(--t)}
+.method-tab svg{width:18px;height:18px;flex-shrink:0}
 .method{background:linear-gradient(180deg,rgba(15,15,26,.88),rgba(10,10,18,.9));border:1px solid var(--b);border-radius:18px;padding:20px}
 .method-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
 .method-name{font-size:18px;font-weight:700;color:var(--heading)}
@@ -142,6 +147,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
 [data-theme="light"] .detail-row{background:#f8f9fc;border-color:rgba(0,0,0,.06)}
 [data-theme="light"] .note{background:#f8f9fc;border-color:rgba(0,0,0,.06)}
 [data-theme="light"] .pill{background:#f0f1f6;border-color:rgba(0,0,0,.08)}
+[data-theme="light"] .method-tabs{background:#f0f1f6;border-color:rgba(0,0,0,.08)}
 [data-theme="light"] .pack-option{background:#f8f9fc;border-color:rgba(0,0,0,.08)}
 [data-theme="light"] .pack-option:hover{border-color:rgba(0,0,0,.18)}
 [data-theme="light"] .pack-option.active{background:rgba(22,163,74,.06);border-color:var(--g)}
@@ -278,52 +284,52 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
             </div>
           </div>
 
-          <div id="pakistanMethods" class="method-grid hidden">
+          <div class="method-tabs">
+            <button class="method-tab active" id="tabBank" data-method="bank">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v4"/><path d="M12 14v4"/><path d="M16 14v4"/></svg>
+              Bank Transfer
+            </button>
+            <button class="method-tab" id="tabCard" data-method="card">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+              Credit / Debit Card
+            </button>
+          </div>
+
+          <div id="bankMethod" class="method-grid">
             <div class="method">
               <div class="method-head">
-                <div class="method-name">Meezan Bank Transfer</div>
-                <span class="tag local">Pakistan only</span>
+                <div class="method-name">Bank Transfer</div>
+                <span class="tag local">Manual verification</span>
               </div>
-              <p>Use these temporary test details for now. Replace them with your real bank information when you are ready.</p>
+              <p>Transfer the amount to the account below and share your payment proof via email so your credits can be issued.</p>
               <div class="detail-list">
                 <div class="detail-row"><span>Account title</span><strong>Imad Khan</strong></div>
                 <div class="detail-row"><span>Bank</span><strong>Meezan Bank</strong></div>
                 <div class="detail-row"><span>Account number</span><strong>12345678901234</strong></div>
                 <div class="detail-row"><span>IBAN</span><strong>PK00MEZN00012345678901234</strong></div>
                 <div class="detail-row"><span>Branch</span><strong>Karachi Test Branch</strong></div>
-              </div>
-            </div>
-
-            <div class="method">
-              <div class="method-head">
-                <div class="method-name">Sadapay</div>
-                <span class="tag local">Pakistan only</span>
-              </div>
-              <p>Use this placeholder Sadapay receiver information until you replace it with your live details.</p>
-              <div class="detail-list">
-                <div class="detail-row"><span>Account name</span><strong>Imad Khan</strong></div>
-                <div class="detail-row"><span>Mobile</span><strong>+92 300 1234567</strong></div>
                 <div class="detail-row"><span>Reference</span><strong id="referenceCode">MLS-PRO-PKR</strong></div>
               </div>
               <div class="note">After transfer, share your payment proof with <a href="mailto:elysiansoft.systems@gmail.com" style="color:#22c55e;text-decoration:none">elysiansoft.systems@gmail.com</a> so your credits can be issued manually.</div>
             </div>
           </div>
 
-          <div id="globalCheckout" class="method checkout-card hidden">
-            <div class="method-head">
-              <div class="method-name">Hosted Checkout</div>
-              <span class="tag global">Outside Pakistan</span>
+          <div id="cardMethod" class="method checkout-card hidden">
+            <div class="method">
+              <div class="method-head">
+                <div class="method-name">Card Payment</div>
+                <span class="tag global">Powered by Paddle</span>
+              </div>
+              <p>Pay securely with your credit or debit card via Paddle's hosted checkout. All major cards accepted.</p>
+              <div id="checkoutStatus" class="checkout-status ready">Checkout is ready. Click below to open the secure payment page.</div>
+              <div class="actions" style="margin-top:14px">
+                <button id="checkoutBtn" class="btn-main">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                  Pay with Card
+                </button>
+                <a class="btn-ghost" href="../index.html#pricing">Change plan</a>
+              </div>
             </div>
-            <p>For customers outside Pakistan, continue through the secure checkout page. The URL is served from backend configuration so it can be changed without editing this page.</p>
-            <div id="checkoutStatus" class="checkout-status pending">Loading checkout configuration…</div>
-            <div class="actions">
-              <button id="checkoutBtn" class="btn-main" disabled>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>
-                Continue to Checkout
-              </button>
-              <a class="btn-ghost" href="../index.html#pricing">Change plan</a>
-            </div>
-            <div class="muted">The selected country and currency are stored in the page URL so they can be restored if you come back later.</div>
           </div>
         </div>
       </section>
@@ -390,10 +396,12 @@ const PAYMENT_CONFIG_URL = window.location.hostname === 'localhost'
 const packOptions = document.getElementById('packOptions');
 const countrySelect = document.getElementById('countrySelect');
 const currencySelect = document.getElementById('currencySelect');
-const pakistanMethods = document.getElementById('pakistanMethods');
-const globalCheckout = document.getElementById('globalCheckout');
+const bankMethod = document.getElementById('bankMethod');
+const cardMethod = document.getElementById('cardMethod');
 const checkoutBtn = document.getElementById('checkoutBtn');
 const checkoutStatus = document.getElementById('checkoutStatus');
+const tabBank = document.getElementById('tabBank');
+const tabCard = document.getElementById('tabCard');
 
 const state = {
   pack: 'pro',
@@ -463,17 +471,20 @@ function renderSummary() {
 }
 
 function renderMethods() {
-  const isPakistan = state.country === 'Pakistan';
-  pakistanMethods.classList.toggle('hidden', !isPakistan);
-  globalCheckout.classList.toggle('hidden', isPakistan);
   updateReferenceCode();
 }
 
-async function loadCheckoutUrl() {
-  checkoutStatus.className = 'checkout-status ready';
-  checkoutStatus.textContent = 'Checkout is ready. Click below to open the secure payment overlay.';
-  checkoutBtn.disabled = false;
+function switchMethod(method) {
+  tabBank.classList.toggle('active', method === 'bank');
+  tabCard.classList.toggle('active', method === 'card');
+  bankMethod.classList.toggle('hidden', method !== 'bank');
+  cardMethod.classList.toggle('hidden', method !== 'card');
 }
+
+tabBank.addEventListener('click', () => switchMethod('bank'));
+tabCard.addEventListener('click', () => switchMethod('card'));
+
+async function loadCheckoutUrl() {}
 
 function render() {
   countrySelect.value = state.country;
