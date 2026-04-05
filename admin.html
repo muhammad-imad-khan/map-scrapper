@@ -168,6 +168,7 @@
         <button id="tabInstalls" class="tab">Installs</button>
         <button id="tabReport" class="tab">Monthly Report</button>
         <button id="refresh" class="ok">Refresh</button>
+        <button id="testEmail" class="warn" style="margin-left:auto;">Send Test Email</button>
       </div>
       <div id="status" class="status"></div>
     </div>
@@ -615,6 +616,27 @@
     }
 
     el.loadReport.addEventListener('click', loadReport);
+
+    // ── Test Email ──
+    document.getElementById('testEmail').addEventListener('click', async () => {
+      const btn = document.getElementById('testEmail');
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+      setStatus('Sending test email...', '');
+      try {
+        const data = await callApi('/api/admin-users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'testEmail' }),
+        });
+        setStatus(data.message || 'Test email sent!', 'ok');
+      } catch (e) {
+        setStatus('Email failed: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Send Test Email';
+      }
+    });
 
     el.prevPage.addEventListener('click', async () => {
       if (state.cursorStack.length === 0) return;

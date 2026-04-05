@@ -7,7 +7,7 @@
 // Auth:
 //   X-Admin-Key: <ADMIN_API_KEY>
 //   or Authorization: Bearer <ADMIN_API_KEY>
-const { cors, getRedis, keys, isValidInstallId } = require('./_helpers');
+const { cors, getRedis, keys, isValidInstallId, sendPurchaseNotification } = require('./_helpers');
 
 const MAX_LIMIT = 200;
 const DEFAULT_LIMIT = 50;
@@ -247,6 +247,24 @@ module.exports = async function handler(req, res) {
       const removed = await redis.del(userKey);
 
       return res.status(200).json({ ok: true, email, deleted: removed > 0 });
+    }
+
+    // ── Send test email ──
+    if (action === 'testEmail') {
+      try {
+        await sendPurchaseNotification({
+          userName: 'Test User',
+          userEmail: 'test@example.com',
+          packLabel: 'Pro Pack (TEST)',
+          credits: 500,
+          amount: '5.00',
+          currency: 'USD',
+          txnId: 'txn_test_' + Date.now(),
+        });
+        return res.status(200).json({ ok: true, message: 'Test email sent successfully.' });
+      } catch (err) {
+        return res.status(500).json({ error: 'Failed to send test email: ' + err.message });
+      }
     }
 
     // ── Monthly sales report ──
