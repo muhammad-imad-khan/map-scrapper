@@ -787,6 +787,8 @@ function navigateTo(page) {
   if (page === 'users') loadUsersPage();
   if (page === 'installs') loadInstallsPage();
   if (page === 'bank-transfers') loadBankTransfers();
+  if (page === 'reports') loadReportPage();
+  if (page === 'tools') loadToolsPage();
 }
 
 /* ═══ API HELPER ═══ */
@@ -1110,7 +1112,12 @@ document.getElementById('btLoad').addEventListener('click', loadBankTransfers);
 /* ═══════════════════════════════════════════════════════╗
    REPORTS PAGE                                           ║
    ═══════════════════════════════════════════════════════*/
-document.getElementById('loadReport').addEventListener('click', async () => {
+let reportLoaded = false;
+async function loadReportPage() {
+  if (reportLoaded) return;
+  await doLoadReport();
+}
+async function doLoadReport() {
   const month = document.getElementById('reportMonth').value || '';
   document.getElementById('reportStatus').textContent = 'Loading report...';
   document.getElementById('reportStatus').className = 'status';
@@ -1118,7 +1125,7 @@ document.getElementById('loadReport').addEventListener('click', async () => {
   document.getElementById('reportTableWrap').innerHTML = '';
   try {
     const data = await callApi('/api/admin-users', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action:'monthlyReport', month}) });
-    if (!data.months || !data.months.length) { document.getElementById('reportStatus').textContent = 'No purchases found.'; return; }
+    if (!data.months || !data.months.length) { document.getElementById('reportStatus').textContent = 'No purchases found for the selected period.'; document.getElementById('reportStatus').className = 'status'; reportLoaded = true; return; }
 
     let totalSales = 0, totalRevenue = 0;
     for (const m of data.months) { totalSales += m.totalSales; totalRevenue += parseFloat(m.totalRevenue); }
@@ -1148,15 +1155,24 @@ document.getElementById('loadReport').addEventListener('click', async () => {
     document.getElementById('reportTableWrap').innerHTML = html;
     document.getElementById('reportStatus').textContent = `Report loaded: ${totalSales} purchase(s) across ${data.months.length} month(s).`;
     document.getElementById('reportStatus').className = 'status ok';
+    reportLoaded = true;
   } catch (e) {
     document.getElementById('reportStatus').textContent = e.message;
     document.getElementById('reportStatus').className = 'status error';
   }
-});
+}
+document.getElementById('loadReport').addEventListener('click', () => { reportLoaded = false; doLoadReport(); });
 
 /* ═══════════════════════════════════════════════════════╗
    SETTINGS PAGE                                          ║
    ═══════════════════════════════════════════════════════*/
+function loadToolsPage() {
+  const sess = getSession();
+  if (sess) {
+    document.getElementById('toolsApiUrl').textContent = sess.apiBase;
+  }
+}
+
 document.getElementById('testConn').addEventListener('click', async () => {
   document.getElementById('connStatus').textContent = 'Testing...';
   document.getElementById('connStatus').className = 'status';
