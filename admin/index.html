@@ -823,13 +823,13 @@ let dashLoaded = false;
 async function loadDashboardData() {
   if (dashLoaded) return;
   try {
-    // Load all data in parallel
+    // Load all data in parallel — all using GET to avoid POST body parsing issues
     const [usersData, installsData, reportData, btData, statsData] = await Promise.all([
       callApi('/api/admin-users?type=users&limit=200&cursor=0'),
       callApi('/api/admin-users?type=installs&limit=200&cursor=0'),
-      callApi('/api/admin-users', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action:'monthlyReport'}) }),
-      callApi('/api/admin-users', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action:'listBankTransfers',status:'pending'}) }).catch(() => ({items:[]})),
-      callApi('/api/admin-users', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action:'getStats'}) }).catch(() => ({totalInstalls: 0})),
+      callApi('/api/admin-users?type=monthlyReport').catch(e => { console.error('monthlyReport failed:', e.message); return {months:[]}; }),
+      callApi('/api/admin-users?type=bankTransfers&status=pending').catch(e => { console.error('bankTransfers failed:', e.message); return {items:[]}; }),
+      callApi('/api/admin-users?type=stats').catch(e => { console.error('getStats failed:', e.message); return {totalInstalls: 0}; }),
     ]);
 
     // Stats
@@ -1051,7 +1051,7 @@ async function loadBankTransfers() {
   document.getElementById('btStatus').className = 'status';
   document.getElementById('btTableWrap').innerHTML = '';
   try {
-    const data = await callApi('/api/admin-users', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action:'listBankTransfers', status}) });
+    const data = await callApi('/api/admin-users?type=bankTransfers&status=' + encodeURIComponent(status));
     const items = data.transfers || data.items || [];
     if (!items.length) { document.getElementById('btStatus').textContent = 'No ' + status + ' transfers found.'; return; }
 
@@ -1128,7 +1128,7 @@ async function doLoadReport() {
   document.getElementById('reportSummary').innerHTML = '';
   document.getElementById('reportTableWrap').innerHTML = '';
   try {
-    const data = await callApi('/api/admin-users', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action:'monthlyReport', month}) });
+    const data = await callApi('/api/admin-users?type=monthlyReport' + (month ? '&month=' + encodeURIComponent(month) : ''));
     if (!data.months || !data.months.length) { document.getElementById('reportStatus').textContent = 'No purchases found for the selected period.'; document.getElementById('reportStatus').className = 'status'; reportLoaded = true; return; }
 
     let totalSales = 0, totalRevenue = 0;
