@@ -319,13 +319,13 @@ async function runScraper(query, requestedMax, startCredits) {
     });
     await chrome.tabs.create({
       url: `https://www.google.com/maps/search/${encodeURIComponent(query)}`,
-      active: false
+      active: true
     });
     const tabId = await navReady;
     state.tabId = tabId;
 
     await waitForTab(tabId);
-    await sleep(3500);
+    await sleep(4000);
 
     // Dismiss consent dialog
     await exec(tabId, () => {
@@ -416,15 +416,27 @@ async function collectUrls(tabId, max) {
   const seen = new Set();
   let att = 0;
   while (seen.size < max && att < 40) {
-    const found = await exec(tabId, () =>
-      [...document.querySelectorAll('a[href*="/maps/place/"]')]
-        .map(a => a.href).filter(h => h.includes('/maps/place/'))
-    );
+    const found = await exec(tabId, () => {
+      // Try multiple selectors — Google Maps changes DOM frequently
+      const links = [
+        ...document.querySelectorAll('a[href*="/maps/place/"]'),
+        ...document.querySelectorAll('a.hfpxzc'),
+        ...document.querySelectorAll('div[role="feed"] a[href*="google.com/maps"]'),
+      ];
+      return [...new Set(links.map(a => a.href))].filter(h => h.includes('/maps/place/') || h.includes('!3d'));
+    });
     if (found) found.forEach(u => { if (seen.size < max) seen.add(u); });
     if (seen.size >= max) break;
     const scrolled = await exec(tabId, () => {
-      const f = document.querySelector('div[role="feed"]');
-      if (f) { f.scrollBy(0, 800); return true; } return false;
+      // Try multiple scroll containers
+      const feed = document.querySelector('div[role="feed"]')
+        || document.querySelector('div[role="main"] div.m6QErb[aria-label]')
+        || document.querySelector('div.m6QErb.DxyBCb');
+      if (feed) { feed.scrollBy(0, 800); return true; }
+      // Fallback: scroll the results panel
+      const panel = document.querySelector('div[role="main"]');
+      if (panel) { panel.scrollBy(0, 800); return true; }
+      return false;
     });
     await sleep(scrolled ? 1800 : 2500);
     att++;
