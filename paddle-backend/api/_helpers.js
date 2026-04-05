@@ -10,7 +10,7 @@ const BASE_URL = PADDLE_ENV === 'live'
 
 const PADDLE_API_KEY = process.env.PADDLE_API_KEY || '';
 
-const FREE_STARTER_CREDITS = 25;
+const FREE_STARTER_CREDITS = 3;
 const CREDITS_EXPIRY_DAYS = 7;
 
 // Two paid tiers — maps priceId → credits + label

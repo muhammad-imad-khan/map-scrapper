@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════════════════
 //  Maps Lead Scraper v2 — Background Service Worker
 //  Monetization: SERVER-SIDE CREDIT SYSTEM (Paddle + Redis)
-//  • New installs: 25 free starter credits (server-granted)
+//  • New installs: 3 free starter credits (server-granted)
 //  • Each scraped result costs 1 credit (server-deducted)
 //  • 500 cr / $10 — emails + social media (Pro)
 //  • 2500 cr / $25 — emails + social media (Enterprise)
