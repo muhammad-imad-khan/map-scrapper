@@ -71,7 +71,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--nav-scroll)
 .plan-meta{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
 .pill{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;background:var(--s2);border:1px solid var(--b);border-radius:999px;font-size:12.5px;color:var(--t2)}
 .plan-price{display:flex;align-items:flex-end;gap:10px}.plan-price strong{font-family:var(--display);font-size:48px;line-height:.9;color:var(--heading)}.plan-price span{font-size:14px;color:var(--t2);padding-bottom:6px}
-.plan-packs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.plan-packs{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .pack-option{appearance:none;background:var(--s2);border:1px solid var(--b);border-radius:16px;padding:16px;text-align:left;cursor:pointer;transition:border-color .2s,transform .15s,background .2s;color:inherit}
 .pack-option:hover{border-color:var(--bhi);transform:translateY(-1px)}
 .pack-option.active{background:linear-gradient(135deg,rgba(34,197,94,.11),rgba(34,197,94,.04));border-color:var(--g)}
@@ -525,15 +525,13 @@ currencySelect.addEventListener('change', () => {
 
 checkoutBtn.addEventListener('click', () => {
   const pack = PACKS[state.pack];
-  if (!pack || !pack.priceId || pack.priceId.includes('placeholder')) return;
+  if (!pack || !pack.priceId) return;
   // Check auth first
   if (!localStorage.getItem('mls_auth_token')) {
     const returnUrl = '/payment/' + window.location.search;
     window.location.href = '../auth/?redirect=' + encodeURIComponent(returnUrl);
     return;
   }
-  const pack = PACKS[state.pack];
-  if (!pack || !pack.priceId) return;
   // Auto-generate installId if not provided (website purchases)
   if (!state.installId) {
     let webId = localStorage.getItem('mls_web_install_id');
