@@ -29,6 +29,14 @@ const ovPacks           = document.getElementById('ovPacks');
 const btnOvClose        = document.getElementById('btnOvClose');
 const ftrCredits        = document.getElementById('ftrCredits');
 
+// Email overlay elements
+const emailOverlay      = document.getElementById('emailOverlay');
+const emailName         = document.getElementById('emailName');
+const emailInput        = document.getElementById('emailInput');
+const emailMsg          = document.getElementById('emailMsg');
+const btnSaveEmail      = document.getElementById('btnSaveEmail');
+const btnSkipEmail      = document.getElementById('btnSkipEmail');
+
 let allResults = [];
 let isRunning  = false;
 let currentCredits = 0;
@@ -53,6 +61,65 @@ chrome.runtime.sendMessage({ type: 'GET_STATE' }, res => {
 // Load latest packs from backend (catches price changes without extension update)
 chrome.runtime.sendMessage({ type: 'GET_PACKS' }, res => {
   if (res?.packs?.length) { packs = res.packs; renderPacks(packs); renderOvPacks(packs); }
+});
+
+// ── Email collection on first install ─────────────────
+chrome.storage.local.get(['emailCollected'], d => {
+  if (!d.emailCollected) {
+    emailOverlay.classList.add('show');
+  }
+});
+
+btnSaveEmail.addEventListener('click', () => {
+  const email = emailInput.value.trim();
+  const name = emailName.value.trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    emailMsg.textContent = 'Please enter a valid email address.';
+    emailMsg.className = 'redeem-msg err';
+    shake(emailInput);
+    return;
+  }
+  btnSaveEmail.disabled = true;
+  btnSaveEmail.textContent = 'Saving…';
+  emailMsg.textContent = '';
+  chrome.runtime.sendMessage({ type: 'GET_INSTALL_ID' }, res => {
+    const installId = res?.installId;
+    if (!installId) {
+      emailMsg.textContent = 'Error getting install ID.';
+      emailMsg.className = 'redeem-msg err';
+      btnSaveEmail.disabled = false;
+      btnSaveEmail.textContent = 'Continue';
+      return;
+    }
+    fetch('https://map-scraper-paddle-backend.vercel.app/api/credits', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Install-Id': installId },
+      body: JSON.stringify({ action: 'saveEmail', email, name }),
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.ok) {
+        chrome.storage.local.set({ emailCollected: true, userEmail: email, userName: name });
+        emailOverlay.classList.remove('show');
+      } else {
+        emailMsg.textContent = data.error || 'Failed to save.';
+        emailMsg.className = 'redeem-msg err';
+      }
+    })
+    .catch(() => {
+      emailMsg.textContent = 'Network error. Try again.';
+      emailMsg.className = 'redeem-msg err';
+    })
+    .finally(() => {
+      btnSaveEmail.disabled = false;
+      btnSaveEmail.textContent = 'Continue';
+    });
+  });
+});
+
+btnSkipEmail.addEventListener('click', () => {
+  chrome.storage.local.set({ emailCollected: true });
+  emailOverlay.classList.remove('show');
 });
 
 // ── Background messages ───────────────────────────────

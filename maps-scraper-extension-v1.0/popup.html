@@ -174,6 +174,23 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 
 <!-- NO-CREDITS OVERLAY -->
 <div class="overlay" id="noCreditsOverlay">
+
+<!-- EMAIL COLLECTION OVERLAY -->
+<div class="overlay" id="emailOverlay">
+  <div class="overlay-sheet">
+    <div class="ov-handle"></div>
+    <div class="ov-icon">📧</div>
+    <div class="ov-title">Welcome! Enter your email</div>
+    <div class="ov-sub">Get <strong>exclusive offers</strong>, credit deals, and product updates.<br>We'll also alert you when credits run low.</div>
+    <div style="margin-bottom:12px">
+      <input type="text" class="redeem-input" id="emailName" placeholder="Your name (optional)" style="margin-bottom:8px;width:100%" />
+      <input type="email" class="redeem-input" id="emailInput" placeholder="you@example.com" style="width:100%" />
+    </div>
+    <div id="emailMsg" class="redeem-msg"></div>
+    <button class="btn-start" id="btnSaveEmail" style="margin-top:8px">Continue</button>
+    <button class="btn-ov-close" id="btnSkipEmail" style="margin-top:8px">Skip for now</button>
+  </div>
+</div>
   <div class="overlay-sheet">
     <div class="ov-handle"></div>
     <div class="ov-icon">💳</div>

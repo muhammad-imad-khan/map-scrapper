@@ -230,10 +230,51 @@ async function sendInstallNotification({ installId }) {
   }
 }
 
+const LOW_CREDITS_THRESHOLD = 5;
+
+async function sendLowCreditsEmail({ email, name, credits, installId }) {
+  const transport = getMailTransport();
+  if (!transport || !email) return;
+  const html = `
+    <div style="font-family:Segoe UI,Arial,sans-serif;max-width:560px;margin:0 auto;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
+      <div style="background:#d97706;padding:20px 24px;color:#fff;">
+        <h2 style="margin:0;font-size:20px;">Your Credits Are Running Low</h2>
+      </div>
+      <div style="padding:24px;">
+        <p style="font-size:14px;color:#334155;margin:0 0 16px;">Hi${name ? ' ' + name : ''},</p>
+        <p style="font-size:14px;color:#334155;margin:0 0 16px;">You only have <strong style="color:#d97706;font-size:18px;">${credits}</strong> credit${credits !== 1 ? 's' : ''} remaining. Each scrape uses 1 credit.</p>
+        <p style="font-size:14px;color:#334155;margin:0 0 20px;">Top up now so your scraping isn't interrupted:</p>
+        <div style="text-align:center;margin-bottom:20px;">
+          <a href="https://map-scrapper-five.vercel.app/payment/" style="display:inline-block;background:#2563eb;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;">Buy More Credits</a>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <tr><td style="padding:6px 0;color:#64748b;">Pro Pack</td><td style="padding:6px 0;font-weight:600;">500 credits — $5</td></tr>
+          <tr><td style="padding:6px 0;color:#64748b;">Enterprise Pack</td><td style="padding:6px 0;font-weight:600;">2,500 credits — $25</td></tr>
+        </table>
+      </div>
+      <div style="background:#f8fafc;padding:14px 24px;font-size:12px;color:#94a3b8;text-align:center;">
+        Map Lead Scraper &mdash; Low Credits Alert
+      </div>
+    </div>
+  `;
+  try {
+    await transport.sendMail({
+      from: `"Map Lead Scraper" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: `Only ${credits} credit${credits !== 1 ? 's' : ''} left — top up now`,
+      html,
+    });
+    console.log(`Low credits email sent to ${email} (${credits} remaining)`);
+  } catch (err) {
+    console.error('Failed to send low credits email:', err.message);
+  }
+}
+
 module.exports = {
   PADDLE_ENV, BASE_URL, PADDLE_API_KEY, PRICE_CREDITS, FREE_STARTER_CREDITS, CREDITS_EXPIRY_DAYS,
+  LOW_CREDITS_THRESHOLD,
   cors, paddleRequest, getRedis, keys,
   getCredits, initUser, addCredits, deductCredits, isValidInstallId,
-  sendPurchaseNotification, sendInstallNotification, ADMIN_EMAIL,
+  sendPurchaseNotification, sendInstallNotification, sendLowCreditsEmail, ADMIN_EMAIL,
 };
 
