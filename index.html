@@ -1845,10 +1845,12 @@ function animCounter(el, target, duration=1400) {
 //  HERO COUNTDOWN TIMER
 // ══════════════════════════════════════════════════════
 (function(){
-  var END_KEY = 'mls_sale_end';
+  var END_KEY = 'mls_sale_end_v2';
+  localStorage.removeItem('mls_sale_end'); // clear old key
+  var SALE_DURATION = 2*60*60*1000; // 2 hours
   var endTs = localStorage.getItem(END_KEY);
-  if(!endTs || Date.now() > parseInt(endTs,10)){
-    endTs = Date.now() + 2*60*60*1000; // 2 hours from now
+  if(!endTs || parseInt(endTs,10) - Date.now() > SALE_DURATION){
+    endTs = Date.now() + SALE_DURATION;
     localStorage.setItem(END_KEY, endTs);
   }
   endTs = parseInt(endTs,10);
