@@ -1848,10 +1848,10 @@ function animCounter(el, target, duration=1400) {
   var END_KEY = 'mls_sale_end_v2';
   localStorage.removeItem('mls_sale_end'); // clear old key
   var SALE_DURATION = 2*60*60*1000; // 2 hours
-  var endTs = localStorage.getItem(END_KEY);
-  if(!endTs || parseInt(endTs,10) - Date.now() > SALE_DURATION){
+  var endTs = sessionStorage.getItem(END_KEY);
+  if(!endTs || parseInt(endTs,10) <= Date.now()){
     endTs = Date.now() + SALE_DURATION;
-    localStorage.setItem(END_KEY, endTs);
+    sessionStorage.setItem(END_KEY, endTs);
   }
   endTs = parseInt(endTs,10);
   function pad(n){return String(n).padStart(2,'0');}
