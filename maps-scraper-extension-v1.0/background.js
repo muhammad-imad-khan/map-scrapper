@@ -26,6 +26,8 @@ const ONE_TIME_PACK = { id: 'pri_01knfqkcbhqbnwhq5k1ace3sd9', slug: 'lifetime', 
 const COST_PER_RESULT = 1;
 const PRICING_MODE_CREDIT = 'credit_based';
 const PRICING_MODE_ONE_TIME = 'one_time';
+const LIFETIME_COOLDOWN_THRESHOLD = 100;
+const LIFETIME_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
 
 // ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
@@ -34,6 +36,7 @@ let state = {
   status: 'idle', tabId: null, credits: 0
 };
 let pricingMode = PRICING_MODE_CREDIT;
+let lifetimeSessionCount = 0; // tracks results scraped in current lifetime session
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -232,12 +235,15 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
 
       case 'START': {
         if (state.running) { sendResponse({ ok: false }); return; }
+        const mode = await getPricingMode();
+        const isLifetime = mode === PRICING_MODE_ONE_TIME;
         const credits = await getCredits();
-        if (credits < COST_PER_RESULT) {
+        if (!isLifetime && credits < COST_PER_RESULT) {
           broadcast('NO_CREDITS', { credits, packs: CREDIT_PACKS });
           sendResponse({ ok: false, reason: 'no_credits' });
           return;
         }
+        lifetimeSessionCount = 0; // reset per-session counter
         runScraper(msg.query, msg.max || 15, credits);
         sendResponse({ ok: true, credits });
         break;
@@ -352,8 +358,9 @@ getPricingMode().catch(() => {});
 // ÔöÇÔöÇ Main scraper ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 async function runScraper(query, requestedMax, startCredits) {
-  // Cap max by available credits
-  const maxAffordable = Math.floor(startCredits / COST_PER_RESULT);
+  const isLifetime = pricingMode === PRICING_MODE_ONE_TIME;
+  // Cap max by available credits (skip cap for lifetime)
+  const maxAffordable = isLifetime ? requestedMax : Math.floor(startCredits / COST_PER_RESULT);
   const maxResults    = Math.min(requestedMax, maxAffordable);
 
   state = {
@@ -521,9 +528,11 @@ async function runScraper(query, requestedMax, startCredits) {
 
       // Card-click mode completed; finalize run.
       chrome.tabs.remove(state.tabId).catch(() => {});
-      const finalCredits = await getCredits();
-      state.running = false; state.tabId = null; state.credits = finalCredits;
-      state.status = `Done ÔÇö ${state.results.length} listings. ${finalCredits} credits remaining.`;
+      const finalCredits2 = isLifetime ? Infinity : await getCredits();
+      state.running = false; state.tabId = null; state.credits = isLifetime ? '∞' : finalCredits2;
+      state.status = isLifetime
+        ? `Done — ${state.results.length} listings scraped (Lifetime).`
+        : `Done — ${state.results.length} listings. ${finalCredits2} credits remaining.`;
       if (state.results.length > 0) await autoExportAndView(state.results, query);
       broadcast('DONE', { ...state });
       return;
@@ -536,15 +545,28 @@ async function runScraper(query, requestedMax, startCredits) {
     for (let i = 0; i < urls.length; i++) {
       if (!state.running) break;
 
-      // Check credits before each scrape
-      const currentCredits = await getCredits();
-      if (currentCredits < COST_PER_RESULT) {
-        broadcast('NO_CREDITS', { credits: currentCredits, packs: CREDIT_PACKS, mid: true, scraped: state.results.length });
-        break;
+      // Lifetime mode: 5-min cooldown after every 100 results
+      if (isLifetime && lifetimeSessionCount > 0 && lifetimeSessionCount % LIFETIME_COOLDOWN_THRESHOLD === 0) {
+        state.status = `Cooldown: pausing 5 min after ${lifetimeSessionCount} results…`;
+        broadcast('STATE', state);
+        await sleep(LIFETIME_COOLDOWN_MS);
+        if (!state.running) break;
       }
 
+      if (!isLifetime) {
+        // Check credits before each scrape
+        const currentCredits = await getCredits();
+        if (currentCredits < COST_PER_RESULT) {
+          broadcast('NO_CREDITS', { credits: currentCredits, packs: CREDIT_PACKS, mid: true, scraped: state.results.length });
+          break;
+        }
+      }
+
+      const currentCredits = isLifetime ? '∞' : await getCredits();
       state.progress = i + 1;
-      state.status = `[${currentCredits} cr] Extracting ${i + 1} / ${urls.length}ÔÇª`;
+      state.status = isLifetime
+        ? `[Lifetime] Extracting ${i + 1} / ${urls.length}…`
+        : `[${currentCredits} cr] Extracting ${i + 1} / ${urls.length}ÔÇª`;
       broadcast('STATE', state);
 
       try {
@@ -555,11 +577,13 @@ async function runScraper(query, requestedMax, startCredits) {
         const data = await exec(tabId, extractDetails);
         if (!data) continue;
 
-        // Deduct credit for successful extraction
-        const deducted = await deductCredit();
-        if (!deducted) {
-          broadcast('NO_CREDITS', { credits: 0, packs: CREDIT_PACKS, mid: true });
-          break;
+        if (!isLifetime) {
+          // Deduct credit for successful extraction
+          const deducted = await deductCredit();
+          if (!deducted) {
+            broadcast('NO_CREDITS', { credits: 0, packs: CREDIT_PACKS, mid: true });
+            break;
+          }
         }
 
         // Fetch email + socials from business website
@@ -571,17 +595,20 @@ async function runScraper(query, requestedMax, startCredits) {
             data.socials = webData.socials;
         }
 
-        const newCredits = await getCredits();
+        if (isLifetime) lifetimeSessionCount++;
+        const newCredits = isLifetime ? Infinity : await getCredits();
         state.results.push(data);
-        broadcast('RESULT', { result: data, count: state.results.length, credits: newCredits });
+        broadcast('RESULT', { result: data, count: state.results.length, credits: isLifetime ? '∞' : newCredits });
 
       } catch (e) { console.warn('Listing error:', e); }
     }
 
     chrome.tabs.remove(state.tabId).catch(() => {});
-    const finalCredits = await getCredits();
-    state.running = false; state.tabId = null; state.credits = finalCredits;
-    state.status = `Done ÔÇö ${state.results.length} listings. ${finalCredits} credits remaining.`;
+    const finalCredits = isLifetime ? Infinity : await getCredits();
+    state.running = false; state.tabId = null; state.credits = isLifetime ? '∞' : finalCredits;
+    state.status = isLifetime
+      ? `Done — ${state.results.length} listings scraped (Lifetime).`
+      : `Done ÔÇö ${state.results.length} listings. ${finalCredits} credits remaining.`;
 
     // ÔöÇÔöÇ Auto-export CSV + open viewer tab ÔöÇÔöÇ
     if (state.results.length > 0) {
@@ -599,19 +626,32 @@ async function runScraper(query, requestedMax, startCredits) {
 }
 
 async function scrapeByClickingResults(tabId, maxResults) {
+  const isLifetime = pricingMode === PRICING_MODE_ONE_TIME;
   let attempts = 0;
   const maxAttempts = Math.max(maxResults * 8, 30);
   let successCount = 0;
 
   while (state.running && successCount < maxResults && attempts < maxAttempts) {
-    const currentCredits = await getCredits();
-    if (currentCredits < COST_PER_RESULT) {
-      broadcast('NO_CREDITS', { credits: currentCredits, packs: CREDIT_PACKS, mid: true, scraped: state.results.length });
-      break;
+    // Lifetime mode: 5-min cooldown after every 100 results
+    if (isLifetime && lifetimeSessionCount > 0 && lifetimeSessionCount % LIFETIME_COOLDOWN_THRESHOLD === 0) {
+      state.status = `Cooldown: pausing 5 min after ${lifetimeSessionCount} results…`;
+      broadcast('STATE', state);
+      await sleep(LIFETIME_COOLDOWN_MS);
+      if (!state.running) break;
+    }
+
+    if (!isLifetime) {
+      const currentCredits = await getCredits();
+      if (currentCredits < COST_PER_RESULT) {
+        broadcast('NO_CREDITS', { credits: currentCredits, packs: CREDIT_PACKS, mid: true, scraped: state.results.length });
+        break;
+      }
     }
 
     state.progress = successCount + 1;
-    state.status = `[${currentCredits} cr] Scraping result ${successCount + 1} / ${maxResults}ÔÇª`;
+    state.status = isLifetime
+      ? `[Lifetime] Scraping result ${successCount + 1} / ${maxResults}…`
+      : `[${await getCredits()} cr] Scraping result ${successCount + 1} / ${maxResults}…`;
     broadcast('STATE', state);
 
     const clicked = await exec(tabId, () => {
@@ -697,16 +737,18 @@ async function scrapeByClickingResults(tabId, maxResults) {
       continue;
     }
 
-    // Deduct credit
-    const deducted = await deductCredit();
-    if (!deducted) {
-      broadcast('NO_CREDITS', { credits: 0, packs: CREDIT_PACKS, mid: true, scraped: state.results.length });
-      break;
+    // Deduct credit (skip for lifetime)
+    if (!isLifetime) {
+      const deducted = await deductCredit();
+      if (!deducted) {
+        broadcast('NO_CREDITS', { credits: 0, packs: CREDIT_PACKS, mid: true, scraped: state.results.length });
+        break;
+      }
     }
 
     // Fetch email/socials if website exists
     if (data.website && data.website !== 'N/A') {
-      state.status = `Finding email for "${data.name}"ÔÇª`;
+      state.status = `Finding email for "${data.name}"…`;
       broadcast('STATE', state);
       try {
         const webData = await fetchWebsiteData(data.website, true);
@@ -718,9 +760,10 @@ async function scrapeByClickingResults(tabId, maxResults) {
     }
 
     // Add to results
-    const newCredits = await getCredits();
+    if (isLifetime) lifetimeSessionCount++;
+    const newCredits = isLifetime ? Infinity : await getCredits();
     state.results.push(data);
-    broadcast('RESULT', { result: data, count: state.results.length, credits: newCredits });
+    broadcast('RESULT', { result: data, count: state.results.length, credits: isLifetime ? '∞' : newCredits });
     successCount++;
 
     // Go back to results for next iteration
