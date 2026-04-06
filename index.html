@@ -1848,21 +1848,22 @@ function animCounter(el, target, duration=1400) {
   var END_KEY = 'mls_sale_end';
   var endTs = localStorage.getItem(END_KEY);
   if(!endTs || Date.now() > parseInt(endTs,10)){
-    endTs = Date.now() + 3*60*60*1000; // 3 hours from now
+    endTs = Date.now() + 2*60*60*1000; // 2 hours from now
     localStorage.setItem(END_KEY, endTs);
   }
   endTs = parseInt(endTs,10);
   function pad(n){return String(n).padStart(2,'0');}
   function tick(){
     var diff = endTs - Date.now();
-    if(diff<=0){endTs=Date.now()+3*60*60*1000;localStorage.setItem(END_KEY,endTs);diff=endTs-Date.now();}
+    if(diff<=0){diff=0;}
     var h=Math.floor(diff/36e5),m=Math.floor((diff%36e5)/6e4),s=Math.floor((diff%6e4)/1e3);
     document.getElementById('hcHours').textContent=pad(h);
     document.getElementById('hcMins').textContent=pad(m);
     document.getElementById('hcSecs').textContent=pad(s);
+    if(diff<=0){clearInterval(iv);}
   }
   tick();
-  setInterval(tick,1000);
+  var iv=setInterval(tick,1000);
 })();
 
 // ══════════════════════════════════════════════════════
