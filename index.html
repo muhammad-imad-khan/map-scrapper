@@ -477,8 +477,6 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
     <div class="hero-countdown">
       <div class="hc-label">🔥 SALE ENDS IN</div>
       <div class="hc-timer">
-        <div class="hc-unit"><span id="hcDays">00</span><small>Days</small></div>
-        <div class="hc-sep">:</div>
         <div class="hc-unit"><span id="hcHours">00</span><small>Hours</small></div>
         <div class="hc-sep">:</div>
         <div class="hc-unit"><span id="hcMins">00</span><small>Min</small></div>
@@ -1858,8 +1856,7 @@ function animCounter(el, target, duration=1400) {
   function tick(){
     var diff = endTs - Date.now();
     if(diff<=0){endTs=Date.now()+12*60*60*1000;localStorage.setItem(END_KEY,endTs);diff=endTs-Date.now();}
-    var d=Math.floor(diff/(864e5)),h=Math.floor((diff%864e5)/36e5),m=Math.floor((diff%36e5)/6e4),s=Math.floor((diff%6e4)/1e3);
-    document.getElementById('hcDays').textContent=pad(d);
+    var h=Math.floor(diff/36e5),m=Math.floor((diff%36e5)/6e4),s=Math.floor((diff%6e4)/1e3);
     document.getElementById('hcHours').textContent=pad(h);
     document.getElementById('hcMins').textContent=pad(m);
     document.getElementById('hcSecs').textContent=pad(s);
