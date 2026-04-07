@@ -330,7 +330,7 @@ async function sendLowCreditsEmail({ email, name, credits, installId }) {
 }
 
 // ── Course delivery email ─────────────────────────────────
-const COURSE_DRIVE_LINK = process.env.COURSE_LINK || '';
+const COURSE_DRIVE_LINK = process.env.COURSE_LINK || 'https://drive.google.com/drive/folders/1-FQQCwzAvlnHVKn2BYPhKBRB9lWVsaUi?usp=drive_link';
 const COURSE_NAME = 'Lead Generation x AI Powered Web Design Course';
 
 async function sendCourseDeliveryEmail({ email, name, txnId }) {
