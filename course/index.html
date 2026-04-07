@@ -280,7 +280,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
           <button type="button" id="bankBackBtn" style="width:100%;margin-top:8px;padding:10px;background:none;border:1px solid var(--b);border-radius:10px;color:var(--t2);font:500 13px var(--body);cursor:pointer">← Back to payment options</button>
         </div>
 
-        <p class="auth-prompt">Secure checkout via Paddle or bank transfer. Google Drive access is granted to your email after payment.</p>
+        <p class="auth-prompt">Secure checkout via Paddle sandbox (test mode) or bank transfer. Google Drive access is granted to your email after payment.</p>
 
         <div class="detail-list" style="margin-top:20px">
           <div class="detail-row"><span>Payment</span><strong>Card or Bank Transfer</strong></div>
@@ -326,7 +326,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 /* ── Config ── */
-const COURSE_PRICE_ID = 'pri_01knj7g8kpj9d1b43ys31ttz53';
+const COURSE_PRICE_ID = 'pri_01knmdy54t0wd91ne4tspntxty';
 const BACKEND_BASE = window.location.hostname === 'localhost'
   ? 'http://localhost:3000'
   : 'https://map-scraper-paddle-backend.vercel.app';
