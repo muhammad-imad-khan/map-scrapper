@@ -22,6 +22,7 @@ const PRICE_CREDITS = {
   [process.env.PRICE_ENTERPRISE || 'pri_01kkwtyfwvrwspy654f56h4n5d']:       { credits: 2500, label: 'Enterprise Pack' },
   [process.env.PRICE_ONE_TIME_ID || 'pri_01knfqkcbhqbnwhq5k1ace3sd9']:      { credits: 0, label: 'Lifetime License', unlimited: true },
   [process.env.PRICE_ONE_TIME_INTL_ID || 'pri_01knfsscfv6njhwwb40k8p6mwz']: { credits: 0, label: 'Lifetime License', unlimited: true },
+  [process.env.PRICE_COURSE_ID || 'pri_01knmdy54t0wd91ne4tspntxty']:        { credits: 0, label: 'Lead Gen x AI Web Design Course', course: true },
 };
 
 // ── Redis singleton ───────────────────────────────────────
@@ -328,11 +329,67 @@ async function sendLowCreditsEmail({ email, name, credits, installId }) {
   }
 }
 
+// ── Course delivery email ─────────────────────────────────
+const COURSE_DRIVE_LINK = process.env.COURSE_LINK || '';
+const COURSE_NAME = 'Lead Generation x AI Powered Web Design Course';
+
+async function sendCourseDeliveryEmail({ email, name, txnId }) {
+  const transport = getMailTransport();
+  if (!transport || !email) {
+    console.warn('SMTP or recipient missing, skipping course delivery email');
+    return;
+  }
+  if (!COURSE_DRIVE_LINK) {
+    console.error('COURSE_LINK env variable not set, cannot deliver course');
+    return;
+  }
+
+  const html = `
+    <div style="font-family:Segoe UI,Arial,sans-serif;max-width:560px;margin:0 auto;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
+      <div style="background:linear-gradient(135deg,#a855f7,#6366f1);padding:24px;color:#fff;">
+        <h2 style="margin:0;font-size:22px;">🎉 Payment Confirmed!</h2>
+        <p style="margin:8px 0 0;font-size:13px;opacity:.85;">${COURSE_NAME}</p>
+      </div>
+      <div style="padding:24px;">
+        <p style="font-size:14px;color:#334155;margin:0 0 14px;">Hi${name ? ' ' + name : ''},</p>
+        <p style="font-size:14px;color:#334155;margin:0 0 14px;">Thank you for your purchase! Your payment has been confirmed and your course is ready to access.</p>
+        <div style="text-align:center;margin:24px 0;">
+          <a href="${COURSE_DRIVE_LINK}" style="display:inline-block;background:linear-gradient(135deg,#a855f7,#6366f1);color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;">📂 Access Your Course on Google Drive</a>
+        </div>
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px;margin:16px 0;">
+          <p style="margin:0;font-size:13px;color:#16a34a;">✅ You have <strong>lifetime access</strong> to this course. Bookmark the link for easy access anytime.</p>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:16px;">
+          <tr><td style="padding:6px 0;color:#64748b;width:120px;">Course</td><td style="padding:6px 0;font-weight:600;color:#334155;">${COURSE_NAME}</td></tr>
+          <tr><td style="padding:6px 0;color:#64748b;">Transaction ID</td><td style="padding:6px 0;font-size:12px;color:#334155;">${txnId || 'N/A'}</td></tr>
+          <tr><td style="padding:6px 0;color:#64748b;">Access</td><td style="padding:6px 0;color:#334155;">Google Drive Folder (Lifetime)</td></tr>
+        </table>
+        <p style="font-size:13px;color:#64748b;margin:20px 0 0;">Need help? Contact <a href="mailto:courses@imadkhan.dev" style="color:#a855f7;">courses@imadkhan.dev</a></p>
+      </div>
+      <div style="background:#f8fafc;padding:14px 24px;font-size:12px;color:#94a3b8;text-align:center;">
+        Map Lead Scraper &mdash; Course Delivery Email
+      </div>
+    </div>
+  `;
+
+  try {
+    await transport.sendMail({
+      from: `"Imad Khan Courses" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: '🎓 Your Course is Ready — Lead Gen x AI Web Design',
+      html,
+    });
+    console.log(`Course delivery email sent to ${email} (txn: ${txnId})`);
+  } catch (err) {
+    console.error('Failed to send course delivery email:', err.message);
+  }
+}
+
 module.exports = {
   PADDLE_ENV, BASE_URL, PADDLE_API_KEY, PRICE_CREDITS, FREE_STARTER_CREDITS, CREDITS_EXPIRY_DAYS,
   LOW_CREDITS_THRESHOLD,
   cors, paddleRequest, getRedis, keys,
   getCredits, initUser, addCredits, deductCredits, isValidInstallId,
-  sendPurchaseNotification, sendZipDeliveryEmail, sendInstallNotification, sendLowCreditsEmail, ADMIN_EMAIL,
+  sendPurchaseNotification, sendZipDeliveryEmail, sendCourseDeliveryEmail, sendInstallNotification, sendLowCreditsEmail, ADMIN_EMAIL,
 };
 

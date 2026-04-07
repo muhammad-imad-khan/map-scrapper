@@ -3,7 +3,7 @@
 // Auto-credits the user's account using installId from custom_data.
 // Deduplicates by transaction ID so replay attacks are harmless.
 const crypto = require('crypto');
-const { cors, PRICE_CREDITS, addCredits, getRedis, keys, isValidInstallId, sendPurchaseNotification, sendZipDeliveryEmail } = require('./_helpers');
+const { cors, PRICE_CREDITS, addCredits, getRedis, keys, isValidInstallId, sendPurchaseNotification, sendZipDeliveryEmail, sendCourseDeliveryEmail } = require('./_helpers');
 
 // ── Webhook signature verification ─────────────────────
 function verifySignature(rawBody, signature, secret) {
@@ -77,6 +77,7 @@ module.exports = async function handler(req, res) {
     let matchedPurchase = false;
     let matchedPriceId = null;
     let grantsUnlimited = false;
+    let isCoursePurchase = false;
 
     for (const item of items) {
       const priceId = item?.price?.id;
@@ -87,6 +88,7 @@ module.exports = async function handler(req, res) {
         totalCredits += (match.credits || 0) * (item.quantity || 1);
         label = match.label;
         grantsUnlimited = grantsUnlimited || match.unlimited === true;
+        isCoursePurchase = isCoursePurchase || match.course === true;
       }
     }
 
@@ -152,6 +154,14 @@ module.exports = async function handler(req, res) {
 
         if (grantsUnlimited) {
           sendZipDeliveryEmail({
+            email: userEmail,
+            name: userData.name,
+            txnId,
+          }).catch(() => {}); // fire-and-forget, don't block webhook response
+        }
+
+        if (isCoursePurchase) {
+          sendCourseDeliveryEmail({
             email: userEmail,
             name: userData.name,
             txnId,

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Course — Lead Gen x AI Powered Web Design | Maps Lead Scraper</title>
+<meta name="description" content="Learn the complete 6-step system to scrape, qualify, build, deploy, pitch and close high-value leads using AI-powered web design.">
+<meta name="theme-color" content="#06060c">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="128x128" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;0,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06060c;--s1:#0a0a12;--s2:#0f0f1a;--s3:#161622;--s4:#1c1c2e;
+  --b:rgba(255,255,255,.06);--bhi:rgba(255,255,255,.11);--bact:rgba(255,255,255,.18);
+  --g:#22c55e;--g2:#16a34a;--gd:rgba(34,197,94,.1);--gb:rgba(34,197,94,.2);
+  --amber:#f59e0b;--blue:#60a5fa;--red:#f87171;--purple:#a78bfa;
+  --t:#d4d4e8;--t2:#9494b0;--t3:#52526a;
+  --heading:#fff;--heading2:#dde;
+  --nav-scroll:rgba(6,6,12,.92);
+  --display:'Syne',sans-serif;--body:'DM Sans',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+[data-theme="light"]{
+  --bg:#f5f6fa;--s1:#ebedf5;--s2:#e2e4ee;--s3:#d5d8e4;--s4:#c8ccda;
+  --b:rgba(0,0,0,.08);--bhi:rgba(0,0,0,.13);--bact:rgba(0,0,0,.2);
+  --g:#16a34a;--g2:#15803d;--gd:rgba(22,163,74,.08);--gb:rgba(22,163,74,.18);
+  --amber:#d97706;--blue:#2563eb;--red:#dc2626;--purple:#7c3aed;
+  --t:#2e2e3e;--t2:#555568;--t3:#888898;
+  --heading:#1a1a2e;--heading2:#2e2e3e;
+  --nav-scroll:rgba(245,246,250,.95);
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{font-family:var(--body);background:var(--bg);color:var(--t);overflow-x:hidden;min-height:100vh}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--s4);border-radius:3px}
+::selection{background:rgba(34,197,94,.22);color:var(--heading)}
+.container{max-width:1100px;margin:0 auto;padding:0 24px}
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(circle at center,black 32%,transparent 82%);pointer-events:none;z-index:0}
+.bg-glow{position:fixed;inset:auto auto 0 50%;width:720px;height:720px;background:radial-gradient(circle,rgba(168,85,247,.16),transparent 62%);transform:translate(-50%,35%);pointer-events:none;z-index:0;filter:blur(12px)}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--nav-scroll);backdrop-filter:blur(20px);border-bottom:1px solid var(--b)}
+.nav-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;height:64px;gap:32px;padding:0 24px}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo-ic{width:34px;height:34px;background:var(--gd);border:1px solid var(--gb);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
+.nav-logo:hover .nav-logo-ic{background:var(--gb)}
+.nav-logo-txt{font-family:var(--display);font-size:15px;font-weight:800;color:var(--heading)}.nav-logo-txt em{color:var(--g);font-style:normal}
+.nav-links-wrap{margin-left:auto;display:flex;align-items:center;gap:28px}
+.nav-links-wrap a{text-decoration:none;color:var(--t2);font-size:14px;font-weight:500;transition:color .15s}
+.nav-links-wrap a:hover,.nav-links-wrap a.active{color:var(--heading)}
+.nav-cta{padding:8px 20px;background:var(--g)!important;color:#000!important;border-radius:8px;font-size:13.5px;font-weight:700!important;display:flex;align-items:center;gap:7px;transition:background .15s,transform .1s}
+.nav-cta:hover{background:var(--g2)!important;transform:translateY(-1px)}
+.nav-burger{display:none;background:none;border:1px solid var(--b);border-radius:6px;padding:7px 9px;cursor:pointer;color:var(--t2);margin-left:auto}
+.theme-toggle{background:none;border:1px solid var(--b);border-radius:10px;padding:6px 8px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--heading);transition:border-color .25s}
+.theme-toggle:hover{border-color:var(--g)}
+.theme-toggle svg{width:18px;height:18px}
+[data-theme="light"] .theme-toggle .ic-moon{display:none}
+[data-theme="light"] .theme-toggle .ic-sun{display:inline}
+.theme-toggle .ic-sun{display:none}
+.theme-toggle .ic-moon{display:inline}
+[data-theme="light"] .bg-grid{opacity:.18}
+[data-theme="light"] .bg-glow{opacity:.10}
+
+/* HERO */
+.hero-strip{position:relative;z-index:1;padding:120px 0 40px}
+.breadcrumb{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--t3);font-family:var(--mono);margin-bottom:18px}
+.breadcrumb a{color:var(--t2);text-decoration:none}.breadcrumb a:hover{color:var(--g)}
+.page-kicker{display:inline-flex;align-items:center;gap:8px;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.22);border-radius:100px;padding:7px 16px;font-size:12px;font-weight:600;color:var(--purple);margin-bottom:22px;letter-spacing:.4px}
+.page-h{font-family:var(--display);font-size:clamp(36px,6vw,64px);font-weight:800;line-height:.95;letter-spacing:-1.8px;color:var(--heading);max-width:720px}.page-h em{color:var(--purple);font-style:normal}
+.page-sub{margin-top:18px;max-width:640px;font-size:17px;color:var(--t2);line-height:1.7}
+
+/* LAYOUT */
+.main{position:relative;z-index:1;padding:24px 0 72px}
+.layout{display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:start}
+.panel{background:linear-gradient(180deg,rgba(15,15,26,.96),rgba(10,10,18,.96));border:1px solid var(--b);border-radius:22px;padding:28px;box-shadow:0 30px 90px rgba(0,0,0,.35)}
+.panel h2{font-family:var(--display);font-size:26px;font-weight:800;color:var(--heading);letter-spacing:-.8px;margin-bottom:12px}
+.panel-sub{font-size:14.5px;color:var(--t2);line-height:1.7;margin-bottom:20px}
+[data-theme="light"] .panel{background:#fff!important;border-color:rgba(0,0,0,.1);box-shadow:0 4px 24px rgba(0,0,0,.06)}
+
+/* WORKFLOW */
+.workflow{display:grid;gap:12px;margin:20px 0}
+.wf-step{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;background:var(--s2);border:1px solid var(--b);border-radius:14px;transition:border-color .2s,transform .15s}
+.wf-step:hover{border-color:var(--purple);transform:translateX(4px)}
+.wf-num{width:32px;height:32px;border-radius:50%;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.25);color:var(--purple);font-family:var(--mono);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.wf-step h4{font-size:14px;font-weight:700;color:var(--heading);margin-bottom:3px}
+.wf-step p{font-size:13px;color:var(--t2);line-height:1.5}
+[data-theme="light"] .wf-step{background:#f8f9fc;border-color:rgba(0,0,0,.06)}
+
+/* FEATURES */
+.features{display:grid;gap:10px;margin:16px 0}
+.feat{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--t2);line-height:1.6}
+.feat::before{content:'✓';color:var(--g);font-weight:700;flex-shrink:0}
+
+/* PRICE CARD */
+.price-card{background:linear-gradient(135deg,rgba(168,85,247,.12),rgba(168,85,247,.03));border:1px solid rgba(168,85,247,.22);border-radius:18px;padding:24px;margin-bottom:20px}
+.price-label{font-size:11px;color:var(--purple);font-family:var(--mono);letter-spacing:1.8px;text-transform:uppercase;margin-bottom:10px}
+.price-display{display:flex;align-items:flex-end;gap:8px;margin-bottom:8px}
+.price-display strong{font-family:var(--display);font-size:52px;line-height:.85;color:var(--heading)}
+.price-display span{font-size:14px;color:var(--t2);padding-bottom:8px}
+.price-note{font-size:13px;color:var(--t3)}
+[data-theme="light"] .price-card{background:rgba(168,85,247,.05);border-color:rgba(168,85,247,.18)}
+
+/* DETAILS */
+.detail-list{display:grid;gap:10px;margin:16px 0}
+.detail-row{display:flex;justify-content:space-between;gap:16px;padding:12px 14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:12px}
+.detail-row span{font-size:12px;color:var(--t3);font-family:var(--mono);text-transform:uppercase;letter-spacing:1px}
+.detail-row strong{font-size:14px;color:var(--t);text-align:right}
+[data-theme="light"] .detail-row{background:#f8f9fc;border-color:rgba(0,0,0,.06)}
+
+/* BUTTONS */
+.btn-main{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:16px 28px;border-radius:12px;font-size:15px;font-weight:700;text-decoration:none;font-family:var(--body);cursor:pointer;transition:background .15s,transform .1s;white-space:nowrap;width:100%;background:linear-gradient(135deg,#a855f7,#6366f1);color:#fff;border:none;box-shadow:0 0 50px rgba(168,85,247,.14)}
+.btn-main:hover{transform:translateY(-2px);box-shadow:0 0 60px rgba(168,85,247,.25)}
+.btn-main[disabled]{background:rgba(255,255,255,.08);color:rgba(255,255,255,.42);cursor:not-allowed;box-shadow:none;transform:none}
+.checkout-status{padding:12px 14px;border-radius:12px;font-size:13px;line-height:1.6;margin-bottom:12px}
+.checkout-status.pending{background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);color:var(--blue)}
+.checkout-status.error{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);color:var(--red)}
+.checkout-status.ready{background:var(--gd);border:1px solid var(--gb);color:var(--g)}
+.checkout-status.success{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);color:var(--g)}
+.auth-prompt{font-size:13px;color:var(--t3);text-align:center;margin-top:10px}
+.auth-prompt a{color:var(--purple);text-decoration:none;font-weight:600}.auth-prompt a:hover{text-decoration:underline}
+
+/* FOOTER */
+footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-index:1;margin-top:40px}
+.f-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--t3)}
+.f-bottom a{color:var(--t3);text-decoration:none}.f-bottom a:hover{color:var(--t)}
+
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+@media(max-width:720px){
+  .nav-links-wrap{display:none;position:fixed;top:64px;left:0;right:0;background:var(--bg);border-bottom:1px solid var(--b);padding:20px 24px;flex-direction:column;align-items:flex-start;gap:16px;margin-left:0}
+  .nav-links-wrap.open{display:flex}.nav-burger{display:flex;align-items:center}
+  .panel{padding:22px}.page-sub{font-size:15px}
+}
+@media(max-width:520px){.container{padding:0 18px}.panel{border-radius:18px;padding:20px}}
+</style>
+<script src="https://sandbox-cdn.paddle.com/paddle/v2/paddle.js"></script>
+<script>
+Paddle.Environment.set('sandbox');
+Paddle.Initialize({
+  token: 'test_72fcb1bf88e7b485d977abd74ac',
+  eventCallback: function(ev) {
+    if (ev && ev.name === 'checkout.completed') handlePaymentSuccess();
+    if (ev && ev.name === 'checkout.error') handleCheckoutError(ev);
+  }
+});
+</script>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+
+<nav>
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-logo">
+      <div class="nav-logo-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+      <span class="nav-logo-txt">Maps Lead <em>Scraper</em></span>
+    </a>
+    <div class="nav-links-wrap" id="navLinks">
+      <a href="../index.html#how">How it works</a>
+      <a href="../index.html#pricing">Pricing</a>
+      <a href="../payment/">Payment</a>
+      <a href="./" class="active">Course</a>
+      <a href="../about.html">About</a>
+      <a href="../auth/">Account</a>
+      <a href="../index.html#install" class="nav-cta">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Add to Browser
+      </a>
+    </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+      <svg class="ic-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg class="ic-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+    </button>
+    <button class="nav-burger" id="navBurger" aria-label="Toggle menu">
+      <svg width="17" height="13" viewBox="0 0 17 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="0" y1="1" x2="17" y2="1"/><line x1="0" y1="6.5" x2="17" y2="6.5"/><line x1="0" y1="12" x2="17" y2="12"/></svg>
+    </button>
+  </div>
+</nav>
+
+<div class="hero-strip">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../index.html">Home</a>
+      <span>›</span>
+      <span>Course</span>
+    </div>
+    <div class="page-kicker">🎓 Premium Course</div>
+    <h1 class="page-h">Lead Gen x<br><em>AI Powered Web Design</em></h1>
+    <p class="page-sub">Learn the complete 6-step system to scrape, qualify, and convert high-value leads into paying customers using AI-powered web design.</p>
+  </div>
+</div>
+
+<main class="main">
+  <div class="container">
+    <div class="layout">
+      <!-- LEFT: Course Details -->
+      <section class="panel">
+        <h2>Your Complete Workflow</h2>
+        <p class="panel-sub">Master the end-to-end lead generation pipeline — from scraping Google Maps to closing deals with AI-built websites.</p>
+
+        <div class="workflow">
+          <div class="wf-step">
+            <div class="wf-num">1</div>
+            <div><h4>SCRAPE</h4><p>Extract leads from Google Maps with the Maps Lead Scraper extension</p></div>
+          </div>
+          <div class="wf-step">
+            <div class="wf-num">2</div>
+            <div><h4>QUALIFY</h4><p>Score leads as HOT / WARM / COLD based on online presence signals</p></div>
+          </div>
+          <div class="wf-step">
+            <div class="wf-num">3</div>
+            <div><h4>BUILD</h4><p>Generate a professional website with Claude AI in minutes</p></div>
+          </div>
+          <div class="wf-step">
+            <div class="wf-num">4</div>
+            <div><h4>DEPLOY</h4><p>Push to Vercel and get a live URL instantly</p></div>
+          </div>
+          <div class="wf-step">
+            <div class="wf-num">5</div>
+            <div><h4>PITCH</h4><p>Send cold email with the live demo link</p></div>
+          </div>
+          <div class="wf-step">
+            <div class="wf-num">6</div>
+            <div><h4>CLOSE</h4><p>Deliver the site, collect payment</p></div>
+          </div>
+        </div>
+
+        <h2 style="margin-top:28px">What You'll Get</h2>
+        <div class="features">
+          <div class="feat">Step-by-step video tutorials</div>
+          <div class="feat">AI Prompts &amp; Pitch Templates</div>
+          <div class="feat">Maps Lead Scraper Extension</div>
+          <div class="feat">Email Automation Setup</div>
+          <div class="feat">Live Case Studies &amp; Results</div>
+          <div class="feat">Lifetime Access &amp; Updates</div>
+        </div>
+
+        <div class="detail-list" style="margin-top:24px">
+          <div class="detail-row"><span>Duration</span><strong>3 Days</strong></div>
+          <div class="detail-row"><span>Level</span><strong>Beginner to Intermediate</strong></div>
+          <div class="detail-row"><span>Format</span><strong>Video + Guides</strong></div>
+          <div class="detail-row"><span>Access</span><strong>Lifetime (Google Drive)</strong></div>
+        </div>
+      </section>
+
+      <!-- RIGHT: Purchase -->
+      <section class="panel" style="position:sticky;top:88px">
+        <div class="price-card">
+          <div class="price-label">Course Price</div>
+          <div class="price-display">
+            <strong>$10</strong>
+            <span>USD · One-time</span>
+          </div>
+          <p class="price-note">One-time payment · Lifetime access · Instant delivery via email</p>
+        </div>
+
+        <div id="checkoutStatus" class="checkout-status" style="display:none"></div>
+
+        <button id="enrollBtn" class="btn-main">
+          🎓 Enroll Now — $10
+        </button>
+
+        <p class="auth-prompt">You must be <a href="../auth/?redirect=/course/">signed in</a> to purchase.</p>
+
+        <div class="detail-list" style="margin-top:20px">
+          <div class="detail-row"><span>Payment</span><strong>Paddle Checkout</strong></div>
+          <div class="detail-row"><span>Delivery</span><strong>Email (Google Drive link)</strong></div>
+          <div class="detail-row"><span>Guarantee</span><strong>7-day money back</strong></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="f-bottom">
+      <span>© <span id="yr">2026</span> Maps Lead Scraper. All rights reserved.</span>
+      <span><a href="../terms-and-conditions.html">Terms</a> · <a href="../about.html">About</a> · <a href="mailto:courses@imadkhan.dev">Support</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+'use strict';
+
+/* ── Theme ── */
+(function(){
+  const t=localStorage.getItem('mls_theme')||(matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');
+  document.documentElement.setAttribute('data-theme',t);
+  document.addEventListener('DOMContentLoaded',()=>{
+    const btn=document.getElementById('themeToggle');
+    if(btn) btn.addEventListener('click',()=>{
+      const next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+      document.documentElement.setAttribute('data-theme',next);
+      localStorage.setItem('mls_theme',next);
+    });
+  });
+})();
+
+/* ── Nav burger ── */
+document.addEventListener('DOMContentLoaded',()=>{
+  const burger=document.getElementById('navBurger');
+  const links=document.getElementById('navLinks');
+  if(burger&&links) burger.addEventListener('click',()=>links.classList.toggle('open'));
+});
+
+/* ── Config ── */
+const COURSE_PRICE_ID = 'pri_01knmdy54t0wd91ne4tspntxty';
+const BACKEND_BASE = window.location.hostname === 'localhost'
+  ? 'http://localhost:3000'
+  : 'https://map-scraper-paddle-backend.vercel.app';
+
+/* ── Checkout ── */
+const enrollBtn = document.getElementById('enrollBtn');
+const statusEl = document.getElementById('checkoutStatus');
+
+enrollBtn.addEventListener('click', async () => {
+  // Check auth
+  const token = localStorage.getItem('mls_auth_token');
+  if (!token) {
+    window.location.href = '../auth/?redirect=/course/';
+    return;
+  }
+
+  // Get or generate installId
+  let installId = localStorage.getItem('mls_web_install_id');
+  if (!installId) {
+    installId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = Math.random() * 16 | 0;
+      return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+    localStorage.setItem('mls_web_install_id', installId);
+  }
+
+  enrollBtn.disabled = true;
+  enrollBtn.textContent = 'Creating checkout…';
+  statusEl.style.display = 'block';
+  statusEl.className = 'checkout-status pending';
+  statusEl.textContent = 'Creating secure checkout…';
+
+  try {
+    const res = await fetch(`${BACKEND_BASE}/api/checkout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        priceId: COURSE_PRICE_ID,
+        installId,
+        token,
+      }),
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data.checkoutUrl) {
+      throw new Error(data.detail || data.error || 'Could not create checkout.');
+    }
+
+    statusEl.className = 'checkout-status ready';
+    statusEl.textContent = 'Redirecting to checkout…';
+    window.location.href = data.checkoutUrl;
+  } catch (err) {
+    statusEl.className = 'checkout-status error';
+    statusEl.textContent = err.message || 'Checkout failed. Try again.';
+    enrollBtn.disabled = false;
+    enrollBtn.textContent = '🎓 Enroll Now — $10';
+  }
+});
+
+function handlePaymentSuccess() {
+  statusEl.style.display = 'block';
+  statusEl.className = 'checkout-status success';
+  statusEl.textContent = '🎉 Payment successful! Check your email for the course access link.';
+  enrollBtn.textContent = '✓ Enrolled';
+  enrollBtn.disabled = true;
+}
+
+function handleCheckoutError(ev) {
+  statusEl.style.display = 'block';
+  statusEl.className = 'checkout-status error';
+  statusEl.textContent = 'Payment failed. Please try again.';
+  enrollBtn.disabled = false;
+  enrollBtn.textContent = '🎓 Enroll Now — $10';
+}
+
+/* ── Check success return ── */
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('success') === 'true') {
+    window.history.replaceState({}, '', window.location.pathname);
+    handlePaymentSuccess();
+  }
+})();
+
+/* ── Year ── */
+document.getElementById('yr').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
