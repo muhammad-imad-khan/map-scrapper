@@ -336,12 +336,7 @@ enrollBtn.addEventListener('click', async () => {
     const res = await fetch(`${BACKEND_BASE}/api/course-checkout`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email,
-        name,
-        priceId: COURSE_PRICE_ID,
-        successUrl: window.location.origin + '/course/?success=true',
-      }),
+      body: JSON.stringify({ email, name, priceId: COURSE_PRICE_ID }),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data.checkoutUrl) {
