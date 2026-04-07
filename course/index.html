@@ -260,7 +260,7 @@ Paddle.Initialize({
           🎓 Enroll Now — $10
         </button>
 
-        <p class="auth-prompt">You must be <a href="../auth/?redirect=/course/">signed in</a> to purchase.</p>
+        <p class="auth-prompt">Secure payment via Paddle. Course link delivered to your email instantly.</p>
 
         <div class="detail-list" style="margin-top:20px">
           <div class="detail-row"><span>Payment</span><strong>Paddle Checkout</strong></div>
@@ -307,57 +307,34 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 /* ── Config ── */
 const COURSE_PRICE_ID = 'pri_01knmdy54t0wd91ne4tspntxty';
-const BACKEND_BASE = window.location.hostname === 'localhost'
-  ? 'http://localhost:3000'
-  : 'https://map-scraper-paddle-backend.vercel.app';
 
 /* ── Checkout ── */
 const enrollBtn = document.getElementById('enrollBtn');
 const statusEl = document.getElementById('checkoutStatus');
 
-enrollBtn.addEventListener('click', async () => {
-  // Check auth
-  const token = localStorage.getItem('mls_auth_token');
-  if (!token) {
-    window.location.href = '../auth/?redirect=/course/';
-    return;
-  }
-
-  // Get or generate installId
-  let installId = localStorage.getItem('mls_web_install_id');
-  if (!installId) {
-    installId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-      const r = Math.random() * 16 | 0;
-      return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-    });
-    localStorage.setItem('mls_web_install_id', installId);
-  }
-
+enrollBtn.addEventListener('click', () => {
   enrollBtn.disabled = true;
-  enrollBtn.textContent = 'Creating checkout…';
+  enrollBtn.textContent = 'Opening checkout…';
   statusEl.style.display = 'block';
   statusEl.className = 'checkout-status pending';
-  statusEl.textContent = 'Creating secure checkout…';
+  statusEl.textContent = 'Opening secure checkout…';
 
   try {
-    const res = await fetch(`${BACKEND_BASE}/api/checkout`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        priceId: COURSE_PRICE_ID,
-        installId,
-        token,
-      }),
+    Paddle.Checkout.open({
+      items: [{ priceId: COURSE_PRICE_ID, quantity: 1 }],
+      settings: {
+        successUrl: window.location.origin + '/course/?success=true',
+        theme: 'dark',
+        locale: 'en',
+      },
     });
-    const data = await res.json();
 
-    if (!res.ok || !data.checkoutUrl) {
-      throw new Error(data.detail || data.error || 'Could not create checkout.');
-    }
-
-    statusEl.className = 'checkout-status ready';
-    statusEl.textContent = 'Redirecting to checkout…';
-    window.location.href = data.checkoutUrl;
+    // Reset button after overlay opens
+    setTimeout(() => {
+      enrollBtn.disabled = false;
+      enrollBtn.textContent = '🎓 Enroll Now — $10';
+      statusEl.style.display = 'none';
+    }, 2000);
   } catch (err) {
     statusEl.className = 'checkout-status error';
     statusEl.textContent = err.message || 'Checkout failed. Try again.';
