@@ -250,14 +250,40 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
           <input id="courseName" type="text" placeholder="Your name (optional)" autocomplete="name" style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid var(--b);background:var(--s2);color:var(--t);font:500 14px var(--body)">
         </div>
 
-        <button id="enrollBtn" class="btn-main">
-          🎓 Enroll Now — $10
-        </button>
+        <!-- Payment method selector -->
+        <div id="payMethodPicker" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+          <button type="button" class="btn-main" id="btnCard" style="font-size:14px;padding:14px 10px">
+            💳 Credit / Debit
+          </button>
+          <button type="button" class="btn-main" id="btnBank" style="font-size:14px;padding:14px 10px;background:linear-gradient(135deg,#f59e0b,#d97706)">
+            🏦 Bank Transfer
+          </button>
+        </div>
 
-        <p class="auth-prompt">Secure payment via Paddle sandbox (test mode). Google Drive access is granted to this email after payment.</p>
+        <!-- Bank transfer details (hidden by default) -->
+        <div id="bankPanel" style="display:none">
+          <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.22);border-radius:14px;padding:18px;margin-bottom:14px">
+            <p style="font-size:13px;color:var(--t2);margin-bottom:12px">Transfer <strong style="color:var(--heading)">$10 USD</strong> (or PKR equivalent) to the account below, then confirm.</p>
+            <div class="detail-list" style="margin:0">
+              <div class="detail-row"><span>Account Title</span><strong>MUHAMMAD IMADUDDIN KHAN</strong></div>
+              <div class="detail-row"><span>Bank</span><strong>Meezan Bank</strong></div>
+              <div class="detail-row"><span>Account No.</span><strong>99470108585827</strong></div>
+              <div class="detail-row"><span>IBAN</span><strong>PK70MEZN0099470108585827</strong></div>
+              <div class="detail-row"><span>Branch</span><strong>PIB Colony Branch, KHI</strong></div>
+              <div class="detail-row"><span>Reference</span><strong>MLS-COURSE</strong></div>
+            </div>
+            <p style="font-size:12px;color:var(--t3);margin-top:10px">After transfer, share your payment proof with <a href="mailto:elysiansoft.systems@gmail.com" style="color:var(--amber);text-decoration:none">elysiansoft.systems@gmail.com</a></p>
+          </div>
+          <button id="bankDoneBtn" class="btn-main" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
+            ✓ I've Made the Transfer
+          </button>
+          <button type="button" id="bankBackBtn" style="width:100%;margin-top:8px;padding:10px;background:none;border:1px solid var(--b);border-radius:10px;color:var(--t2);font:500 13px var(--body);cursor:pointer">← Back to payment options</button>
+        </div>
+
+        <p class="auth-prompt">Secure checkout via Paddle or bank transfer. Google Drive access is granted to your email after payment.</p>
 
         <div class="detail-list" style="margin-top:20px">
-          <div class="detail-row"><span>Payment</span><strong>Paddle Checkout</strong></div>
+          <div class="detail-row"><span>Payment</span><strong>Card or Bank Transfer</strong></div>
           <div class="detail-row"><span>Delivery</span><strong>Email (Google Drive link)</strong></div>
           <div class="detail-row"><span>Guarantee</span><strong>7-day money back</strong></div>
         </div>
@@ -305,60 +331,132 @@ const BACKEND_BASE = window.location.hostname === 'localhost'
   ? 'http://localhost:3000'
   : 'https://map-scraper-paddle-backend.vercel.app';
 
-/* ── Checkout ── */
-const enrollBtn = document.getElementById('enrollBtn');
+/* ── DOM refs ── */
 const statusEl = document.getElementById('checkoutStatus');
 const courseEmailInput = document.getElementById('courseEmail');
 const courseNameInput = document.getElementById('courseName');
+const payMethodPicker = document.getElementById('payMethodPicker');
+const btnCard = document.getElementById('btnCard');
+const btnBank = document.getElementById('btnBank');
+const bankPanel = document.getElementById('bankPanel');
+const bankDoneBtn = document.getElementById('bankDoneBtn');
+const bankBackBtn = document.getElementById('bankBackBtn');
 
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-enrollBtn.addEventListener('click', async () => {
+function showStatus(msg, type) {
+  statusEl.style.display = 'block';
+  statusEl.className = 'checkout-status ' + type;
+  statusEl.textContent = msg;
+}
+
+function getInputs() {
   const email = (courseEmailInput.value || '').trim().toLowerCase();
   const name = (courseNameInput.value || '').trim();
   if (!isValidEmail(email)) {
-    statusEl.style.display = 'block';
-    statusEl.className = 'checkout-status error';
-    statusEl.textContent = 'Please enter a valid email address first.';
+    showStatus('Please enter a valid email address first.', 'error');
     courseEmailInput.focus();
-    return;
+    return null;
   }
+  return { email, name };
+}
 
-  enrollBtn.disabled = true;
-  enrollBtn.textContent = 'Opening checkout…';
-  statusEl.style.display = 'block';
-  statusEl.className = 'checkout-status pending';
-  statusEl.textContent = 'Creating secure checkout in test mode…';
+/* ── Credit / Debit (Paddle) ── */
+btnCard.addEventListener('click', async () => {
+  const inputs = getInputs();
+  if (!inputs) return;
+
+  btnCard.disabled = true;
+  btnCard.textContent = 'Opening checkout…';
+  showStatus('Creating secure checkout…', 'pending');
 
   try {
     const res = await fetch(`${BACKEND_BASE}/api/course-checkout`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, name, priceId: COURSE_PRICE_ID }),
+      body: JSON.stringify({ email: inputs.email, name: inputs.name, priceId: COURSE_PRICE_ID }),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data.checkoutUrl) {
       throw new Error(data.detail || data.error || 'Checkout could not be created.');
     }
 
-    localStorage.setItem('mls_course_buyer_email', email);
-    localStorage.setItem('mls_course_buyer_name', name);
+    localStorage.setItem('mls_course_buyer_email', inputs.email);
+    localStorage.setItem('mls_course_buyer_name', inputs.name);
     if (data.txnId) localStorage.setItem('mls_course_txn_id', data.txnId);
-    statusEl.className = 'checkout-status ready';
-    statusEl.textContent = 'Redirecting to Paddle checkout…';
-    // Append success redirect so Paddle sends buyer back after payment
+    showStatus('Redirecting to Paddle checkout…', 'ready');
     const successUrl = encodeURIComponent(window.location.origin + '/course/?success=true');
     const checkoutUrl = data.checkoutUrl + (data.checkoutUrl.includes('?') ? '&' : '?') + 'returnUrl=' + successUrl;
     window.location.href = checkoutUrl;
-    return;
-
   } catch (err) {
-    statusEl.className = 'checkout-status error';
-    statusEl.textContent = err.message || 'Checkout failed. Try again.';
-    enrollBtn.disabled = false;
-    enrollBtn.textContent = '🎓 Enroll Now — $10';
+    showStatus(err.message || 'Checkout failed. Try again.', 'error');
+    btnCard.disabled = false;
+    btnCard.textContent = '💳 Credit / Debit';
+  }
+});
+
+/* ── Bank Transfer ── */
+btnBank.addEventListener('click', () => {
+  const inputs = getInputs();
+  if (!inputs) return;
+  payMethodPicker.style.display = 'none';
+  bankPanel.style.display = 'block';
+  statusEl.style.display = 'none';
+});
+
+bankBackBtn.addEventListener('click', () => {
+  bankPanel.style.display = 'none';
+  payMethodPicker.style.display = 'grid';
+});
+
+bankDoneBtn.addEventListener('click', async () => {
+  const inputs = getInputs();
+  if (!inputs) return;
+
+  bankDoneBtn.disabled = true;
+  bankDoneBtn.textContent = 'Submitting…';
+  showStatus('Recording your transfer…', 'pending');
+
+  try {
+    // 1. Record the bank transfer request
+    const btRes = await fetch(`${BACKEND_BASE}/api/bank-transfer`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pack: 'course',
+        email: inputs.email,
+        name: inputs.name,
+        reference: 'MLS-COURSE',
+      }),
+    });
+    const btData = await btRes.json().catch(() => ({}));
+    if (!btRes.ok) throw new Error(btData.error || 'Failed to record transfer.');
+
+    // 2. Also trigger course email delivery immediately
+    const deliverRes = await fetch(`${BACKEND_BASE}/api/course-deliver`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: inputs.email, name: inputs.name, txnId: 'bank-transfer' }),
+    });
+    const deliverData = await deliverRes.json().catch(() => ({}));
+
+    if (deliverRes.ok && deliverData.ok) {
+      if (deliverData.alreadySent) {
+        showStatus(`Course access was already sent to ${inputs.email}. Check your inbox and spam folder.`, 'success');
+      } else {
+        showStatus(`🎉 Transfer recorded & course access sent to ${inputs.email}! Check your inbox (and spam).`, 'success');
+      }
+    } else {
+      showStatus(`Transfer recorded! Admin notified. Course email will be sent to ${inputs.email} after verification.`, 'success');
+    }
+    bankDoneBtn.textContent = '✓ Done';
+    bankPanel.querySelector('button#bankBackBtn').style.display = 'none';
+  } catch (err) {
+    showStatus(err.message || 'Something went wrong. Contact support.', 'error');
+    bankDoneBtn.disabled = false;
+    bankDoneBtn.textContent = '✓ I\'ve Made the Transfer';
   }
 });
 
@@ -367,15 +465,13 @@ async function handlePaymentSuccess() {
   const buyerName = localStorage.getItem('mls_course_buyer_name') || '';
   const txnId = localStorage.getItem('mls_course_txn_id') || '';
 
-  enrollBtn.textContent = '✓ Processing…';
-  enrollBtn.disabled = true;
-  statusEl.style.display = 'block';
-  statusEl.className = 'checkout-status pending';
-  statusEl.textContent = 'Payment received! Sending course access to your email…';
+  btnCard.textContent = '✓ Processing…';
+  btnCard.disabled = true;
+  btnBank.style.display = 'none';
+  showStatus('Payment received! Sending course access to your email…', 'pending');
 
   if (!buyerEmail) {
-    statusEl.className = 'checkout-status error';
-    statusEl.textContent = 'Payment successful but email was lost. Please contact courses@imadkhan.dev with your transaction details.';
+    showStatus('Payment successful but email was lost. Please contact courses@imadkhan.dev with your transaction details.', 'error');
     return;
   }
 
@@ -388,13 +484,12 @@ async function handlePaymentSuccess() {
     const data = await res.json().catch(() => ({}));
 
     if (res.ok && data.ok) {
-      statusEl.className = 'checkout-status success';
       if (data.alreadySent) {
-        statusEl.textContent = `Course access was already sent to ${buyerEmail}. Check your inbox and spam folder.`;
+        showStatus(`Course access was already sent to ${buyerEmail}. Check your inbox and spam folder.`, 'success');
       } else {
-        statusEl.textContent = `🎉 Course access sent to ${buyerEmail}! Check your inbox (and spam) for the Google Drive link.`;
+        showStatus(`🎉 Course access sent to ${buyerEmail}! Check your inbox (and spam) for the Google Drive link.`, 'success');
       }
-      enrollBtn.textContent = '✓ Enrolled';
+      btnCard.textContent = '✓ Enrolled';
       localStorage.removeItem('mls_course_buyer_email');
       localStorage.removeItem('mls_course_buyer_name');
       localStorage.removeItem('mls_course_txn_id');
@@ -402,9 +497,8 @@ async function handlePaymentSuccess() {
       throw new Error(data.error || 'Delivery failed');
     }
   } catch (err) {
-    statusEl.className = 'checkout-status error';
-    statusEl.textContent = `Payment received but email delivery failed: ${err.message}. Contact courses@imadkhan.dev`;
-    enrollBtn.textContent = '✓ Enrolled (email pending)';
+    showStatus(`Payment received but email delivery failed: ${err.message}. Contact courses@imadkhan.dev`, 'error');
+    btnCard.textContent = '✓ Enrolled (email pending)';
   }
 }
 
