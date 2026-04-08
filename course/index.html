@@ -241,7 +241,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
             <strong>$10</strong>
             <span>USD · One-time</span>
           </div>
-          <p class="price-note">One-time payment · Lifetime access · Instant delivery via email</p>
+          <p class="price-note">One-time payment · Lifetime access · Delivered in your customer portal</p>
         </div>
 
         <div id="checkoutStatus" class="checkout-status" style="display:none"></div>
@@ -249,6 +249,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
         <div style="display:grid;gap:10px;margin-bottom:14px">
           <input id="courseEmail" type="email" placeholder="Your email (required)" autocomplete="email" style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid var(--b);background:var(--s2);color:var(--t);font:500 14px var(--body)">
           <input id="courseName" type="text" placeholder="Your name (optional)" autocomplete="name" style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid var(--b);background:var(--s2);color:var(--t);font:500 14px var(--body)">
+          <input id="courseReceipt" type="file" accept="image/*,.pdf" style="width:100%;padding:12px 14px;border-radius:10px;border:1px dashed var(--b);background:var(--s2);color:var(--t);font:500 13px var(--body)">
         </div>
 
         <!-- Payment method selector -->
@@ -281,11 +282,11 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
           <button type="button" id="bankBackBtn" style="width:100%;margin-top:8px;padding:10px;background:none;border:1px solid var(--b);border-radius:10px;color:var(--t2);font:500 13px var(--body);cursor:pointer">← Back to payment options</button>
         </div>
 
-        <p class="auth-prompt">Secure checkout via Paddle sandbox (test mode) or bank transfer. Google Drive access is granted to your email after payment.</p>
+        <p class="auth-prompt" id="authPrompt">Log in before purchase so your course is attached to your customer portal automatically.</p>
 
         <div class="detail-list" style="margin-top:20px">
           <div class="detail-row"><span>Payment</span><strong>Card or Bank Transfer</strong></div>
-          <div class="detail-row"><span>Delivery</span><strong>Email (Google Drive link)</strong></div>
+          <div class="detail-row"><span>Delivery</span><strong>Customer Portal + Email Access</strong></div>
           <div class="detail-row"><span>Guarantee</span><strong>7-day money back</strong></div>
         </div>
       </section>
@@ -331,6 +332,8 @@ const COURSE_PRICE_ID = 'pri_01knmdy54t0wd91ne4tspntxty';
 const BACKEND_BASE = window.location.hostname === 'localhost'
   ? 'http://localhost:3000'
   : 'https://map-scraper-paddle-backend.vercel.app';
+const AUTH_API = `${BACKEND_BASE}/api/auth`;
+const TOKEN_KEY = 'mls_auth_token';
 
 /* ── Initialize Paddle.js ── */
 Paddle.Environment.set('sandbox');
@@ -347,12 +350,14 @@ Paddle.Initialize({
 const statusEl = document.getElementById('checkoutStatus');
 const courseEmailInput = document.getElementById('courseEmail');
 const courseNameInput = document.getElementById('courseName');
+const courseReceiptInput = document.getElementById('courseReceipt');
 const payMethodPicker = document.getElementById('payMethodPicker');
 const btnCard = document.getElementById('btnCard');
 const btnBank = document.getElementById('btnBank');
 const bankPanel = document.getElementById('bankPanel');
 const bankDoneBtn = document.getElementById('bankDoneBtn');
 const bankBackBtn = document.getElementById('bankBackBtn');
+const authPrompt = document.getElementById('authPrompt');
 
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -364,7 +369,23 @@ function showStatus(msg, type) {
   statusEl.textContent = msg;
 }
 
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('Could not read receipt file.'));
+    reader.readAsDataURL(file);
+  });
+}
+
 function getInputs() {
+  if (!localStorage.getItem(TOKEN_KEY)) {
+    showStatus('Please log in first. Your course access is delivered through the customer portal.', 'error');
+    setTimeout(() => {
+      window.location.href = '/auth/?redirect=/course/';
+    }, 500);
+    return null;
+  }
   const email = (courseEmailInput.value || '').trim().toLowerCase();
   const name = (courseNameInput.value || '').trim();
   if (!isValidEmail(email)) {
@@ -428,42 +449,43 @@ bankDoneBtn.addEventListener('click', async () => {
   const inputs = getInputs();
   if (!inputs) return;
 
+  const receiptFile = courseReceiptInput.files && courseReceiptInput.files[0];
+  if (!receiptFile) {
+    showStatus('Attach your receipt screenshot or PDF before submitting the bank transfer request.', 'error');
+    return;
+  }
+  if (receiptFile.size > 2 * 1024 * 1024) {
+    showStatus('Receipt file must be under 2 MB. Please compress or use a smaller image.', 'error');
+    return;
+  }
+
   bankDoneBtn.disabled = true;
   bankDoneBtn.textContent = 'Submitting…';
-  showStatus('Recording your transfer…', 'pending');
+  showStatus('Recording your transfer and uploading the receipt…', 'pending');
 
   try {
-    // 1. Record the bank transfer request
+    const receiptDataUrl = await fileToDataUrl(receiptFile);
     const btRes = await fetch(`${BACKEND_BASE}/api/bank-transfer`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        pack: 'course',
+        pack: 'Lead Gen x AI Powered Web Design',
         email: inputs.email,
         name: inputs.name,
         reference: 'MLS-COURSE',
+        purchaseType: 'course',
+        courseId: 'lead-gen-ai-web-design',
+        amount: 1000,
+        currency: 'USD',
+        receiptDataUrl,
+        receiptName: receiptFile.name,
+        receiptMimeType: receiptFile.type || 'application/octet-stream',
       }),
     });
     const btData = await btRes.json().catch(() => ({}));
     if (!btRes.ok) throw new Error(btData.error || 'Failed to record transfer.');
 
-    // 2. Also trigger course email delivery immediately
-    const deliverRes = await fetch(`${BACKEND_BASE}/api/course-deliver`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: inputs.email, name: inputs.name, txnId: 'bank-transfer' }),
-    });
-    const deliverData = await deliverRes.json().catch(() => ({}));
-
-    if (deliverRes.ok && deliverData.ok) {
-      if (deliverData.alreadySent) {
-        showStatus(`Course access was already sent to ${inputs.email}. Check your inbox and spam folder.`, 'success');
-      } else {
-        showStatus(`🎉 Transfer recorded & course access sent to ${inputs.email}! Check your inbox (and spam).`, 'success');
-      }
-    } else {
-      showStatus(`Transfer recorded! Admin notified. Course email will be sent to ${inputs.email} after verification.`, 'success');
-    }
+    showStatus(`Transfer recorded. Your receipt is now visible in admin, and portal access will be emailed to ${inputs.email} after approval.`, 'success');
     bankDoneBtn.textContent = '✓ Done';
     bankPanel.querySelector('button#bankBackBtn').style.display = 'none';
   } catch (err) {
@@ -481,7 +503,7 @@ async function handlePaymentSuccess() {
   btnCard.textContent = '✓ Processing…';
   btnCard.disabled = true;
   btnBank.style.display = 'none';
-  showStatus('Payment received! Sending course access to your email…', 'pending');
+  showStatus('Payment received! Activating your customer portal access…', 'pending');
 
   if (!buyerEmail) {
     showStatus('Payment successful but email was lost. Please contact courses@imadkhan.dev with your transaction details.', 'error');
@@ -498,9 +520,9 @@ async function handlePaymentSuccess() {
 
     if (res.ok && data.ok) {
       if (data.alreadySent) {
-        showStatus(`Course access was already sent to ${buyerEmail}. Check your inbox and spam folder.`, 'success');
+        showStatus(`Course access was already activated for ${buyerEmail}. Open your customer portal or check your inbox for the access email.`, 'success');
       } else {
-        showStatus(`🎉 Course access sent to ${buyerEmail}! Check your inbox (and spam) for the Google Drive link.`, 'success');
+        showStatus(`🎉 Course access activated for ${buyerEmail}. Open the customer portal or check your inbox for the access email.`, 'success');
       }
       btnCard.textContent = '✓ Enrolled';
       localStorage.removeItem('mls_course_buyer_email');
@@ -510,8 +532,8 @@ async function handlePaymentSuccess() {
       throw new Error(data.error || 'Delivery failed');
     }
   } catch (err) {
-    showStatus(`Payment received but email delivery failed: ${err.message}. Contact courses@imadkhan.dev`, 'error');
-    btnCard.textContent = '✓ Enrolled (email pending)';
+    showStatus(`Payment received but portal activation email failed: ${err.message}. Your purchase is safe, and support can resend access.`, 'error');
+    btnCard.textContent = '✓ Enrolled (portal pending)';
   }
 }
 
@@ -522,6 +544,29 @@ async function handlePaymentSuccess() {
     window.history.replaceState({}, '', window.location.pathname);
     handlePaymentSuccess();
   }
+})();
+
+(async function restoreLoggedInUser() {
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (!token) {
+    authPrompt.innerHTML = 'Log in before purchase so your course is attached to your customer portal automatically. <a href="../auth/?redirect=/course/" style="color:var(--purple);text-decoration:none;font-weight:700;">Log in now</a>';
+    return;
+  }
+  try {
+    const res = await fetch(AUTH_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'me', token }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (data.ok && data.user) {
+      courseEmailInput.value = data.user.email || '';
+      courseNameInput.value = data.user.name || '';
+      authPrompt.innerHTML = `Logged in as <strong>${data.user.email}</strong>. This purchase will unlock the <a href="../portal/" style="color:var(--purple);text-decoration:none;font-weight:700;">customer portal</a> after payment.`;
+      return;
+    }
+  } catch {}
+  authPrompt.innerHTML = 'Please <a href="../auth/?redirect=/course/" style="color:var(--purple);text-decoration:none;font-weight:700;">log in again</a> before buying.';
 })();
 
 /* ── Year ── */

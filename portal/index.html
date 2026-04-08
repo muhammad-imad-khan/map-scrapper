@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer Portal — Maps Lead Scraper</title>
+<meta name="description" content="Access your purchased courses, watch lessons, open PDFs, and track your progress.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:'DM Sans',system-ui,sans-serif;background:#06060c;color:#d4d4e8;min-height:100vh}
+:root{--bg:#06060c;--p1:#0d111b;--p2:#121827;--line:rgba(255,255,255,.08);--txt:#d4d4e8;--muted:#9aa0b8;--green:#22c55e;--green-d:rgba(34,197,94,.12);--blue:#60a5fa;--danger:#f87171;--display:'Syne',sans-serif}
+[data-theme="light"]{--bg:#f4f6fb;--p1:#ffffff;--p2:#eef1f8;--line:rgba(0,0,0,.08);--txt:#1f2433;--muted:#5f6a84;--green:#16a34a;--green-d:rgba(22,163,74,.09);--blue:#2563eb;--danger:#dc2626}
+body{background:radial-gradient(circle at top,#171730 0%,var(--bg) 42%)}a{color:inherit}.container{max-width:1320px;margin:0 auto;padding:24px}
+.top{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;padding:18px 0 22px}.brand{font-family:var(--display);font-size:28px;font-weight:800;letter-spacing:-1px}.brand em{color:var(--green);font-style:normal}.hero-sub{color:var(--muted);max-width:700px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 16px;border-radius:12px;border:1px solid var(--line);background:var(--p2);color:var(--txt);text-decoration:none;font-weight:700;cursor:pointer}.btn.primary{background:var(--green);color:#02140a;border:none}
+.gate,.panel{background:rgba(13,17,27,.94);border:1px solid var(--line);border-radius:22px;box-shadow:0 26px 80px rgba(0,0,0,.28)}[data-theme="light"] .gate,[data-theme="light"] .panel{background:rgba(255,255,255,.96)}
+.gate{max-width:540px;margin:72px auto;padding:30px}.gate h1,.panel h2,.panel h3{margin:0}.muted{color:var(--muted)}
+.shell{display:none;grid-template-columns:340px 1fr;gap:18px}.sidebar{display:grid;gap:18px}.panel{padding:20px}.course-list{display:grid;gap:10px;max-height:560px;overflow:auto}.course-card{padding:16px;border-radius:16px;border:1px solid var(--line);background:var(--p2);cursor:pointer}.course-card.active{border-color:var(--green);background:var(--green-d)}.course-card strong{display:block;font-size:16px;margin-bottom:6px}.progress{height:8px;background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden;margin-top:10px}.progress>span{display:block;height:100%;background:linear-gradient(90deg,var(--green),#14b8a6)}
+.overview{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:18px}.stat{padding:16px;border-radius:16px;background:var(--p2);border:1px solid var(--line)}.stat b{display:block;font-size:28px;margin-top:8px}
+.course-layout{display:grid;grid-template-columns:320px 1fr;gap:18px}.module-list{display:grid;gap:12px}.module{padding:14px;border-radius:16px;background:var(--p2);border:1px solid var(--line)}.module h4{margin:0 0 6px;font-size:15px}.module-items{display:grid;gap:8px;margin-top:12px}.lesson{padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.02);cursor:pointer}.lesson.active{border-color:var(--blue)}.lesson.done{border-color:var(--green);background:var(--green-d)}.lesson small{display:block;color:var(--muted);margin-top:4px}
+.viewer{display:grid;gap:14px}.viewer-box{min-height:320px;background:var(--p2);border:1px solid var(--line);border-radius:18px;padding:18px}.viewer-box iframe,.viewer-box video{width:100%;min-height:360px;border:0;border-radius:14px;background:#000}.viewer-box .empty{color:var(--muted);line-height:1.7}.viewer-actions{display:flex;gap:10px;flex-wrap:wrap}.pill{display:inline-flex;align-items:center;padding:7px 11px;border-radius:999px;background:var(--green-d);border:1px solid rgba(34,197,94,.22);font-size:12px;font-weight:700;color:var(--green)}
+.status{min-height:20px;color:var(--muted);font-size:13px}.status.error{color:var(--danger)}.status.ok{color:var(--green)}
+@media(max-width:1024px){.shell,.course-layout{grid-template-columns:1fr}}@media(max-width:720px){.container{padding:18px}.gate{margin:28px auto;padding:22px}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="top">
+    <div>
+      <div class="brand">Customer <em>Portal</em></div>
+      <div class="hero-sub">Open your purchased courses, continue lessons, view PDFs, and track what you’ve completed.</div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <a class="btn" href="../course/">Buy Course</a>
+      <a class="btn" href="../auth/" id="accountLink">Account</a>
+      <button class="btn" id="themeBtn">Theme</button>
+    </div>
+  </div>
+
+  <div class="gate" id="gate">
+    <h1 style="font-family:var(--display);font-size:40px;line-height:1;letter-spacing:-1px;margin-bottom:12px;">Log in to open<br>your purchased courses.</h1>
+    <p class="muted" style="line-height:1.7;margin-bottom:18px;">This portal uses the same account system as checkout. If your course was granted manually, log in with the same email address used for purchase. If we created an account for you, use the temporary password from your email.</p>
+    <div class="status" id="gateStatus"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <a class="btn primary" href="../auth/?redirect=/portal/">Log In / Register</a>
+      <a class="btn" href="../course/">Go To Course Checkout</a>
+    </div>
+  </div>
+
+  <div class="shell" id="shell">
+    <aside class="sidebar">
+      <div class="panel">
+        <div class="muted">Signed in as</div>
+        <h2 id="userName" style="margin-top:8px;">User</h2>
+        <div class="muted" id="userEmail" style="margin-top:4px;"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
+          <a class="btn" href="../course/">Buy Another Course</a>
+          <button class="btn" id="logoutBtn">Log Out</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Your Courses</h3>
+        <div class="course-list" id="courseList" style="margin-top:14px;"></div>
+      </div>
+    </aside>
+
+    <main style="display:grid;gap:18px;">
+      <div class="overview" id="overview"></div>
+
+      <div class="panel">
+        <div style="display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap;">
+          <div>
+            <h2 id="courseTitle">Select a course</h2>
+            <div class="muted" id="courseDescription" style="margin-top:8px;max-width:760px;"></div>
+          </div>
+          <div class="pill" id="courseProgressBadge">0% complete</div>
+        </div>
+      </div>
+
+      <div class="course-layout">
+        <div class="panel">
+          <h3>Lessons</h3>
+          <div class="module-list" id="moduleList" style="margin-top:14px;"></div>
+        </div>
+        <div class="viewer">
+          <div class="panel viewer-box" id="viewerBox"></div>
+          <div class="panel">
+            <div style="display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap;">
+              <div>
+                <h3 id="lessonTitle">No lesson selected</h3>
+                <div class="muted" id="lessonMeta" style="margin-top:6px;"></div>
+              </div>
+              <div class="viewer-actions">
+                <button class="btn primary" id="markDoneBtn">Mark Complete</button>
+                <a class="btn" id="openAssetBtn" target="_blank" rel="noopener">Open Asset</a>
+              </div>
+            </div>
+            <div class="status" id="portalStatus" style="margin-top:14px;"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+const TOKEN_KEY='mls_auth_token';
+const API_BASE=window.location.hostname==='localhost'?'http://localhost:3000':'https://map-scraper-paddle-backend.vercel.app';
+const state={user:null,courses:[],selectedCourse:null,selectedLesson:null};
+
+(function(){const t=localStorage.getItem('mls_theme')||(matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t)})();
+document.getElementById('themeBtn').addEventListener('click',()=>{const next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',next);localStorage.setItem('mls_theme',next)});
+
+function esc(value){return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+function setStatus(msg,type=''){const el=document.getElementById('portalStatus');el.textContent=msg;el.className='status'+(type?` ${type}`:'')}
+function getToken(){return localStorage.getItem(TOKEN_KEY)||''}
+
+async function portalApi(action,payload={}){
+  const res=await fetch(`${API_BASE}/api/customer-portal`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,token:getToken(),...payload})});
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(data.error||'Request failed');
+  return data;
+}
+
+function renderOverview(){
+  const totalCourses=state.courses.length;
+  const totalLessons=state.courses.reduce((sum,course)=>sum+(course.course.modules||[]).reduce((inner,module)=>inner+(module.items||[]).length,0),0);
+  const averageProgress=totalCourses?Math.round(state.courses.reduce((sum,course)=>sum+(course.progress?.percent||0),0)/totalCourses):0;
+  document.getElementById('overview').innerHTML=`
+    <div class="stat"><div class="muted">Purchased Courses</div><b>${totalCourses}</b></div>
+    <div class="stat"><div class="muted">Total Lessons</div><b>${totalLessons}</b></div>
+    <div class="stat"><div class="muted">Average Progress</div><b>${averageProgress}%</b></div>`;
+}
+
+function renderCourseList(){
+  const list=document.getElementById('courseList');
+  if(!state.courses.length){list.innerHTML='<div class="muted">No purchased courses yet. Buy one and it will appear here.</div>';return}
+  list.innerHTML=state.courses.map((entry)=>`
+    <div class="course-card ${state.selectedCourse&&state.selectedCourse.courseId===entry.courseId?'active':''}" data-course-id="${esc(entry.courseId)}">
+      <strong>${esc(entry.course.title)}</strong>
+      <div class="muted">${esc(entry.course.shortDescription||entry.course.description||'')}</div>
+      <div class="progress"><span style="width:${entry.progress?.percent||0}%"></span></div>
+      <div class="muted" style="margin-top:8px;">${entry.progress?.percent||0}% complete</div>
+    </div>`).join('');
+  list.querySelectorAll('[data-course-id]').forEach((node)=>node.addEventListener('click',()=>selectCourse(node.dataset.courseId)));
+}
+
+function getAllLessons(course){
+  return (course.course.modules||[]).flatMap((module)=>module.items||[]);
+}
+
+function selectCourse(courseId){
+  state.selectedCourse=state.courses.find((entry)=>entry.courseId===courseId)||state.courses[0]||null;
+  const qp=new URLSearchParams(location.search); qp.set('course', courseId); history.replaceState(null,'',`${location.pathname}?${qp.toString()}`);
+  renderCourseList();
+  renderSelectedCourse();
+}
+
+function renderSelectedCourse(){
+  const entry=state.selectedCourse;
+  if(!entry){
+    document.getElementById('courseTitle').textContent='No course selected';
+    document.getElementById('courseDescription').textContent='';
+    document.getElementById('moduleList').innerHTML='';
+    document.getElementById('viewerBox').innerHTML='<div class="empty">No purchased course selected yet.</div>';
+    return;
+  }
+
+  document.getElementById('courseTitle').textContent=entry.course.title;
+  document.getElementById('courseDescription').textContent=entry.course.description||entry.course.shortDescription||'';
+  document.getElementById('courseProgressBadge').textContent=`${entry.progress?.percent||0}% complete`;
+
+  const completedIds=new Set(entry.progress?.completedItemIds||[]);
+  document.getElementById('moduleList').innerHTML=(entry.course.modules||[]).map((module)=>`
+    <div class="module">
+      <h4>${esc(module.title)}</h4>
+      <div class="muted">${esc(module.description||'')}</div>
+      <div class="module-items">
+        ${(module.items||[]).map((item)=>`
+          <div class="lesson ${state.selectedLesson&&state.selectedLesson.id===item.id?'active':''} ${completedIds.has(item.id)?'done':''}" data-item-id="${esc(item.id)}">
+            <strong>${esc(item.title)}</strong>
+            <small>${esc(item.type)}${item.durationMinutes?` · ${item.durationMinutes} min`:''}</small>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+
+  document.querySelectorAll('.lesson[data-item-id]').forEach((node)=>{
+    node.addEventListener('click',()=>{
+      state.selectedLesson=getAllLessons(entry).find((item)=>item.id===node.dataset.itemId)||null;
+      renderSelectedCourse();
+      renderViewer();
+    });
+  });
+
+  if(!state.selectedLesson || !getAllLessons(entry).some((item)=>item.id===state.selectedLesson.id)){
+    state.selectedLesson=getAllLessons(entry)[0]||null;
+  }
+  renderViewer();
+}
+
+function viewerHtmlForLesson(lesson){
+  if(!lesson) return '<div class="empty">Select a lesson to start learning.</div>';
+  const url=lesson.url||'';
+  if(lesson.type==='video'&&/^https?:\/\/.+\.(mp4|webm|ogg)(\?.*)?$/i.test(url)){
+    return `<video id="lessonVideo" controls src="${url}"></video>`;
+  }
+  if((lesson.type==='video'||lesson.type==='embed')&&/(youtube\.com|youtu\.be|vimeo\.com|drive\.google\.com)/i.test(url)){
+    return `<iframe src="${url}" allowfullscreen loading="lazy"></iframe>`;
+  }
+  if(lesson.type==='pdf'){
+    return `<iframe src="${url}" title="${esc(lesson.title)}"></iframe>`;
+  }
+  return `<div class="empty">${esc(lesson.description||'Open this lesson in a new tab from the button below.')}</div>`;
+}
+
+async function updateProgress(completed){
+  if(!state.selectedCourse||!state.selectedLesson) return;
+  try{
+    const data=await portalApi('updateProgress',{courseId:state.selectedCourse.courseId,itemId:state.selectedLesson.id,completed});
+    state.selectedCourse.progress={...(state.selectedCourse.progress||{}),...data.progress};
+    setStatus(completed?'Progress updated.':'Completion removed.','ok');
+    renderCourseList();
+    renderSelectedCourse();
+  }catch(error){setStatus(error.message,'error')}
+}
+
+function renderViewer(){
+  const entry=state.selectedCourse;
+  const lesson=state.selectedLesson;
+  const completed=new Set(entry?.progress?.completedItemIds||[]);
+  document.getElementById('viewerBox').innerHTML=viewerHtmlForLesson(lesson);
+  document.getElementById('lessonTitle').textContent=lesson?lesson.title:'No lesson selected';
+  document.getElementById('lessonMeta').textContent=lesson?`${lesson.type}${lesson.durationMinutes?` · ${lesson.durationMinutes} min`:''}${lesson.description?` · ${lesson.description}`:''}`:'';
+  const openAssetBtn=document.getElementById('openAssetBtn');
+  if(lesson&&lesson.url){openAssetBtn.href=lesson.url;openAssetBtn.style.display='inline-flex'}else{openAssetBtn.removeAttribute('href');openAssetBtn.style.display='none'}
+  const markDoneBtn=document.getElementById('markDoneBtn');
+  markDoneBtn.textContent=completed.has(lesson?.id)?'Mark Incomplete':'Mark Complete';
+  markDoneBtn.onclick=()=>updateProgress(!completed.has(lesson?.id));
+  const video=document.getElementById('lessonVideo');
+  if(video&&lesson){video.addEventListener('ended',()=>updateProgress(true),{once:true})}
+}
+
+async function loadPortal(){
+  const token=getToken();
+  if(!token){document.getElementById('gateStatus').textContent='You need to log in first.';return}
+  try{
+    const data=await portalApi('dashboard');
+    state.user=data.user;
+    state.courses=data.courses||[];
+    document.getElementById('userName').textContent=data.user.name||'User';
+    document.getElementById('userEmail').textContent=data.user.email||'';
+    document.getElementById('gate').style.display='none';
+    document.getElementById('shell').style.display='grid';
+    renderOverview();
+    const requestedCourse=new URLSearchParams(location.search).get('course');
+    state.selectedCourse=state.courses.find((entry)=>entry.courseId===requestedCourse)||state.courses[0]||null;
+    renderCourseList();
+    renderSelectedCourse();
+  }catch(error){
+    document.getElementById('gateStatus').textContent=error.message;
+    if(/session expired|log in/i.test(error.message)){localStorage.removeItem(TOKEN_KEY)}
+  }
+}
+
+document.getElementById('logoutBtn').addEventListener('click',async()=>{
+  try{await fetch(`${API_BASE}/api/auth`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'logout',token:getToken()})})}catch{}
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem('mls_auth_user');
+  location.reload();
+});
+
+loadPortal();
+</script>
+</body>
+</html>

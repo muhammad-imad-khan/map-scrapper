@@ -1,0 +1,729 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Course Manager</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <style>
+    :root {
+      --bg: #09111f;
+      --panel: #111a2c;
+      --panel-2: #17233b;
+      --line: #2b3a59;
+      --text: #eef4ff;
+      --muted: #93a4ca;
+      --accent: #22c55e;
+      --accent-dim: rgba(34, 197, 94, .12);
+      --blue: #60a5fa;
+      --warn: #f59e0b;
+      --warn-dim: rgba(245, 158, 11, .12);
+      --danger: #fb7185;
+      --danger-dim: rgba(251, 113, 133, .12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: radial-gradient(circle at top, #14213d 0%, var(--bg) 44%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .shell { max-width: 1380px; margin: 0 auto; padding: 24px; }
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(7, 11, 20, .96);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .login-card, .card {
+      background: rgba(17, 26, 44, .96);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 24px 90px rgba(0, 0, 0, .35);
+    }
+    .login-card {
+      width: min(420px, calc(100vw - 32px));
+      padding: 28px;
+    }
+    h1, h2, h3 { margin: 0; }
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .hero p, .muted { color: var(--muted); }
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+    .stats { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 16px; }
+    .main { grid-template-columns: minmax(340px, 420px) 1fr; align-items: start; }
+    .side { display: grid; gap: 16px; }
+    .card { padding: 20px; }
+    .stat-value { font-size: 34px; font-weight: 800; margin-top: 10px; }
+    .field, .field-row { display: grid; gap: 8px; }
+    .field-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .7px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    input, select, textarea, button {
+      font: inherit;
+    }
+    input, select, textarea {
+      width: 100%;
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+      outline: none;
+    }
+    textarea { min-height: 160px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    button, .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      color: var(--text);
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: 700;
+    }
+    button.primary, .btn.primary { background: #2563eb; border-color: #3b82f6; color: #fff; }
+    button.success { background: #166534; border-color: #22c55e; color: #fff; }
+    button.warn { background: var(--warn-dim); border-color: rgba(245,158,11,.3); color: #fbbf24; }
+    button.danger { background: var(--danger-dim); border-color: rgba(251,113,133,.3); color: #fda4af; }
+    .status {
+      min-height: 20px;
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .status.ok { color: var(--accent); }
+    .status.error { color: #fda4af; }
+    .list {
+      display: grid;
+      gap: 10px;
+      max-height: 420px;
+      overflow: auto;
+    }
+    .course-pill {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(23, 35, 59, .88);
+      cursor: pointer;
+    }
+    .course-pill.active { border-color: var(--accent); background: var(--accent-dim); }
+    .course-pill strong { display: block; margin-bottom: 6px; }
+    .table-wrap { overflow: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 12px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--muted); text-transform: uppercase; font-size: 11px; letter-spacing: .6px; }
+    code {
+      font-family: Consolas, monospace;
+      font-size: 12px;
+      color: var(--blue);
+      word-break: break-all;
+    }
+    .preview {
+      max-width: 120px;
+      max-height: 90px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      object-fit: cover;
+    }
+    .inline-note {
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(96, 165, 250, .08);
+      border: 1px solid rgba(96, 165, 250, .18);
+      color: #bfdbfe;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    @media (max-width: 1024px) {
+      .main, .field-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-card">
+      <h1>Course Manager</h1>
+      <p class="muted">Use the same admin session as the main dashboard, or authenticate directly.</p>
+      <div class="field" style="margin-top:18px;">
+        <label for="apiBase">Backend API URL</label>
+        <input id="apiBase" type="url" placeholder="https://map-scraper-paddle-backend.vercel.app" />
+      </div>
+      <div class="field" style="margin-top:14px;">
+        <label for="adminKey">Admin API Key</label>
+        <input id="adminKey" type="password" placeholder="Enter your admin key" />
+      </div>
+      <div class="btn-row" style="margin-top:18px;">
+        <button class="primary" id="loginBtn">Authenticate</button>
+        <a class="btn" href="./">Open Main Admin</a>
+      </div>
+      <div class="status" id="loginStatus"></div>
+    </div>
+  </div>
+
+  <div class="shell" id="app" style="display:none;">
+    <div class="hero">
+      <div>
+        <h1>Course Manager</h1>
+        <p>Manage portal courses, review paid course receipts, grant access, and resend portal emails.</p>
+      </div>
+      <div class="hero-actions">
+        <a class="btn" href="./">Main Admin</a>
+        <button id="reloadAllBtn">Reload Data</button>
+        <button class="danger" id="lockBtn">Lock</button>
+      </div>
+    </div>
+
+    <div class="grid stats">
+      <div class="card"><div class="muted">Courses</div><div class="stat-value" id="statCourses">0</div></div>
+      <div class="card"><div class="muted">Enrollments</div><div class="stat-value" id="statEnrollments">0</div></div>
+      <div class="card"><div class="muted">Pending Course Receipts</div><div class="stat-value" id="statTransfers">0</div></div>
+    </div>
+
+    <div class="grid main">
+      <div class="side">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;">
+            <div>
+              <h2>Courses</h2>
+              <div class="muted">Existing course catalog</div>
+            </div>
+            <button id="newCourseBtn">New Course</button>
+          </div>
+          <div class="list" id="courseList"></div>
+        </div>
+
+        <div class="card">
+          <h2>Manual Access</h2>
+          <div class="muted" style="margin:4px 0 14px;">Grant a customer access and optionally email them the portal link.</div>
+          <div class="field-row">
+            <div class="field">
+              <label for="grantEmail">Customer Email</label>
+              <input id="grantEmail" type="email" placeholder="buyer@example.com" />
+            </div>
+            <div class="field">
+              <label for="grantName">Customer Name</label>
+              <input id="grantName" type="text" placeholder="Customer name" />
+            </div>
+          </div>
+          <div class="field" style="margin-top:12px;">
+            <label for="grantCourse">Course</label>
+            <select id="grantCourse"></select>
+          </div>
+          <div class="btn-row" style="margin-top:14px;">
+            <button class="success" id="grantBtn">Grant Access + Email</button>
+            <button id="grantOnlyBtn">Grant Without Email</button>
+          </div>
+          <div class="status" id="grantStatus"></div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+            <div>
+              <h2>Course Editor</h2>
+              <div class="muted">Keep lessons in structured JSON. Videos, PDFs, and links all render in the customer portal.</div>
+            </div>
+            <div class="btn-row">
+              <button class="primary" id="saveCourseBtn">Save Course</button>
+              <button class="danger" id="deleteCourseBtn">Delete Course</button>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="courseId">Course ID</label>
+              <input id="courseId" type="text" placeholder="lead-gen-ai-web-design" />
+            </div>
+            <div class="field">
+              <label for="courseSlug">Slug</label>
+              <input id="courseSlug" type="text" placeholder="lead-gen-ai-web-design" />
+            </div>
+          </div>
+          <div class="field-row" style="margin-top:12px;">
+            <div class="field">
+              <label for="courseTitle">Title</label>
+              <input id="courseTitle" type="text" placeholder="Course title" />
+            </div>
+            <div class="field">
+              <label for="courseStatus">Status</label>
+              <select id="courseStatus">
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+                <option value="archived">Archived</option>
+              </select>
+            </div>
+          </div>
+          <div class="field-row" style="margin-top:12px;">
+            <div class="field">
+              <label for="coursePriceId">Paddle Price ID</label>
+              <input id="coursePriceId" type="text" placeholder="pri_..." />
+            </div>
+            <div class="field">
+              <label for="courseCoverImage">Cover Image URL</label>
+              <input id="courseCoverImage" type="url" placeholder="https://..." />
+            </div>
+          </div>
+          <div class="field" style="margin-top:12px;">
+            <label for="courseShortDescription">Short Description</label>
+            <input id="courseShortDescription" type="text" placeholder="Short summary for course cards" />
+          </div>
+          <div class="field" style="margin-top:12px;">
+            <label for="courseDescription">Full Description</label>
+            <textarea id="courseDescription" placeholder="Detailed course description"></textarea>
+          </div>
+          <div class="field" style="margin-top:12px;">
+            <label for="courseModules">Modules JSON</label>
+            <textarea id="courseModules"></textarea>
+          </div>
+          <div class="inline-note" style="margin-top:12px;">Schema: [{"id":"module-1","title":"Module 1","description":"...","items":[{"id":"lesson-1","title":"Intro","type":"video|pdf|link|embed","url":"https://...","description":"...","durationMinutes":10}]}]</div>
+          <div class="status" id="editorStatus"></div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+            <div>
+              <h2>Pending Course Receipts</h2>
+              <div class="muted">Receipts submitted by bank transfer customers for course access.</div>
+            </div>
+            <button id="reloadTransfersBtn">Reload Receipts</button>
+          </div>
+          <div class="table-wrap" id="transferTableWrap"></div>
+          <div class="status" id="transferStatus"></div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+            <div>
+              <h2>Enrollments</h2>
+              <div class="muted">Customers who can open the customer portal and access course content.</div>
+            </div>
+            <button id="reloadEnrollmentsBtn">Reload Enrollments</button>
+          </div>
+          <div class="table-wrap" id="enrollmentTableWrap"></div>
+          <div class="status" id="enrollmentStatus"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SESSION_KEY = '__admin_session';
+    const DEFAULT_API_BASE = localStorage.getItem('admin_api_base') || 'https://map-scraper-paddle-backend.vercel.app';
+    const state = { courses: [], selectedCourseId: '', enrollments: [], transfers: [] };
+
+    const loginOverlay = document.getElementById('loginOverlay');
+    const app = document.getElementById('app');
+    document.getElementById('apiBase').value = DEFAULT_API_BASE;
+
+    function getSession() {
+      try {
+        const raw = sessionStorage.getItem(SESSION_KEY);
+        if (!raw) return null;
+        const data = JSON.parse(raw);
+        if (!data.apiBase || !data.adminKey || !data.expiresAt) return null;
+        if (Date.now() > data.expiresAt) return null;
+        return data;
+      } catch {
+        return null;
+      }
+    }
+
+    function saveSession(apiBase, adminKey) {
+      const session = { apiBase, adminKey, expiresAt: Date.now() + 30 * 60 * 1000 };
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+      localStorage.setItem('admin_api_base', apiBase);
+      return session;
+    }
+
+    function clearSession() {
+      sessionStorage.removeItem(SESSION_KEY);
+    }
+
+    async function api(path, options = {}) {
+      const session = getSession();
+      if (!session) throw new Error('Admin session expired.');
+      const response = await fetch(session.apiBase.replace(/\/$/, '') + path, {
+        ...options,
+        headers: {
+          'X-Admin-Key': session.adminKey,
+          ...(options.headers || {}),
+        },
+      });
+      const text = await response.text();
+      let data = null;
+      try { data = text ? JSON.parse(text) : null; } catch { data = null; }
+      if (!response.ok) throw new Error(data && data.error ? data.error : (text || 'Request failed.'));
+      return data;
+    }
+
+    function esc(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function fmt(date) {
+      return date ? String(date).slice(0, 16).replace('T', ' ') : '';
+    }
+
+    function enterApp() {
+      loginOverlay.style.display = 'none';
+      app.style.display = '';
+      loadAll();
+    }
+
+    async function authenticate() {
+      const apiBase = document.getElementById('apiBase').value.trim();
+      const adminKey = document.getElementById('adminKey').value.trim();
+      const status = document.getElementById('loginStatus');
+      status.textContent = 'Authenticating...';
+      status.className = 'status';
+      try {
+        const response = await fetch(apiBase.replace(/\/$/, '') + '/api/admin-users?type=users&limit=1&cursor=0', {
+          headers: { 'X-Admin-Key': adminKey },
+        });
+        if (!response.ok) throw new Error('Authentication failed.');
+        saveSession(apiBase, adminKey);
+        enterApp();
+      } catch (error) {
+        status.textContent = error.message;
+        status.className = 'status error';
+      }
+    }
+
+    function resetEditor(course) {
+      const current = course || {
+        id: '', slug: '', title: '', shortDescription: '', description: '', status: 'draft', priceId: '', coverImage: '', modules: [],
+      };
+      document.getElementById('courseId').value = current.id || '';
+      document.getElementById('courseSlug').value = current.slug || '';
+      document.getElementById('courseTitle').value = current.title || '';
+      document.getElementById('courseShortDescription').value = current.shortDescription || '';
+      document.getElementById('courseDescription').value = current.description || '';
+      document.getElementById('courseStatus').value = current.status || 'draft';
+      document.getElementById('coursePriceId').value = current.priceId || '';
+      document.getElementById('courseCoverImage').value = current.coverImage || '';
+      document.getElementById('courseModules').value = JSON.stringify(current.modules || [], null, 2);
+      state.selectedCourseId = current.id || '';
+      renderCourseList();
+    }
+
+    function renderCourseList() {
+      const wrap = document.getElementById('courseList');
+      document.getElementById('grantCourse').innerHTML = state.courses.map((course) => `<option value="${esc(course.id)}">${esc(course.title)}</option>`).join('');
+      if (!state.courses.length) {
+        wrap.innerHTML = '<div class="muted">No courses found yet.</div>';
+        return;
+      }
+      wrap.innerHTML = state.courses.map((course) => `
+        <div class="course-pill ${course.id === state.selectedCourseId ? 'active' : ''}" data-course-id="${esc(course.id)}">
+          <strong>${esc(course.title)}</strong>
+          <div class="muted">${esc(course.status)} · ${esc(course.priceId || 'no priceId')}</div>
+          <div class="muted">${(course.modules || []).length} module(s)</div>
+        </div>
+      `).join('');
+      wrap.querySelectorAll('[data-course-id]').forEach((node) => {
+        node.addEventListener('click', () => {
+          const course = state.courses.find((entry) => entry.id === node.dataset.courseId);
+          if (course) resetEditor(course);
+        });
+      });
+      if (state.selectedCourseId) {
+        document.getElementById('grantCourse').value = state.selectedCourseId;
+      }
+    }
+
+    function renderTransfers() {
+      const wrap = document.getElementById('transferTableWrap');
+      const status = document.getElementById('transferStatus');
+      if (!state.transfers.length) {
+        wrap.innerHTML = '<div class="muted">No pending course receipts.</div>';
+        status.textContent = '';
+        return;
+      }
+      wrap.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Email</th><th>Course</th><th>Reference</th><th>Receipt</th><th>Created</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${state.transfers.map((item) => {
+              const receipt = item.receiptDataUrl && item.receiptDataUrl.startsWith('data:image/')
+                ? `<img class="preview" src="${item.receiptDataUrl}" alt="Receipt preview">`
+                : (item.receiptDataUrl ? `<a class="btn" target="_blank" href="${item.receiptDataUrl}">Open receipt</a>` : '<span class="muted">No file</span>');
+              return `
+                <tr>
+                  <td><code>${esc(item.id)}</code></td>
+                  <td>${esc(item.email)}</td>
+                  <td>${esc(item.pack || item.courseId || '')}</td>
+                  <td>${esc(item.reference || '')}</td>
+                  <td>${receipt}</td>
+                  <td>${esc(fmt(item.createdAt))}</td>
+                  <td>
+                    <div class="btn-row">
+                      <button class="success approve-transfer" data-btid="${esc(item.id)}" data-course-id="${esc(item.courseId || state.selectedCourseId || '')}">Approve</button>
+                      <button class="danger reject-transfer" data-btid="${esc(item.id)}">Reject</button>
+                    </div>
+                  </td>
+                </tr>`;
+            }).join('')}
+          </tbody>
+        </table>`;
+      wrap.querySelectorAll('.approve-transfer').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          try {
+            status.textContent = 'Approving transfer...';
+            status.className = 'status';
+            await api('/api/admin-courses', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'approveCourseTransfer', btId: btn.dataset.btid, courseId: btn.dataset.courseId || state.selectedCourseId, sendEmail: true }),
+            });
+            status.textContent = 'Transfer approved and portal email sent.';
+            status.className = 'status ok';
+            await loadAll();
+          } catch (error) {
+            status.textContent = error.message;
+            status.className = 'status error';
+          }
+        });
+      });
+      wrap.querySelectorAll('.reject-transfer').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('Reject this course transfer?')) return;
+          try {
+            status.textContent = 'Rejecting transfer...';
+            status.className = 'status';
+            await api('/api/admin-courses', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'rejectCourseTransfer', btId: btn.dataset.btid }),
+            });
+            status.textContent = 'Transfer rejected.';
+            status.className = 'status ok';
+            await loadAll();
+          } catch (error) {
+            status.textContent = error.message;
+            status.className = 'status error';
+          }
+        });
+      });
+    }
+
+    function renderEnrollments() {
+      const wrap = document.getElementById('enrollmentTableWrap');
+      const status = document.getElementById('enrollmentStatus');
+      if (!state.enrollments.length) {
+        wrap.innerHTML = '<div class="muted">No enrollments found yet.</div>';
+        status.textContent = '';
+        return;
+      }
+      wrap.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Email</th><th>Course</th><th>Source</th><th>Progress</th><th>Granted</th><th>Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${state.enrollments.map((item) => `
+              <tr>
+                <td><code>${esc(item.email)}</code></td>
+                <td>${esc(item.courseTitle || item.course?.title || item.courseId)}</td>
+                <td>${esc(item.source || 'admin')}</td>
+                <td>${esc(item.progress && typeof item.progress.percent === 'number' ? item.progress.percent + '%' : '0%')}</td>
+                <td>${esc(fmt(item.grantedAt))}</td>
+                <td><button class="warn resend-email" data-email="${esc(item.email)}" data-course-id="${esc(item.courseId)}" data-name="${esc(item.name || '')}">Resend</button></td>
+              </tr>`).join('')}
+          </tbody>
+        </table>`;
+      wrap.querySelectorAll('.resend-email').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          try {
+            status.textContent = 'Sending portal email...';
+            status.className = 'status';
+            await api('/api/admin-courses', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'sendAccessEmail', email: btn.dataset.email, name: btn.dataset.name, courseId: btn.dataset.courseId }),
+            });
+            status.textContent = 'Portal email resent.';
+            status.className = 'status ok';
+          } catch (error) {
+            status.textContent = error.message;
+            status.className = 'status error';
+          }
+        });
+      });
+    }
+
+    async function loadAll() {
+      const [overview, courses, transfers, enrollments] = await Promise.all([
+        api('/api/admin-courses?type=overview'),
+        api('/api/admin-courses?type=courses'),
+        api('/api/admin-courses?type=transfers&status=pending'),
+        api('/api/admin-courses?type=enrollments'),
+      ]);
+      state.courses = courses.items || [];
+      state.transfers = transfers.items || [];
+      state.enrollments = enrollments.items || [];
+      document.getElementById('statCourses').textContent = overview.stats.courses;
+      document.getElementById('statEnrollments').textContent = overview.stats.enrollments;
+      document.getElementById('statTransfers').textContent = overview.stats.pendingTransfers;
+      if (!state.selectedCourseId && state.courses[0]) state.selectedCourseId = state.courses[0].id;
+      const selected = state.courses.find((course) => course.id === state.selectedCourseId) || state.courses[0] || null;
+      renderCourseList();
+      renderTransfers();
+      renderEnrollments();
+      resetEditor(selected);
+    }
+
+    document.getElementById('loginBtn').addEventListener('click', authenticate);
+    document.getElementById('lockBtn').addEventListener('click', () => {
+      clearSession();
+      app.style.display = 'none';
+      loginOverlay.style.display = 'flex';
+    });
+    document.getElementById('reloadAllBtn').addEventListener('click', loadAll);
+    document.getElementById('reloadTransfersBtn').addEventListener('click', loadAll);
+    document.getElementById('reloadEnrollmentsBtn').addEventListener('click', loadAll);
+    document.getElementById('newCourseBtn').addEventListener('click', () => resetEditor());
+
+    document.getElementById('saveCourseBtn').addEventListener('click', async () => {
+      const status = document.getElementById('editorStatus');
+      try {
+        status.textContent = 'Saving course...';
+        status.className = 'status';
+        const modules = JSON.parse(document.getElementById('courseModules').value || '[]');
+        await api('/api/admin-courses', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'saveCourse',
+            course: {
+              id: document.getElementById('courseId').value.trim(),
+              slug: document.getElementById('courseSlug').value.trim(),
+              title: document.getElementById('courseTitle').value.trim(),
+              shortDescription: document.getElementById('courseShortDescription').value.trim(),
+              description: document.getElementById('courseDescription').value.trim(),
+              status: document.getElementById('courseStatus').value,
+              priceId: document.getElementById('coursePriceId').value.trim(),
+              coverImage: document.getElementById('courseCoverImage').value.trim(),
+              modules,
+            },
+          }),
+        });
+        status.textContent = 'Course saved.';
+        status.className = 'status ok';
+        await loadAll();
+      } catch (error) {
+        status.textContent = error.message;
+        status.className = 'status error';
+      }
+    });
+
+    document.getElementById('deleteCourseBtn').addEventListener('click', async () => {
+      const courseId = document.getElementById('courseId').value.trim();
+      const status = document.getElementById('editorStatus');
+      if (!courseId) return;
+      if (!confirm(`Delete course ${courseId}?`)) return;
+      try {
+        await api('/api/admin-courses', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'deleteCourse', courseId }),
+        });
+        status.textContent = 'Course deleted.';
+        status.className = 'status ok';
+        state.selectedCourseId = '';
+        await loadAll();
+      } catch (error) {
+        status.textContent = error.message;
+        status.className = 'status error';
+      }
+    });
+
+    document.getElementById('grantBtn').addEventListener('click', async () => {
+      const status = document.getElementById('grantStatus');
+      try {
+        await api('/api/admin-courses', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'grantAccess',
+            email: document.getElementById('grantEmail').value.trim(),
+            name: document.getElementById('grantName').value.trim(),
+            courseId: document.getElementById('grantCourse').value,
+            sendEmail: true,
+            forceEmail: true,
+          }),
+        });
+        status.textContent = 'Access granted and email sent.';
+        status.className = 'status ok';
+        await loadAll();
+      } catch (error) {
+        status.textContent = error.message;
+        status.className = 'status error';
+      }
+    });
+
+    document.getElementById('grantOnlyBtn').addEventListener('click', async () => {
+      const status = document.getElementById('grantStatus');
+      try {
+        await api('/api/admin-courses', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'grantAccess',
+            email: document.getElementById('grantEmail').value.trim(),
+            name: document.getElementById('grantName').value.trim(),
+            courseId: document.getElementById('grantCourse').value,
+            sendEmail: false,
+          }),
+        });
+        status.textContent = 'Access granted.';
+        status.className = 'status ok';
+        await loadAll();
+      } catch (error) {
+        status.textContent = error.message;
+        status.className = 'status error';
+      }
+    });
+
+    if (getSession()) {
+      enterApp();
+    }
+  </script>
+</body>
+</html>

@@ -234,11 +234,15 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
           <div class="li-name" id="liName">User</div>
           <div class="li-email" id="liEmail">user@example.com</div>
           <div class="li-actions">
+            <a href="../portal/" class="btn-main">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M7 12h10"/><path d="M12 7v10"/></svg>
+              Open Customer Portal
+            </a>
             <a href="../payment/" class="btn-main">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
               Buy Credits
             </a>
-            <a href="../index.html#pricing" class="btn-ghost">View Pricing Plans</a>
+            <a href="../course/" class="btn-ghost">Buy Course</a>
             <button class="btn-ghost btn-danger" id="logoutBtn">Log Out</button>
           </div>
         </div>
@@ -456,7 +460,7 @@ async function checkAuth() {
 function showLoggedIn(user) {
   const u = user || JSON.parse(localStorage.getItem(USER_KEY) || '{}');
   document.getElementById('pageTitle').innerHTML = 'Welcome back, <em>' + escapeHtml(u.name || 'User') + '.</em>';
-  document.getElementById('pageSub').textContent = 'You are signed in as ' + (u.email || '');
+  document.getElementById('pageSub').textContent = 'You are signed in as ' + (u.email || '') + '. Open your customer portal to access purchased courses.';
   document.getElementById('liAvatar').textContent = (u.name || '?')[0].toUpperCase();
   document.getElementById('liName').textContent = u.name || 'User';
   document.getElementById('liEmail').textContent = u.email || '';
