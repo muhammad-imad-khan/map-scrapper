@@ -1748,13 +1748,18 @@ document.getElementById('emailModal').addEventListener('click', e => {
   if (e.target === document.getElementById('emailModal')) proceedToInstall();
 });
 
+function bindClickIfPresent(id, handler) {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('click', handler);
+}
+
 document.querySelectorAll('#heroCta,#navCtaBtn,#installBtn,#ctaBtn').forEach(btn => {
   btn.addEventListener('click', handleInstallClick);
 });
-document.getElementById('navZipDownload').addEventListener('click', handleDirectDownloadClick);
-document.getElementById('heroZipDownload').addEventListener('click', handleDirectDownloadClick);
-document.getElementById('modalClose').addEventListener('click', closeInstallModal);
-document.getElementById('reDownload').addEventListener('click', () => {
+bindClickIfPresent('navZipDownload', handleDirectDownloadClick);
+bindClickIfPresent('heroZipDownload', handleDirectDownloadClick);
+bindClickIfPresent('modalClose', closeInstallModal);
+bindClickIfPresent('reDownload', () => {
   triggerDownload()
     .then(() => {
       document.getElementById('reDownload').textContent = '✓ Downloading…';
