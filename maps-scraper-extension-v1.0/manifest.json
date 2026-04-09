@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Maps Lead Scraper Pro",
+  "name": "Lead Gen X Map Scrapper Pro",
   "description": "Scrape Google Maps \u2192 CSV. Name, Email, Rating, Hours. Credit-based \u2014 buy only what you need.",
   "version": "2.1",
   "permissions": [
@@ -16,7 +16,7 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Maps Lead Scraper",
+    "default_title": "Lead Gen X Map Scrapper",
     "default_icon": {
       "16": "icon16.png",
       "32": "icon32.png",

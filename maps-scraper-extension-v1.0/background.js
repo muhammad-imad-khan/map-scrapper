@@ -1,5 +1,5 @@
 ﻿// ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-//  Maps Lead Scraper v2 ÔÇö Background Service Worker
+//  Lead Gen X Map Scrapper v2 ÔÇö Background Service Worker
 //  Monetization: SERVER-SIDE CREDIT SYSTEM (Paddle + Redis)
 //  ÔÇó New installs: 3 free starter credits (server-granted)
 //  ÔÇó Each scraped result costs 1 credit (server-deducted)

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Course — Lead Gen x AI Powered Web Design | Maps Lead Scraper</title>
+<title>Course — Lead Gen x AI Powered Web Design | Lead Gen X Map Scrapper</title>
 <meta name="description" content="Learn the complete 6-step system to scrape, qualify, build, deploy, pitch and close high-value leads using AI-powered web design.">
 <meta name="theme-color" content="#06060c">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -100,7 +100,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--nav-scroll)
 .price-display strong{font-family:var(--display);font-size:52px;line-height:.85;color:var(--heading)}
 .price-display span{font-size:14px;color:var(--t2);padding-bottom:8px}
 .price-note{font-size:13px;color:var(--t3)}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.field{display:grid;gap:8px}
+.field label{font-size:11px;color:var(--t3);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase}
+.select{width:100%;padding:13px 14px;border-radius:10px;border:1px solid var(--b);background:var(--s2);color:var(--t);font:500 14px var(--body);outline:none;transition:border-color .15s,box-shadow .15s}
+.select:focus{border-color:rgba(168,85,247,.4);box-shadow:0 0 0 3px rgba(168,85,247,.08)}
 [data-theme="light"] .price-card{background:rgba(168,85,247,.05);border-color:rgba(168,85,247,.18)}
+[data-theme="light"] .select{background:#fff;border-color:rgba(0,0,0,.12)}
 
 /* DETAILS */
 .detail-list{display:grid;gap:10px;margin:16px 0}
@@ -118,6 +124,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--nav-scroll)
 .checkout-status.error{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);color:var(--red)}
 .checkout-status.ready{background:var(--gd);border:1px solid var(--gb);color:var(--g)}
 .checkout-status.success{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);color:var(--g)}
+.checkout-status.warn{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.24);color:var(--amber)}
 .auth-prompt{font-size:13px;color:var(--t3);text-align:center;margin-top:10px}
 .auth-prompt a{color:var(--purple);text-decoration:none;font-weight:600}.auth-prompt a:hover{text-decoration:underline}
 
@@ -143,7 +150,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
   <div class="nav-inner">
     <a href="../index.html" class="nav-logo">
       <div class="nav-logo-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
-      <span class="nav-logo-txt">Maps Lead <em>Scraper</em></span>
+      <span class="nav-logo-txt">Lead Gen X Map <em>Scrapper</em></span>
     </a>
     <div class="nav-links-wrap" id="navLinks">
       <a href="../index.html#how">How it works</a>
@@ -194,7 +201,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
         <div class="workflow">
           <div class="wf-step">
             <div class="wf-num">1</div>
-            <div><h4>SCRAPE</h4><p>Extract leads from Google Maps with the Maps Lead Scraper extension</p></div>
+            <div><h4>SCRAPE</h4><p>Extract leads from Google Maps with the Lead Gen X Map Scrapper extension</p></div>
           </div>
           <div class="wf-step">
             <div class="wf-num">2</div>
@@ -222,7 +229,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
         <div class="features">
           <div class="feat">Step-by-step video tutorials</div>
           <div class="feat">AI Prompts &amp; Pitch Templates</div>
-          <div class="feat">Maps Lead Scraper Extension</div>
+          <div class="feat">Lead Gen X Map Scrapper Extension</div>
           <div class="feat">Email Automation Setup</div>
           <div class="feat">Live Case Studies &amp; Results</div>
           <div class="feat">Lifetime Access &amp; Updates</div>
@@ -245,6 +252,12 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
             <span id="coursePriceMeta">USD · One-time</span>
           </div>
           <p class="price-note" id="coursePriceNote">One-time payment · Lifetime access · Delivered in your customer portal</p>
+          <div class="detail-list" style="margin-top:16px">
+            <div class="detail-row"><span>Country</span><strong id="courseSummaryCountry">Pakistan</strong></div>
+            <div class="detail-row"><span>Currency</span><strong id="courseSummaryCurrency">PKR</strong></div>
+            <div class="detail-row"><span>USD Base</span><strong id="courseBaseUsd">$10</strong></div>
+            <div class="detail-row"><span>FX Rate</span><strong id="courseFxRate">1 USD ≈ Rs 278</strong></div>
+          </div>
         </div>
 
         <div id="checkoutStatus" class="checkout-status" style="display:none"></div>
@@ -252,8 +265,12 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
         <div style="display:grid;gap:10px;margin-bottom:14px">
           <input id="courseEmail" type="email" placeholder="Your email (required)" autocomplete="email" style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid var(--b);background:var(--s2);color:var(--t);font:500 14px var(--body)">
           <input id="courseName" type="text" placeholder="Your name (optional)" autocomplete="name" style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid var(--b);background:var(--s2);color:var(--t);font:500 14px var(--body)">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-            <select id="courseCountry" style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid var(--b);background:var(--s2);color:var(--t);font:500 14px var(--body)">
+        </div>
+
+        <div class="field-grid">
+          <div class="field">
+            <label for="courseCountry">Country</label>
+            <select id="courseCountry" class="select">
               <option value="Pakistan">Pakistan</option>
               <option value="United Arab Emirates">United Arab Emirates</option>
               <option value="Saudi Arabia">Saudi Arabia</option>
@@ -264,7 +281,10 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
               <option value="Germany">Germany</option>
               <option value="India">India</option>
             </select>
-            <select id="courseCurrency" style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid var(--b);background:var(--s2);color:var(--t);font:500 14px var(--body)">
+          </div>
+          <div class="field">
+            <label for="courseCurrency">Currency</label>
+            <select id="courseCurrency" class="select">
               <option value="PKR">PKR</option>
               <option value="USD">USD</option>
               <option value="AED">AED</option>
@@ -276,8 +296,9 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
               <option value="INR">INR</option>
             </select>
           </div>
-          <input id="courseReceipt" type="file" accept="image/*,.pdf" style="width:100%;padding:12px 14px;border-radius:10px;border:1px dashed var(--b);background:var(--s2);color:var(--t);font:500 13px var(--body)">
         </div>
+
+        <div id="courseMarketNotice" class="checkout-status warn" style="display:none"></div>
 
         <!-- Payment method selector -->
         <div id="payMethodPicker" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
@@ -292,7 +313,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
         <!-- Bank transfer details (hidden by default) -->
         <div id="bankPanel" style="display:none">
           <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.22);border-radius:14px;padding:18px;margin-bottom:14px">
-            <p style="font-size:13px;color:var(--t2);margin-bottom:12px">Transfer <strong style="color:var(--heading)" id="courseBankAmount">$10 USD</strong> to the account below, then confirm.</p>
+            <p id="bankAmountCopy" style="font-size:13px;color:var(--t2);margin-bottom:12px">Transfer <strong style="color:var(--heading)" id="courseBankAmount">$10 USD</strong> to the account below, then confirm.</p>
             <div class="detail-list" style="margin:0">
               <div class="detail-row"><span>Account Title</span><strong>MUHAMMAD IMADUDDIN KHAN</strong></div>
               <div class="detail-row"><span>Bank</span><strong>Meezan Bank</strong></div>
@@ -303,6 +324,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
             </div>
             <p style="font-size:12px;color:var(--t3);margin-top:10px">After transfer, share your payment proof with <a href="mailto:elysiansoft.systems@gmail.com" style="color:var(--amber);text-decoration:none">elysiansoft.systems@gmail.com</a></p>
           </div>
+          <input id="courseReceipt" type="file" accept="image/*,.pdf" style="width:100%;padding:12px 14px;border-radius:10px;border:1px dashed var(--b);background:var(--s2);color:var(--t);font:500 13px var(--body);margin-bottom:14px">
           <button id="bankDoneBtn" class="btn-main" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
             ✓ I've Made the Transfer
           </button>
@@ -324,7 +346,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
 <footer>
   <div class="container">
     <div class="f-bottom">
-      <span>© <span id="yr">2026</span> Maps Lead Scraper. All rights reserved.</span>
+      <span>© <span id="yr">2026</span> Lead Gen X Map Scrapper. All rights reserved.</span>
       <span><a href="../terms-and-conditions.html">Terms</a> · <a href="../about.html">About</a> · <a href="mailto:courses@imadkhan.dev">Support</a></span>
     </div>
   </div>
@@ -361,6 +383,8 @@ const BACKEND_BASE = window.location.hostname === 'localhost'
 const AUTH_API = `${BACKEND_BASE}/api/auth`;
 const TOKEN_KEY = 'mls_auth_token';
 const CLIENT_KEY = 'mls_client_id';
+const PAKISTAN_COUNTRY = 'Pakistan';
+let courseCurrencyExplicitlySelected = false;
 
 function getClientId() {
   let id = localStorage.getItem(CLIENT_KEY) || '';
@@ -446,10 +470,40 @@ const bankPanel = document.getElementById('bankPanel');
 const bankDoneBtn = document.getElementById('bankDoneBtn');
 const bankBackBtn = document.getElementById('bankBackBtn');
 const authPrompt = document.getElementById('authPrompt');
+const courseSummaryCountry = document.getElementById('courseSummaryCountry');
+const courseSummaryCurrency = document.getElementById('courseSummaryCurrency');
+const courseBaseUsd = document.getElementById('courseBaseUsd');
+const courseFxRate = document.getElementById('courseFxRate');
+const courseMarketNotice = document.getElementById('courseMarketNotice');
+const bankAmountCopy = document.getElementById('bankAmountCopy');
 
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
+
+function detectCourseCountry() {
+  const TZ_COUNTRY = {
+    'Asia/Karachi': 'Pakistan',
+    'Asia/Dubai': 'United Arab Emirates',
+    'Asia/Riyadh': 'Saudi Arabia',
+    'Europe/London': 'United Kingdom',
+    'America/New_York': 'United States', 'America/Chicago': 'United States', 'America/Denver': 'United States', 'America/Los_Angeles': 'United States',
+    'America/Toronto': 'Canada', 'America/Vancouver': 'Canada',
+    'Australia/Sydney': 'Australia', 'Australia/Melbourne': 'Australia',
+    'Europe/Berlin': 'Germany',
+    'Asia/Kolkata': 'India', 'Asia/Calcutta': 'India',
+  };
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const detected = TZ_COUNTRY[tz];
+    if (detected && COUNTRY_DEFAULTS[detected]) {
+      coursePricing.country = detected;
+      coursePricing.currency = COUNTRY_DEFAULTS[detected];
+    }
+  } catch (_) {}
+}
+
+detectCourseCountry();
 
 function showStatus(msg, type) {
   statusEl.style.display = 'block';
@@ -495,12 +549,36 @@ function getLocalizedCourseAmount() {
   return usdAmount * rate;
 }
 
+function getFxRateLabel(currency) {
+  if (currency === 'USD') return '1 USD = 1 USD';
+  return `1 USD ≈ ${formatLocalized(currency, USD_EXCHANGE_RATES[currency] || 1)}`;
+}
+
 function updateCoursePricingUI() {
   const localizedAmount = getLocalizedCourseAmount();
+  const usdBaseText = getSelectedCourseUsdPriceText();
+  const isPakistan = coursePricing.country === PAKISTAN_COUNTRY;
+
   coursePriceValueEl.textContent = formatLocalized(coursePricing.currency, localizedAmount);
-  coursePriceMetaEl.textContent = `${coursePricing.currency} · One-time`;
-  coursePriceNoteEl.textContent = 'One-time payment · Lifetime access · Delivered in your customer portal';
-  courseBankAmountEl.textContent = formatLocalized(coursePricing.currency, localizedAmount);
+  coursePriceMetaEl.textContent = `${coursePricing.currency} estimate · One-time`;
+  coursePriceNoteEl.textContent = coursePricing.currency === 'USD'
+    ? 'One-time payment · Lifetime access · Delivered in your customer portal'
+    : isPakistan
+      ? 'Approx. PKR shown · Pakistan card payments can include extra tax and bank charges'
+      : `Approx. ${coursePricing.currency} shown · One-time payment · Delivered in your customer portal`;
+  courseSummaryCountry.textContent = coursePricing.country;
+  courseSummaryCurrency.textContent = coursePricing.currency;
+  courseBaseUsd.textContent = usdBaseText;
+  courseFxRate.textContent = getFxRateLabel(coursePricing.currency);
+  courseMarketNotice.style.display = 'block';
+  courseMarketNotice.className = `checkout-status ${isPakistan ? 'warn' : 'pending'}`;
+  courseMarketNotice.textContent = isPakistan
+    ? 'If you choose Credit / Debit from Pakistan, your bank can apply additional tax and international transaction charges. We recommend Bank Transfer to avoid those extra deductions.'
+    : `Local ${coursePricing.currency} pricing is shown as an estimate. Paddle settles in USD and your bank applies the final exchange rate.`;
+  bankAmountCopy.innerHTML = isPakistan
+    ? `Transfer approximately <strong style="color:var(--heading)" id="courseBankAmount">${formatLocalized(coursePricing.currency, localizedAmount)}</strong> (${usdBaseText} base) to the account below, then confirm.`
+    : `Bank transfer is mainly recommended for Pakistan buyers. International buyers should usually prefer card checkout unless support has given you manual transfer instructions.`;
+  btnBank.textContent = isPakistan ? '🏦 Bank Transfer (Recommended)' : '🏦 Bank Transfer';
 }
 
 async function loadCoursePricingConfig() {
@@ -522,6 +600,8 @@ async function loadCoursePricingConfig() {
   } catch (err) {
     console.warn('Course pricing config fallback:', err?.message || err);
   }
+  courseCountryInput.value = coursePricing.country;
+  courseCurrencyInput.value = coursePricing.currency;
   updateCoursePricingUI();
 }
 
@@ -529,7 +609,7 @@ courseCountryInput.value = coursePricing.country;
 courseCurrencyInput.value = coursePricing.currency;
 courseCountryInput.addEventListener('change', () => {
   coursePricing.country = courseCountryInput.value;
-  if (!window.location.search.includes('currency=')) {
+  if (!courseCurrencyExplicitlySelected) {
     coursePricing.currency = COUNTRY_DEFAULTS[coursePricing.country] || coursePricing.currency;
     courseCurrencyInput.value = coursePricing.currency;
   }
@@ -537,8 +617,11 @@ courseCountryInput.addEventListener('change', () => {
 });
 courseCurrencyInput.addEventListener('change', () => {
   coursePricing.currency = courseCurrencyInput.value;
+  courseCurrencyExplicitlySelected = true;
   updateCoursePricingUI();
 });
+
+updateCoursePricingUI();
 
 function getInputs() {
   if (!localStorage.getItem(TOKEN_KEY)) {

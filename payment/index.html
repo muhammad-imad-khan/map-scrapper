@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Payment — Maps Lead Scraper</title>
-<meta name="description" content="Review your selected credit pack, choose your country and currency, and complete payment for Maps Lead Scraper credits.">
+<title>Payment — Lead Gen X Map Scrapper</title>
+<meta name="description" content="Review your selected credit pack, choose your country and currency, and complete payment for Lead Gen X Map Scrapper credits.">
 <meta name="theme-color" content="#06060c">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -123,6 +123,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--nav-scroll)
 .actions{display:flex;gap:12px;flex-wrap:wrap}
 .hidden{display:none!important}
 .note{margin-top:14px;padding:14px 16px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:14px;font-size:13px;color:var(--t2);line-height:1.7}
+.warning-banner{padding:14px 16px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.24);border-radius:14px;font-size:13px;line-height:1.7;color:var(--amber)}
+.warning-banner strong{color:var(--heading)}
 footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-index:1;margin-top:40px}
 .footer-inner{max-width:1100px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--t3)}
 .footer-links{display:flex;gap:20px;flex-wrap:wrap}
@@ -153,6 +155,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
 [data-theme="light"] .pack-option.active{background:rgba(22,163,74,.06);border-color:var(--g)}
 [data-theme="light"] .select{background:#fff;border-color:rgba(0,0,0,.12)}
 [data-theme="light"] .plan-hero{background:rgba(22,163,74,.05);border-color:rgba(22,163,74,.18)}
+[data-theme="light"] .warning-banner{background:rgba(217,119,6,.08);border-color:rgba(217,119,6,.22)}
 [data-theme="light"] .btn-main[disabled]{background:rgba(0,0,0,.06);color:rgba(0,0,0,.35)}
 [data-theme="light"] .checkout-status.pending{background:rgba(37,99,235,.08);border-color:rgba(37,99,235,.2)}
 [data-theme="light"] .checkout-status.error{background:rgba(225,29,72,.08);border-color:rgba(225,29,72,.2)}
@@ -181,7 +184,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
   <div class="nav-inner">
     <a href="../index.html" class="nav-logo">
       <div class="nav-logo-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
-      <span class="nav-logo-txt">Maps Lead <em>Scraper</em></span>
+      <span class="nav-logo-txt">Lead Gen X Map <em>Scrapper</em></span>
     </a>
     <div class="nav-links-wrap" id="navLinks">
       <a href="../index.html#how">How it works</a>
@@ -297,6 +300,17 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
             </div>
           </div>
 
+          <div class="info-card">
+            <h3>Price conversion</h3>
+            <p class="muted">Indicative conversion based on your selected country and currency.</p>
+            <div class="detail-list">
+              <div class="detail-row"><span>Local estimate</span><strong id="summaryLocalPrice">Rs 1390</strong></div>
+              <div class="detail-row"><span>USD base</span><strong id="summaryUsdBase">$5</strong></div>
+              <div class="detail-row"><span>FX rate</span><strong id="summaryFxRate">1 USD ≈ Rs 278</strong></div>
+              <div class="detail-row"><span>Settlement</span><strong id="summarySettlement">Pakistan bank transfer recommended</strong></div>
+            </div>
+          </div>
+
           <div class="method-tabs">
             <button class="method-tab active" id="tabBank" data-method="bank">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v4"/><path d="M12 14v4"/><path d="M16 14v4"/></svg>
@@ -349,6 +363,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
                 <span class="tag global">Powered by Paddle</span>
               </div>
               <p>Pay securely with your credit or debit card via Paddle's hosted checkout. All major cards accepted.</p>
+              <div id="cardTaxWarning" class="warning-banner hidden"></div>
               <div id="checkoutStatus" class="checkout-status" style="display:none"></div>
               <div class="actions" style="margin-top:14px">
                 <button id="checkoutBtn" class="btn-main">
@@ -385,7 +400,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
   <div class="footer-inner">
     <a href="../index.html" class="f-logo-sm">
       <div class="f-logo-ic"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
-      <span class="f-logo-txt">Maps Lead <em>Scraper</em></span>
+      <span class="f-logo-txt">Lead Gen X Map <em>Scrapper</em></span>
     </a>
     <div class="footer-links">
       <a href="../index.html">Home</a>
@@ -395,7 +410,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
       <a href="../terms-and-conditions.html">Terms</a>
       <a href="mailto:elysiansoft.systems@gmail.com">Contact</a>
     </div>
-    <span>&copy; <span id="year"></span> Maps Lead Scraper</span>
+    <span>&copy; <span id="year"></span> Lead Gen X Map Scrapper</span>
   </div>
 </footer>
 
@@ -499,6 +514,11 @@ const checkoutBtn = document.getElementById('checkoutBtn');
 const checkoutStatus = document.getElementById('checkoutStatus');
 const tabBank = document.getElementById('tabBank');
 const tabCard = document.getElementById('tabCard');
+const summaryLocalPrice = document.getElementById('summaryLocalPrice');
+const summaryUsdBase = document.getElementById('summaryUsdBase');
+const summaryFxRate = document.getElementById('summaryFxRate');
+const summarySettlement = document.getElementById('summarySettlement');
+const cardTaxWarning = document.getElementById('cardTaxWarning');
 
 const state = {
   pack: 'pro',
@@ -509,6 +529,8 @@ const state = {
 };
 let pendingCheckout = null;
 let paddleFallbackTried = false;
+let currencyExplicitlySelected = false;
+let countryExplicitlySelected = false;
 
 function getParams() {
   const params = new URLSearchParams(window.location.search);
@@ -522,8 +544,14 @@ function getParams() {
     const found = Object.values(PACKS).find(p => p.priceId === pack);
     if (found) state.pack = found.key;
   }
-  if (country && COUNTRY_DEFAULTS[country]) state.country = country;
-  if (currency) state.currency = currency.toUpperCase();
+  if (country && COUNTRY_DEFAULTS[country]) {
+    state.country = country;
+    countryExplicitlySelected = true;
+  }
+  if (currency) {
+    state.currency = currency.toUpperCase();
+    currencyExplicitlySelected = true;
+  }
   if (installId && /^[a-zA-Z0-9_-]{8,64}$/.test(installId)) state.installId = installId;
   if (!state.currency) state.currency = COUNTRY_DEFAULTS[state.country] || 'USD';
 }
@@ -547,6 +575,24 @@ function formatCurrencyAmount(currency, amount) {
   const symbol = CURRENCY_SYMBOLS[currency] || `${currency} `;
   const rounded = amount >= 100 ? Math.round(amount) : amount.toFixed(2);
   return `${symbol}${rounded}`;
+}
+
+function formatUsdAmount(amount) {
+  return `$${Number(amount || 0).toFixed(2).replace(/\.00$/, '')}`;
+}
+
+function getFxRateLabel(currency) {
+  if (currency === 'USD') return '1 USD = 1 USD';
+  const rate = USD_EXCHANGE_RATES[currency] || 1;
+  return `1 USD ≈ ${formatCurrencyAmount(currency, rate)}`;
+}
+
+function getSettlementLabel(country, currency) {
+  if (country === PAKISTAN_COUNTRY) {
+    return 'Card may include extra tax · bank transfer recommended';
+  }
+  if (currency === 'USD') return 'Checkout settles directly in USD';
+  return `Indicative ${currency} only · Paddle settles in USD`;
 }
 
 function getDisplayPrice(priceText, currency) {
@@ -625,6 +671,7 @@ function getActivePack() {
 
 function renderSummary() {
   const pack = getActivePack();
+  const usdAmount = getNumericUsdPrice(pack.usdPrice);
   document.getElementById('planName').textContent = pack.name;
   const creditsText = pack.credits ? `${pack.credits} credits` : 'Lifetime access';
   const localizedPrice = getDisplayPrice(pack.usdPrice, state.currency);
@@ -634,10 +681,16 @@ function renderSummary() {
   document.getElementById('planPrice').textContent = localizedPrice;
   document.getElementById('planPriceNote').textContent = state.currency === 'USD'
     ? (pricingMode === 'one_time' ? 'One-time payment' : 'Charged once per pack')
-    : `Approx. ${state.currency} shown${state.country === PAKISTAN_COUNTRY ? '' : ' · checkout settles in USD'}`;
+    : state.country === PAKISTAN_COUNTRY
+      ? `Approx. ${state.currency} shown · Pakistan card payments can add tax and bank charges`
+      : `Approx. ${state.currency} shown · checkout settles in USD`;
   document.getElementById('summaryPlan').textContent = `${pack.name} · ${creditsText}`;
   document.getElementById('summaryCountry').textContent = state.country;
   document.getElementById('summaryCurrency').textContent = state.currency;
+  summaryLocalPrice.textContent = localizedPrice;
+  summaryUsdBase.textContent = formatUsdAmount(usdAmount);
+  summaryFxRate.textContent = getFxRateLabel(state.currency);
+  summarySettlement.textContent = getSettlementLabel(state.country, state.currency);
 }
 
 function renderMethods() {
@@ -655,6 +708,14 @@ function switchMethod(method) {
 function updateCardState() {
   const pack = getActivePack();
   const hasRealPrice = pack && pack.priceId && !pack.priceId.includes('placeholder');
+  if (state.country === PAKISTAN_COUNTRY && pack) {
+    const localDisplay = getDisplayPrice(pack.usdPrice, state.currency);
+    cardTaxWarning.classList.remove('hidden');
+    cardTaxWarning.innerHTML = `<strong>Pakistan card notice:</strong> Credit and debit card transactions can include extra tax and issuer charges on top of the displayed ${localDisplay}. We recommend Bank Transfer if you want to avoid those extra deductions.`;
+  } else {
+    cardTaxWarning.classList.add('hidden');
+    cardTaxWarning.textContent = '';
+  }
   checkoutBtn.disabled = !hasRealPrice;
   if (!hasRealPrice) {
     checkoutStatus.style.display = 'block';
@@ -768,7 +829,8 @@ function render() {
 
 countrySelect.addEventListener('change', () => {
   state.country = countrySelect.value;
-  if (!window.location.search.includes('currency=')) {
+  countryExplicitlySelected = true;
+  if (!currencyExplicitlySelected) {
     state.currency = COUNTRY_DEFAULTS[state.country] || state.currency;
   }
   render();
@@ -776,6 +838,7 @@ countrySelect.addEventListener('change', () => {
 
 currencySelect.addEventListener('change', () => {
   state.currency = currencySelect.value;
+  currencyExplicitlySelected = true;
   render();
 });
 
@@ -993,7 +1056,7 @@ loadPricingMode().then(() => {
 // ── Auto-detect country via timezone / geo ──
 (function detectCountry() {
   // Only auto-detect if user hasn't explicitly set country in URL
-  if (new URLSearchParams(window.location.search).has('country')) return;
+  if (countryExplicitlySelected) return;
   var TZ_COUNTRY = {
     'Asia/Karachi': 'Pakistan',
     'Asia/Dubai': 'United Arab Emirates',
@@ -1010,7 +1073,7 @@ loadPricingMode().then(() => {
     var detected = TZ_COUNTRY[tz];
     if (detected && COUNTRY_DEFAULTS[detected]) {
       state.country = detected;
-      state.currency = COUNTRY_DEFAULTS[detected];
+      if (!currencyExplicitlySelected) state.currency = COUNTRY_DEFAULTS[detected];
       render();
     }
   } catch(e) {}
