@@ -777,7 +777,7 @@ async function handlePaymentSuccess() {
 
     if (res.ok && data.ok) {
       const emailNotice = data.portalEmailSent === false
-        ? ' Portal access is active, but email delivery is unavailable in sandbox right now. You can continue from the customer portal.'
+        ? ' Portal access is active, but the access email could not be sent right now. You can continue from the customer portal.'
         : '';
       if (data.alreadySent) {
         showStatus(`Course access was already activated for ${buyerEmail}. Open your customer portal or check your inbox for the access email.${emailNotice}`, 'success');
