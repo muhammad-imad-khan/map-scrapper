@@ -387,12 +387,12 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
     </div>
     <h2 style="font-size:22px;font-weight:700;margin:0 0 8px">Payment Confirmed!</h2>
-    <p id="paySuccessMsg" style="font-size:14px;color:var(--t2);margin:0 0 24px;line-height:1.6">Verifying your purchase&hellip;</p>
-    <a id="payDownloadBtn" href="#" style="display:none;align-items:center;justify-content:center;gap:8px;padding:13px 28px;background:#22c55e;color:#000;font-weight:700;font-size:14px;border-radius:10px;text-decoration:none;margin-bottom:16px" onclick="handleDownloadClick(event)">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Download Extension ZIP
-    </a>
-    <p style="font-size:12px;color:var(--t3);margin:4px 0 0">You can also download anytime from <a href="../index.html#install" style="color:#22c55e;text-decoration:none">the homepage</a> after signing in.</p>
+    <p id="paySuccessMsg" style="font-size:14px;color:var(--t2);margin:0 0 24px;line-height:1.6">Verifying your purchase and preparing your access email&hellip;</p>
+    <button id="payEmailBtn" type="button" style="display:none;align-items:center;justify-content:center;gap:8px;padding:13px 28px;background:#22c55e;color:#000;font-weight:700;font-size:14px;border:none;border-radius:10px;text-decoration:none;margin-bottom:16px;cursor:pointer" onclick="handleAccessEmailClick(event)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m22 6-10 7L2 6"/></svg>
+      Resend Access Email
+    </button>
+    <p style="font-size:12px;color:var(--t3);margin:4px 0 0">We will email your Google Drive tool link and the setup steps to this account.</p>
   </div>
 </div>
 
@@ -528,6 +528,13 @@ const state = {
   installId: '',
   txnId: '',
 };
+const authState = {
+  loaded: false,
+  user: null,
+  purchases: [],
+  entitlements: { lifetimeAccess: false, zipDownload: false },
+  latestToolPurchase: null,
+};
 let pendingCheckout = null;
 let paddleFallbackTried = false;
 let currencyExplicitlySelected = false;
@@ -579,10 +586,77 @@ function getPendingToolTxnId() {
 }
 
 function clearPendingToolPurchase() {
-  localStorage.removeItem('mls_pending_zip_download');
   localStorage.removeItem(PENDING_TOOL_TXN_KEY);
   state.txnId = '';
   syncUrl();
+}
+
+function getPurchaseTimestamp(purchase) {
+  const rawValue = purchase && (purchase.completedAt || purchase.createdAt || purchase.updatedAt || 0);
+  const numericValue = new Date(rawValue).getTime();
+  return Number.isFinite(numericValue) ? numericValue : 0;
+}
+
+function isCompletedLifetimeToolPurchase(purchase) {
+  if (!purchase || typeof purchase !== 'object') return false;
+  if (String(purchase.status || '').toLowerCase() !== 'completed') return false;
+  if (purchase.course === true) return false;
+
+  const label = String(purchase.label || '').toLowerCase();
+  return purchase.unlimited === true || label.includes('lifetime');
+}
+
+function getLatestLifetimeToolPurchase(purchases) {
+  const allPurchases = Array.isArray(purchases) ? purchases : [];
+  const normalizedInstallId = String(state.installId || '').trim();
+  const matching = allPurchases.filter(isCompletedLifetimeToolPurchase);
+  const preferred = normalizedInstallId
+    ? matching.filter((purchase) => String(purchase.installId || '').trim() === normalizedInstallId)
+    : [];
+  const pool = preferred.length ? preferred : matching;
+  return pool.slice().sort((left, right) => getPurchaseTimestamp(right) - getPurchaseTimestamp(left))[0] || null;
+}
+
+function syncKnownToolPurchase() {
+  const purchase = getLatestLifetimeToolPurchase(authState.purchases);
+  authState.latestToolPurchase = purchase;
+  if (purchase && purchase.txnId && !state.txnId && !localStorage.getItem(PENDING_TOOL_TXN_KEY)) {
+    localStorage.setItem(PENDING_TOOL_TXN_KEY, purchase.txnId);
+  }
+  return purchase;
+}
+
+function hasActiveLifetimeToolAccess() {
+  return pricingMode === 'one_time' && !!(authState.entitlements && authState.entitlements.lifetimeAccess);
+}
+
+function setCheckoutButtonMode(mode) {
+  if (!checkoutBtn) return;
+  if (mode === 'resend') {
+    checkoutBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m22 6-10 7L2 6"/></svg>Resend Access Email';
+    return;
+  }
+
+  checkoutBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Pay with Card';
+}
+
+function applyLifetimeAccessStateToCheckout() {
+  if (!hasActiveLifetimeToolAccess()) {
+    setCheckoutButtonMode('pay');
+    return false;
+  }
+
+  const purchase = syncKnownToolPurchase();
+  setCheckoutButtonMode('resend');
+  checkoutBtn.disabled = !(purchase && purchase.txnId) && !getPendingToolTxnId();
+  checkoutStatus.style.display = 'block';
+  checkoutStatus.className = 'checkout-status ready';
+  checkoutStatus.textContent = checkoutBtn.disabled
+    ? 'Lifetime access is already active for this account. Your Google Drive tool link was emailed after purchase.'
+    : 'Lifetime access is already active for this account. Use the button below to resend your Google Drive tool email.';
+  cardTaxWarning.classList.add('hidden');
+  cardTaxWarning.textContent = '';
+  return true;
 }
 
 function getNumericUsdPrice(priceText) {
@@ -726,6 +800,7 @@ function switchMethod(method) {
 
 function updateCardState() {
   const pack = getActivePack();
+  if (applyLifetimeAccessStateToCheckout()) return;
   const hasRealPrice = pack && pack.priceId && !pack.priceId.includes('placeholder');
   if (state.country === PAKISTAN_COUNTRY && pack) {
     const localDisplay = getDisplayPrice(pack.usdPrice, state.currency);
@@ -882,10 +957,30 @@ checkoutBtn.addEventListener('click', () => {
     }
     state.installId = webId;
   }
-  // Open Paddle inline overlay directly (client-side) — webhook receives customData
-  if (pricingMode === 'one_time' && pack.key === 'lifetime') {
-    localStorage.setItem('mls_pending_zip_download', '1');
+  if (pricingMode === 'one_time' && authState.entitlements && authState.entitlements.lifetimeAccess) {
+    checkoutStatus.style.display = 'block';
+    checkoutStatus.className = 'checkout-status pending';
+    checkoutStatus.textContent = 'Resending your Google Drive tool email…';
+    checkoutBtn.disabled = true;
+    finalizeToolPurchase({ forceResend: true })
+      .then((data) => {
+        checkoutStatus.className = data && data.zipEmailSent === false ? 'checkout-status error' : 'checkout-status ready';
+        checkoutStatus.textContent = data && data.zipEmailSent === false
+          ? 'Payment is already active, but the access email could not be resent right now. Please try again in a moment.'
+          : 'Access email sent. Check your inbox for the Google Drive tool link and setup steps.';
+      })
+      .catch((err) => {
+        checkoutStatus.className = 'checkout-status error';
+        checkoutStatus.textContent = err.message || 'Could not resend the access email right now.';
+      })
+      .finally(() => {
+        checkoutBtn.disabled = false;
+        updateCardState();
+      });
+    return;
   }
+
+  // Open Paddle inline overlay directly (client-side) — webhook receives customData
   const authToken = localStorage.getItem('mls_auth_token') || '';
   pendingCheckout = { priceId: pack.priceId, installId: state.installId, token: authToken, clientId: getClientId() };
   pendingCheckout.pack = pack.key;
@@ -958,32 +1053,64 @@ async function handlePaddleCheckoutError() {
   }
 }
 
-// ══════════════════════════════════════════════════════
-//  POST-PAYMENT DOWNLOAD
-// ══════════════════════════════════════════════════════
-async function triggerZipDownload() {
-  const token = localStorage.getItem('mls_auth_token') || '';
-  const clientId = getClientId();
-  const res = await fetch('/api/download-extension', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Client-Id': clientId },
-    body: JSON.stringify({ token, clientId }),
-  });
-  if (!res.ok) throw new Error('not_entitled');
-  const blob = await res.blob();
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'maps-scraper-extension-v1.0.zip';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
+function setToolCheckoutStatus(kind, message) {
+  checkoutStatus.style.display = 'block';
+  checkoutStatus.className = `checkout-status ${kind}`;
+  checkoutStatus.textContent = message;
 }
+
+function rememberLatestToolTxn(txnId) {
+  const resolvedTxnId = String(txnId || getPendingToolTxnId() || authState.latestToolPurchase?.txnId || '').trim();
+  if (!resolvedTxnId) return;
+  authState.latestToolPurchase = Object.assign({}, authState.latestToolPurchase || {}, { txnId: resolvedTxnId });
+}
+
+async function refreshPaymentAuthState() {
+  const token = localStorage.getItem('mls_auth_token') || '';
+  if (!token) return null;
+
+  const response = await fetch(`${BACKEND_BASE}/api/auth`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'me', token, clientId: getClientId() }),
+  });
+  const data = await response.json().catch(() => ({}));
+
+  if (data.ok && data.user) {
+    authState.loaded = true;
+    authState.user = data.user;
+    authState.purchases = Array.isArray(data.purchases) ? data.purchases : [];
+    authState.entitlements = data.entitlements || authState.entitlements;
+    syncKnownToolPurchase();
+    localStorage.setItem('mls_auth_user', JSON.stringify(data.user));
+    return data;
+  }
+
+  return data;
+}
+
+function closePaymentSuccessOverlay() {
+  const overlay = document.getElementById('paySuccess');
+  if (!overlay) return;
+  overlay.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+document.getElementById('paySuccess').addEventListener('click', (event) => {
+  if (event.target === event.currentTarget) {
+    closePaymentSuccessOverlay();
+  }
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    closePaymentSuccessOverlay();
+  }
+});
 
 async function finalizeToolPurchase(options = {}) {
   const token = localStorage.getItem('mls_auth_token') || '';
-  const txnId = getPendingToolTxnId();
+  const txnId = getPendingToolTxnId() || authState.latestToolPurchase?.txnId || '';
   if (!token || !txnId) return null;
 
   const clientId = getClientId();
@@ -1005,79 +1132,151 @@ async function finalizeToolPurchase(options = {}) {
     throw new Error(data.detail || data.error || 'Could not verify payment yet.');
   }
   authState.entitlements = data.entitlements || authState.entitlements;
+  if (data.txnId) {
+    state.txnId = data.txnId;
+    localStorage.setItem(PENDING_TOOL_TXN_KEY, data.txnId);
+  }
   return data;
 }
 
 async function handlePaymentSuccess() {
   const overlay = document.getElementById('paySuccess');
   const msg = document.getElementById('paySuccessMsg');
-  const btn = document.getElementById('payDownloadBtn');
+  const btn = document.getElementById('payEmailBtn');
   overlay.style.display = 'flex';
   document.body.style.overflow = 'hidden';
+  msg.textContent = 'Verifying your purchase and preparing your access email...';
+  btn.style.display = 'none';
 
   let entitled = false;
   let delivery = null;
-  const token = localStorage.getItem('mls_auth_token') || '';
-  for (let i = 0; i < 8; i++) {
-    if (i > 0) await new Promise(r => setTimeout(r, i === 1 ? 1800 : 2500));
+
+  for (let attempt = 0; attempt < 8; attempt++) {
+    if (attempt > 0) {
+      await new Promise((resolve) => setTimeout(resolve, attempt === 1 ? 1800 : 2500));
+    }
+
     try {
       delivery = await finalizeToolPurchase();
-      if (delivery && delivery.entitlements && delivery.entitlements.zipDownload) {
+      if (delivery && delivery.entitlements && delivery.entitlements.lifetimeAccess) {
         entitled = true;
         break;
       }
     } catch (_) {}
 
     try {
-      const r = await fetch('https://map-scraper-paddle-backend.vercel.app/api/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'me', token, clientId: getClientId() }),
-      });
-      const d = await r.json().catch(() => ({}));
-      if (d.entitlements && d.entitlements.zipDownload) {
+      const authData = await refreshPaymentAuthState();
+      if (authData && authData.entitlements && authData.entitlements.lifetimeAccess) {
         entitled = true;
         break;
       }
     } catch (_) {}
   }
 
-  if (entitled) {
+  if (!entitled) {
+    setToolCheckoutStatus('pending', 'Payment received. We are still confirming the transaction. Refresh this page in a moment if the access email has not arrived yet.');
+    msg.textContent = 'Payment received. We are still confirming the transaction. Your Google Drive tool email will be sent as soon as the purchase is confirmed.';
+    return;
+  }
+
+  rememberLatestToolTxn(delivery && delivery.txnId);
+  clearPendingToolPurchase();
+  updateCardState();
+
+  if (delivery && delivery.zipEmailSent === false) {
+    setToolCheckoutStatus('error', 'Payment is active, but the access email could not be sent yet. Use resend to try again.');
+    msg.textContent = 'Payment confirmed. We could not send the access email yet. Use the button below to resend it.';
+    btn.style.display = 'inline-flex';
+    return;
+  }
+
+  setToolCheckoutStatus('ready', 'Payment confirmed. Check your email for the Google Drive tool link and setup steps.');
+  if (delivery && delivery.alreadySent) {
+    msg.textContent = 'Payment confirmed. Your Google Drive tool email was already sent. Use the button below if you want a fresh copy.';
+    btn.style.display = 'inline-flex';
+    return;
+  }
+
+  msg.textContent = 'Payment confirmed. Check your email for the Google Drive tool link and the setup steps.';
+  btn.style.display = authState.latestToolPurchase && authState.latestToolPurchase.txnId ? 'inline-flex' : 'none';
+}
+
+async function handleAccessEmailClick(e) {
+  if (e) e.preventDefault();
+
+  const btn = document.getElementById('payEmailBtn');
+  const msg = document.getElementById('paySuccessMsg');
+  btn.disabled = true;
+  btn.style.pointerEvents = 'none';
+  btn.style.opacity = '.65';
+
+  try {
+    const data = await finalizeToolPurchase({ forceResend: true });
+    rememberLatestToolTxn(data && data.txnId);
     clearPendingToolPurchase();
-    msg.textContent = 'Download starting…';
-    btn.style.display = 'inline-flex';
-    try {
-      await triggerZipDownload();
-      msg.textContent = delivery && delivery.zipEmailSent === false
-        ? '\u2714 Download started! Your purchase is active, but the ZIP email could not be sent right now.'
-        : '\u2714 Download started! If it didn\'t begin automatically, click the button below.';
-    } catch (_) {
-      msg.textContent = 'Ready to download — click the button below.';
+    updateCardState();
+
+    if (data && data.zipEmailSent === false) {
+      setToolCheckoutStatus('error', 'Payment is active, but the access email still could not be sent. Please try again in a moment.');
+      msg.textContent = 'Payment is active, but the access email still could not be sent. Please try again in a moment.';
+    } else {
+      setToolCheckoutStatus('ready', 'A fresh access email is on the way. Check your inbox for the Google Drive tool link and setup steps.');
+      msg.textContent = 'A fresh access email is on the way. Check your inbox for the Google Drive tool link and setup steps.';
     }
-  } else {
-    msg.textContent = 'Payment received. We are still confirming the transaction. Use the button below again in a moment if the download is not ready yet.';
-    btn.style.display = 'inline-flex';
+  } catch (err) {
+    msg.textContent = err.message || 'We could not resend the access email right now. Please try again in a moment.';
+  } finally {
+    btn.disabled = false;
+    btn.style.pointerEvents = '';
+    btn.style.opacity = '';
   }
 }
 
-function handleDownloadClick(e) {
-  e.preventDefault();
-  finalizeToolPurchase()
-    .catch(() => null)
-    .then(() => triggerZipDownload())
-    .catch(() => {
-      window.location.href = '../index.html#install';
-    });
-}
+function startPendingToolAccessPollingOnPayment() {
+  if (!getPendingToolTxnId()) return;
 
-function startPendingZipAutoDownloadPollingOnPayment() {
-  const hasPendingZip = localStorage.getItem('mls_pending_zip_download') === '1';
-  if (!hasPendingZip && !getPendingToolTxnId()) return;
-  handlePaymentSuccess().catch(() => {
-    checkoutStatus.style.display = 'block';
-    checkoutStatus.className = 'checkout-status pending';
-    checkoutStatus.innerHTML = 'Payment received. Download will unlock shortly. <a href="../index.html#install" style="color:var(--g);font-weight:700;text-decoration:underline">Open install page</a>.';
-  });
+  setToolCheckoutStatus('pending', 'Payment received. We are preparing your Google Drive tool email. Check your inbox in a moment.');
+
+  let attempts = 0;
+  const poll = async () => {
+    attempts += 1;
+
+    try {
+      const delivery = await finalizeToolPurchase();
+      if (delivery && delivery.entitlements && delivery.entitlements.lifetimeAccess) {
+        rememberLatestToolTxn(delivery.txnId);
+        clearPendingToolPurchase();
+        updateCardState();
+        setToolCheckoutStatus(
+          delivery.zipEmailSent === false ? 'error' : 'ready',
+          delivery.zipEmailSent === false
+            ? 'Payment is active, but the access email could not be sent yet. Use Resend Access Email below to try again.'
+            : 'Payment confirmed. Check your email for the Google Drive tool link and setup steps.'
+        );
+        return;
+      }
+    } catch (_) {}
+
+    try {
+      const authData = await refreshPaymentAuthState();
+      if (authData && authData.entitlements && authData.entitlements.lifetimeAccess) {
+        rememberLatestToolTxn(authState.latestToolPurchase && authState.latestToolPurchase.txnId);
+        clearPendingToolPurchase();
+        updateCardState();
+        setToolCheckoutStatus('ready', 'Lifetime access is already active for this account. Use Resend Access Email below if you need another copy.');
+        return;
+      }
+    } catch (_) {}
+
+    if (attempts >= 8) {
+      setToolCheckoutStatus('pending', 'Payment received. We are still confirming the transaction. Refresh this page in a moment if the access email has not arrived yet.');
+      return;
+    }
+
+    window.setTimeout(poll, attempts === 1 ? 1800 : 2500);
+  };
+
+  window.setTimeout(poll, 1200);
 }
 
 document.getElementById('navBurger').addEventListener('click', () => {
@@ -1099,7 +1298,7 @@ loadPricingMode().then(() => {
   loadCheckoutUrl();
   const navTxt = document.getElementById('navCtaTxt');
   if (navTxt && pricingMode === 'one_time') navTxt.textContent = 'Buy Lifetime Access';
-  startPendingZipAutoDownloadPollingOnPayment();
+  startPendingToolAccessPollingOnPayment();
 });
 
 
@@ -1153,9 +1352,20 @@ loadPricingMode().then(() => {
   .then(function(r) { return r.json(); })
   .then(function(data) {
     if (data.ok && data.user) {
+      authState.loaded = true;
+      authState.user = data.user;
+      authState.purchases = Array.isArray(data.purchases) ? data.purchases : [];
+      authState.entitlements = data.entitlements || authState.entitlements;
+      syncKnownToolPurchase();
       localStorage.setItem(USER_KEY, JSON.stringify(data.user));
       if (accountLink) accountLink.textContent = data.user.name || 'Account';
+      if (cardMethod && !cardMethod.classList.contains('hidden')) updateCardState();
     } else {
+      authState.loaded = true;
+      authState.user = null;
+      authState.purchases = [];
+      authState.entitlements = { lifetimeAccess: false, zipDownload: false };
+      authState.latestToolPurchase = null;
       localStorage.removeItem(TOKEN_KEY);
       localStorage.removeItem(USER_KEY);
     }

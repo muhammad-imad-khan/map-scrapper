@@ -26,6 +26,7 @@ const ONE_TIME_PACK = { id: 'pri_01knfqkcbhqbnwhq5k1ace3sd9', slug: 'lifetime', 
 const COST_PER_RESULT = 1;
 const PRICING_MODE_CREDIT = 'credit_based';
 const PRICING_MODE_ONE_TIME = 'one_time';
+const UNLIMITED_BATCH_RESULTS = 100;
 
 // ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
@@ -100,7 +101,36 @@ async function getInstallId() {
 
 // ÔöÇÔöÇ Server-side credit operations ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
-async function getCredits() {
+function normalizeBillingState(data = {}) {
+  const rawCredits = Number.isFinite(Number(data.credits))
+    ? Math.max(0, Number(data.credits))
+    : 0;
+  const unlimited = data.unlimited === true;
+  return {
+    credits: rawCredits,
+    unlimited,
+    expiresAt: unlimited ? null : (data.expiresAt || null),
+    expired: unlimited ? false : Boolean(data.expired),
+  };
+}
+
+function getDisplayCredits(billingState) {
+  return billingState?.unlimited ? UNLIMITED_BATCH_RESULTS : Math.max(0, Number(billingState?.credits || 0));
+}
+
+async function cacheBillingState(data) {
+  const billingState = normalizeBillingState(data);
+  await chrome.storage.local.set({
+    credits: getDisplayCredits(billingState),
+    rawCredits: billingState.credits,
+    unlimitedAccess: billingState.unlimited,
+    expiresAt: billingState.expiresAt,
+    expired: billingState.expired,
+  });
+  return billingState;
+}
+
+async function getBillingState() {
   try {
     const installId = await getInstallId();
     const res = await fetch(`${BACKEND_URL}/api/credits?installId=${installId}`, {
@@ -108,25 +138,30 @@ async function getCredits() {
     });
     if (!res.ok) throw new Error('Server error');
     const data = await res.json();
-    // Cache locally for offline display
-    await chrome.storage.local.set({
-      credits: data.credits,
-      expiresAt: data.expiresAt || null,
-      expired: data.expired || false,
-    });
-    return data.credits;
+    return await cacheBillingState(data);
   } catch {
-    // Fallback to cached value if offline
     return new Promise(resolve => {
-      chrome.storage.local.get(['credits'], d => resolve(d.credits || 0));
+      chrome.storage.local.get(['credits', 'rawCredits', 'unlimitedAccess', 'expiresAt', 'expired'], (data) => {
+        resolve(normalizeBillingState({
+          credits: data.rawCredits ?? data.credits ?? 0,
+          unlimited: data.unlimitedAccess === true,
+          expiresAt: data.expiresAt || null,
+          expired: data.expired || false,
+        }));
+      });
     });
   }
+}
+
+async function getCredits() {
+  const billingState = await getBillingState();
+  return getDisplayCredits(billingState);
 }
 
 async function setCredits(n) {
   // Only update local cache ÔÇö server is the source of truth
   const val = Math.max(0, n);
-  await chrome.storage.local.set({ credits: val });
+  await chrome.storage.local.set({ credits: val, rawCredits: val, unlimitedAccess: false });
   broadcast('CREDITS_UPDATE', { credits: val });
   return val;
 }
@@ -142,7 +177,7 @@ async function deductCredit() {
     if (res.status === 402) return false; // Insufficient credits
     if (!res.ok) return false;
     const data = await res.json();
-    await chrome.storage.local.set({ credits: data.credits });
+    await cacheBillingState(data);
     return true;
   } catch {
     return false;
@@ -232,14 +267,15 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
 
       case 'START': {
         if (state.running) { sendResponse({ ok: false }); return; }
-        const credits = await getCredits();
-        if (credits < COST_PER_RESULT) {
+        const billingState = await getBillingState();
+        const credits = getDisplayCredits(billingState);
+        if (!billingState.unlimited && billingState.credits < COST_PER_RESULT) {
           broadcast('NO_CREDITS', { credits, packs: CREDIT_PACKS });
           sendResponse({ ok: false, reason: 'no_credits' });
           return;
         }
-        runScraper(msg.query, msg.max || 15, credits);
-        sendResponse({ ok: true, credits });
+        runScraper(msg.query, msg.max || 15, billingState);
+        sendResponse({ ok: true, credits, unlimited: billingState.unlimited });
         break;
       }
 
@@ -251,10 +287,11 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
       }
 
       case 'GET_STATE': {
-        const credits = await getCredits();
+        const billingState = await getBillingState();
+        const credits = getDisplayCredits(billingState);
         const mode = await getPricingMode();
         const packs = mode === PRICING_MODE_ONE_TIME ? [ONE_TIME_PACK] : CREDIT_PACKS;
-        sendResponse({ ...state, credits, packs, costPerResult: COST_PER_RESULT, pricingMode: mode });
+        sendResponse({ ...state, credits, unlimited: billingState.unlimited, packs, costPerResult: COST_PER_RESULT, pricingMode: mode });
         break;
       }
 
@@ -307,8 +344,8 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
 
       case 'SYNC_CREDITS': {
         // Poll server for latest credit balance (e.g., after purchase)
-        const freshCredits = await getCredits();
-        sendResponse({ ok: true, credits: freshCredits });
+        const billingState = await getBillingState();
+        sendResponse({ ok: true, credits: getDisplayCredits(billingState), unlimited: billingState.unlimited });
         break;
       }
 
@@ -326,7 +363,8 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
           });
           if (!res.ok) throw new Error('Server error');
           const data = await res.json();
-          sendResponse({ ok: true, history: data.history || [], credits: data.credits });
+          const billingState = await cacheBillingState(data);
+          sendResponse({ ok: true, history: data.history || [], credits: getDisplayCredits(billingState), unlimited: billingState.unlimited });
         } catch {
           sendResponse({ ok: false, history: [] });
         }
@@ -348,13 +386,18 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
 
 // Prime pricing mode cache in the background.
 getPricingMode().catch(() => {});
+getBillingState().catch(() => {});
 
 // ÔöÇÔöÇ Main scraper ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
-async function runScraper(query, requestedMax, startCredits) {
-  // Cap max by available credits
-  const maxAffordable = Math.floor(startCredits / COST_PER_RESULT);
-  const maxResults    = Math.min(requestedMax, maxAffordable);
+async function runScraper(query, requestedMax, startBillingState) {
+  const billingState = normalizeBillingState(startBillingState);
+  const hasUnlimitedAccess = billingState.unlimited;
+  const maxAffordable = hasUnlimitedAccess
+    ? UNLIMITED_BATCH_RESULTS
+    : Math.floor(billingState.credits / COST_PER_RESULT);
+  const maxResults = Math.min(requestedMax, maxAffordable);
+  const startCredits = getDisplayCredits(billingState);
 
   state = {
     running: true, results: [], progress: 0, total: 0,
@@ -521,9 +564,12 @@ async function runScraper(query, requestedMax, startCredits) {
 
       // Card-click mode completed; finalize run.
       chrome.tabs.remove(state.tabId).catch(() => {});
-      const finalCredits = await getCredits();
+      const finalBillingState = await getBillingState();
+      const finalCredits = getDisplayCredits(finalBillingState);
       state.running = false; state.tabId = null; state.credits = finalCredits;
-      state.status = `Done ÔÇö ${state.results.length} listings. ${finalCredits} credits remaining.`;
+      state.status = finalBillingState.unlimited
+        ? `Done - ${state.results.length} listings. Lifetime access is ready for the next ${UNLIMITED_BATCH_RESULTS}-result batch.`
+        : `Done ÔÇö ${state.results.length} listings. ${finalCredits} credits remaining.`;
       if (state.results.length > 0) await autoExportAndView(state.results, query);
       broadcast('DONE', { ...state });
       return;
@@ -537,14 +583,17 @@ async function runScraper(query, requestedMax, startCredits) {
       if (!state.running) break;
 
       // Check credits before each scrape
-      const currentCredits = await getCredits();
-      if (currentCredits < COST_PER_RESULT) {
+      const currentBillingState = await getBillingState();
+      const currentCredits = getDisplayCredits(currentBillingState);
+      if (!currentBillingState.unlimited && currentBillingState.credits < COST_PER_RESULT) {
         broadcast('NO_CREDITS', { credits: currentCredits, packs: CREDIT_PACKS, mid: true, scraped: state.results.length });
         break;
       }
 
       state.progress = i + 1;
-      state.status = `[${currentCredits} cr] Extracting ${i + 1} / ${urls.length}ÔÇª`;
+      state.status = currentBillingState.unlimited
+        ? `Lifetime mode - Extracting ${i + 1} / ${urls.length}...`
+        : `[${currentCredits} cr] Extracting ${i + 1} / ${urls.length}ÔÇª`;
       broadcast('STATE', state);
 
       try {
@@ -555,11 +604,14 @@ async function runScraper(query, requestedMax, startCredits) {
         const data = await exec(tabId, extractDetails);
         if (!data) continue;
 
-        // Deduct credit for successful extraction
-        const deducted = await deductCredit();
-        if (!deducted) {
-          broadcast('NO_CREDITS', { credits: 0, packs: CREDIT_PACKS, mid: true });
-          break;
+        let newCredits = currentCredits;
+        if (!currentBillingState.unlimited) {
+          const deducted = await deductCredit();
+          if (!deducted) {
+            broadcast('NO_CREDITS', { credits: 0, packs: CREDIT_PACKS, mid: true });
+            break;
+          }
+          newCredits = await getCredits();
         }
 
         // Fetch email + socials from business website
@@ -571,17 +623,19 @@ async function runScraper(query, requestedMax, startCredits) {
             data.socials = webData.socials;
         }
 
-        const newCredits = await getCredits();
         state.results.push(data);
-        broadcast('RESULT', { result: data, count: state.results.length, credits: newCredits });
+        broadcast('RESULT', { result: data, count: state.results.length, credits: newCredits, unlimited: currentBillingState.unlimited });
 
       } catch (e) { console.warn('Listing error:', e); }
     }
 
     chrome.tabs.remove(state.tabId).catch(() => {});
-    const finalCredits = await getCredits();
+    const finalBillingState = await getBillingState();
+    const finalCredits = getDisplayCredits(finalBillingState);
     state.running = false; state.tabId = null; state.credits = finalCredits;
-    state.status = `Done ÔÇö ${state.results.length} listings. ${finalCredits} credits remaining.`;
+    state.status = finalBillingState.unlimited
+      ? `Done - ${state.results.length} listings. Lifetime access is ready for the next ${UNLIMITED_BATCH_RESULTS}-result batch.`
+      : `Done ÔÇö ${state.results.length} listings. ${finalCredits} credits remaining.`;
 
     // ÔöÇÔöÇ Auto-export CSV + open viewer tab ÔöÇÔöÇ
     if (state.results.length > 0) {
@@ -604,14 +658,17 @@ async function scrapeByClickingResults(tabId, maxResults) {
   let successCount = 0;
 
   while (state.running && successCount < maxResults && attempts < maxAttempts) {
-    const currentCredits = await getCredits();
-    if (currentCredits < COST_PER_RESULT) {
+    const currentBillingState = await getBillingState();
+    const currentCredits = getDisplayCredits(currentBillingState);
+    if (!currentBillingState.unlimited && currentBillingState.credits < COST_PER_RESULT) {
       broadcast('NO_CREDITS', { credits: currentCredits, packs: CREDIT_PACKS, mid: true, scraped: state.results.length });
       break;
     }
 
     state.progress = successCount + 1;
-    state.status = `[${currentCredits} cr] Scraping result ${successCount + 1} / ${maxResults}ÔÇª`;
+    state.status = currentBillingState.unlimited
+      ? `Lifetime mode - Scraping result ${successCount + 1} / ${maxResults}...`
+      : `[${currentCredits} cr] Scraping result ${successCount + 1} / ${maxResults}ÔÇª`;
     broadcast('STATE', state);
 
     const clicked = await exec(tabId, () => {
@@ -697,11 +754,14 @@ async function scrapeByClickingResults(tabId, maxResults) {
       continue;
     }
 
-    // Deduct credit
-    const deducted = await deductCredit();
-    if (!deducted) {
-      broadcast('NO_CREDITS', { credits: 0, packs: CREDIT_PACKS, mid: true, scraped: state.results.length });
-      break;
+    let newCredits = currentCredits;
+    if (!currentBillingState.unlimited) {
+      const deducted = await deductCredit();
+      if (!deducted) {
+        broadcast('NO_CREDITS', { credits: 0, packs: CREDIT_PACKS, mid: true, scraped: state.results.length });
+        break;
+      }
+      newCredits = await getCredits();
     }
 
     // Fetch email/socials if website exists
@@ -718,9 +778,8 @@ async function scrapeByClickingResults(tabId, maxResults) {
     }
 
     // Add to results
-    const newCredits = await getCredits();
     state.results.push(data);
-    broadcast('RESULT', { result: data, count: state.results.length, credits: newCredits });
+    broadcast('RESULT', { result: data, count: state.results.length, credits: newCredits, unlimited: currentBillingState.unlimited });
     successCount++;
 
     // Go back to results for next iteration
