@@ -988,10 +988,11 @@ async function finalizeToolPurchase(options = {}) {
 
   const clientId = getClientId();
   const installId = state.installId || localStorage.getItem('mls_web_install_id') || '';
-  const res = await fetch(`${BACKEND_BASE}/api/tool-deliver`, {
+  const res = await fetch(`${BACKEND_BASE}/api/checkout`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-Client-Id': clientId },
     body: JSON.stringify({
+      action: 'deliverToolPurchase',
       token,
       clientId,
       txnId,
