@@ -707,6 +707,14 @@ async function loadPricingMode() {
     const data = await res.json();
     pricingMode = data.mode || 'credit_based';
     if (data.pricing && data.pricing.plans) {
+      if (data.pricing.plans.pro) {
+        CREDIT_PACKS.pro.usdPrice = data.pricing.plans.pro.price || CREDIT_PACKS.pro.usdPrice;
+        CREDIT_PACKS.pro.priceId = data.pricing.plans.pro.priceId || CREDIT_PACKS.pro.priceId;
+      }
+      if (data.pricing.plans.enterprise) {
+        CREDIT_PACKS.enterprise.usdPrice = data.pricing.plans.enterprise.price || CREDIT_PACKS.enterprise.usdPrice;
+        CREDIT_PACKS.enterprise.priceId = data.pricing.plans.enterprise.priceId || CREDIT_PACKS.enterprise.priceId;
+      }
       if (data.pricing.plans.oneTime) {
         ONE_TIME_PACK.usdPrice = data.pricing.plans.oneTime.price || ONE_TIME_PACK.usdPrice;
         ONE_TIME_PACK.priceId = data.pricing.plans.oneTime.priceId || ONE_TIME_PACK.priceId;
@@ -780,6 +788,9 @@ checkoutBtn.addEventListener('click', () => {
   }
   const authToken = localStorage.getItem('mls_auth_token') || '';
   pendingCheckout = { priceId: pack.priceId, installId: state.installId, token: authToken };
+  pendingCheckout.pack = pack.key;
+  pendingCheckout.country = state.country;
+  pendingCheckout.currency = state.currency;
   paddleFallbackTried = false;
   checkoutStatus.style.display = 'block';
   checkoutStatus.className = 'checkout-status pending';

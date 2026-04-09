@@ -238,10 +238,10 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
         <div class="price-card">
           <div class="price-label">Course Price</div>
           <div class="price-display">
-            <strong>$10</strong>
-            <span>USD · One-time</span>
+            <strong id="coursePriceValue">$10</strong>
+            <span id="coursePriceMeta">USD · One-time</span>
           </div>
-          <p class="price-note">One-time payment · Lifetime access · Delivered in your customer portal</p>
+          <p class="price-note" id="coursePriceNote">One-time payment · Lifetime access · Delivered in your customer portal</p>
         </div>
 
         <div id="checkoutStatus" class="checkout-status" style="display:none"></div>
@@ -249,6 +249,30 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
         <div style="display:grid;gap:10px;margin-bottom:14px">
           <input id="courseEmail" type="email" placeholder="Your email (required)" autocomplete="email" style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid var(--b);background:var(--s2);color:var(--t);font:500 14px var(--body)">
           <input id="courseName" type="text" placeholder="Your name (optional)" autocomplete="name" style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid var(--b);background:var(--s2);color:var(--t);font:500 14px var(--body)">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <select id="courseCountry" style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid var(--b);background:var(--s2);color:var(--t);font:500 14px var(--body)">
+              <option value="Pakistan">Pakistan</option>
+              <option value="United Arab Emirates">United Arab Emirates</option>
+              <option value="Saudi Arabia">Saudi Arabia</option>
+              <option value="United Kingdom">United Kingdom</option>
+              <option value="United States">United States</option>
+              <option value="Canada">Canada</option>
+              <option value="Australia">Australia</option>
+              <option value="Germany">Germany</option>
+              <option value="India">India</option>
+            </select>
+            <select id="courseCurrency" style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid var(--b);background:var(--s2);color:var(--t);font:500 14px var(--body)">
+              <option value="PKR">PKR</option>
+              <option value="USD">USD</option>
+              <option value="AED">AED</option>
+              <option value="SAR">SAR</option>
+              <option value="GBP">GBP</option>
+              <option value="EUR">EUR</option>
+              <option value="CAD">CAD</option>
+              <option value="AUD">AUD</option>
+              <option value="INR">INR</option>
+            </select>
+          </div>
           <input id="courseReceipt" type="file" accept="image/*,.pdf" style="width:100%;padding:12px 14px;border-radius:10px;border:1px dashed var(--b);background:var(--s2);color:var(--t);font:500 13px var(--body)">
         </div>
 
@@ -265,7 +289,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
         <!-- Bank transfer details (hidden by default) -->
         <div id="bankPanel" style="display:none">
           <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.22);border-radius:14px;padding:18px;margin-bottom:14px">
-            <p style="font-size:13px;color:var(--t2);margin-bottom:12px">Transfer <strong style="color:var(--heading)">$10 USD</strong> (or PKR equivalent) to the account below, then confirm.</p>
+            <p style="font-size:13px;color:var(--t2);margin-bottom:12px">Transfer <strong style="color:var(--heading)" id="courseBankAmount">$10 USD</strong> to the account below, then confirm.</p>
             <div class="detail-list" style="margin:0">
               <div class="detail-row"><span>Account Title</span><strong>MUHAMMAD IMADUDDIN KHAN</strong></div>
               <div class="detail-row"><span>Bank</span><strong>Meezan Bank</strong></div>
@@ -328,12 +352,52 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 /* ── Config ── */
-const COURSE_PRICE_ID = 'pri_01knmdy54t0wd91ne4tspntxty';
 const BACKEND_BASE = window.location.hostname === 'localhost'
   ? 'http://localhost:3000'
   : 'https://map-scraper-paddle-backend.vercel.app';
 const AUTH_API = `${BACKEND_BASE}/api/auth`;
 const TOKEN_KEY = 'mls_auth_token';
+const COUNTRY_DEFAULTS = {
+  Pakistan: 'PKR',
+  'United Arab Emirates': 'AED',
+  'Saudi Arabia': 'SAR',
+  'United Kingdom': 'GBP',
+  'United States': 'USD',
+  Canada: 'CAD',
+  Australia: 'AUD',
+  Germany: 'EUR',
+  India: 'INR',
+};
+const CURRENCY_SYMBOLS = {
+  PKR: 'Rs ',
+  USD: '$',
+  AED: 'AED ',
+  SAR: 'SAR ',
+  GBP: 'GBP ',
+  EUR: 'EUR ',
+  CAD: 'CAD ',
+  AUD: 'AUD ',
+  INR: 'Rs ',
+};
+const USD_EXCHANGE_RATES = {
+  PKR: 278,
+  USD: 1,
+  AED: 3.67,
+  SAR: 3.75,
+  GBP: 0.79,
+  EUR: 0.92,
+  CAD: 1.36,
+  AUD: 1.53,
+  INR: 83.4,
+};
+const coursePricing = {
+  priceId: 'pri_01knmdy54t0wd91ne4tspntxty',
+  intlPriceId: 'pri_01knmdy54t0wd91ne4tspntxty',
+  usdPrice: '$10',
+  intlUsdPrice: '$10',
+  country: 'Pakistan',
+  currency: 'PKR',
+};
 
 /* ── Initialize Paddle.js ── */
 Paddle.Environment.set('sandbox');
@@ -350,7 +414,13 @@ Paddle.Initialize({
 const statusEl = document.getElementById('checkoutStatus');
 const courseEmailInput = document.getElementById('courseEmail');
 const courseNameInput = document.getElementById('courseName');
+const courseCountryInput = document.getElementById('courseCountry');
+const courseCurrencyInput = document.getElementById('courseCurrency');
 const courseReceiptInput = document.getElementById('courseReceipt');
+const coursePriceValueEl = document.getElementById('coursePriceValue');
+const coursePriceMetaEl = document.getElementById('coursePriceMeta');
+const coursePriceNoteEl = document.getElementById('coursePriceNote');
+const courseBankAmountEl = document.getElementById('courseBankAmount');
 const payMethodPicker = document.getElementById('payMethodPicker');
 const btnCard = document.getElementById('btnCard');
 const btnBank = document.getElementById('btnBank');
@@ -378,6 +448,80 @@ function fileToDataUrl(file) {
   });
 }
 
+function getNumericUsdPrice(priceText) {
+  const amount = Number(String(priceText || '').replace(/[^0-9.]/g, ''));
+  return Number.isFinite(amount) ? amount : 0;
+}
+
+function formatLocalized(currency, value) {
+  const symbol = CURRENCY_SYMBOLS[currency] || `${currency} `;
+  const rounded = value >= 100 ? Math.round(value) : Number(value).toFixed(2);
+  return `${symbol}${String(rounded).replace(/\.00$/, '')}`;
+}
+
+function getSelectedCoursePriceId() {
+  return coursePricing.country === 'Pakistan' || coursePricing.currency === 'PKR'
+    ? coursePricing.priceId
+    : coursePricing.intlPriceId;
+}
+
+function getSelectedCourseUsdPriceText() {
+  return (coursePricing.country === 'Pakistan' || coursePricing.currency === 'PKR')
+    ? coursePricing.usdPrice
+    : coursePricing.intlUsdPrice;
+}
+
+function getLocalizedCourseAmount() {
+  const usdAmount = getNumericUsdPrice(getSelectedCourseUsdPriceText());
+  const rate = USD_EXCHANGE_RATES[coursePricing.currency] || 1;
+  return usdAmount * rate;
+}
+
+function updateCoursePricingUI() {
+  const localizedAmount = getLocalizedCourseAmount();
+  coursePriceValueEl.textContent = formatLocalized(coursePricing.currency, localizedAmount);
+  coursePriceMetaEl.textContent = `${coursePricing.currency} · One-time`;
+  coursePriceNoteEl.textContent = 'One-time payment · Lifetime access · Delivered in your customer portal';
+  courseBankAmountEl.textContent = formatLocalized(coursePricing.currency, localizedAmount);
+}
+
+async function loadCoursePricingConfig() {
+  try {
+    const res = await fetch(`${BACKEND_BASE}/api/pricing-config`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('pricing config unavailable');
+    const data = await res.json();
+    if (data && data.countryCurrency && typeof data.countryCurrency === 'object') {
+      Object.assign(COUNTRY_DEFAULTS, data.countryCurrency);
+    }
+    if (data && data.pricing && data.pricing.plans) {
+      const course = data.pricing.plans.course || {};
+      const courseIntl = data.pricing.plans.courseIntl || {};
+      coursePricing.priceId = course.priceId || coursePricing.priceId;
+      coursePricing.intlPriceId = courseIntl.priceId || coursePricing.intlPriceId;
+      coursePricing.usdPrice = course.price || coursePricing.usdPrice;
+      coursePricing.intlUsdPrice = courseIntl.price || coursePricing.intlUsdPrice;
+    }
+  } catch (err) {
+    console.warn('Course pricing config fallback:', err?.message || err);
+  }
+  updateCoursePricingUI();
+}
+
+courseCountryInput.value = coursePricing.country;
+courseCurrencyInput.value = coursePricing.currency;
+courseCountryInput.addEventListener('change', () => {
+  coursePricing.country = courseCountryInput.value;
+  if (!window.location.search.includes('currency=')) {
+    coursePricing.currency = COUNTRY_DEFAULTS[coursePricing.country] || coursePricing.currency;
+    courseCurrencyInput.value = coursePricing.currency;
+  }
+  updateCoursePricingUI();
+});
+courseCurrencyInput.addEventListener('change', () => {
+  coursePricing.currency = courseCurrencyInput.value;
+  updateCoursePricingUI();
+});
+
 function getInputs() {
   if (!localStorage.getItem(TOKEN_KEY)) {
     showStatus('Please log in first. Your course access is delivered through the customer portal.', 'error');
@@ -393,7 +537,13 @@ function getInputs() {
     courseEmailInput.focus();
     return null;
   }
-  return { email, name };
+  return {
+    email,
+    name,
+    country: coursePricing.country,
+    currency: coursePricing.currency,
+    priceId: getSelectedCoursePriceId(),
+  };
 }
 
 /* ── Credit / Debit (Paddle) ── */
@@ -409,7 +559,13 @@ btnCard.addEventListener('click', async () => {
     const res = await fetch(`${BACKEND_BASE}/api/course-checkout`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: inputs.email, name: inputs.name, priceId: COURSE_PRICE_ID }),
+      body: JSON.stringify({
+        email: inputs.email,
+        name: inputs.name,
+        priceId: inputs.priceId,
+        country: inputs.country,
+        currency: inputs.currency,
+      }),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data.checkoutUrl) {
@@ -475,8 +631,8 @@ bankDoneBtn.addEventListener('click', async () => {
         reference: 'MLS-COURSE',
         purchaseType: 'course',
         courseId: 'lead-gen-ai-web-design',
-        amount: 1000,
-        currency: 'USD',
+        amount: Math.round(getLocalizedCourseAmount() * 100) / 100,
+        currency: inputs.currency,
         receiptDataUrl,
         receiptName: receiptFile.name,
         receiptMimeType: receiptFile.type || 'application/octet-stream',
@@ -545,6 +701,8 @@ async function handlePaymentSuccess() {
     handlePaymentSuccess();
   }
 })();
+
+loadCoursePricingConfig();
 
 (async function restoreLoggedInUser() {
   const token = localStorage.getItem(TOKEN_KEY);
