@@ -526,11 +526,13 @@ const state = {
   currency: 'PKR',
   checkoutUrl: '',
   installId: '',
+  txnId: '',
 };
 let pendingCheckout = null;
 let paddleFallbackTried = false;
 let currencyExplicitlySelected = false;
 let countryExplicitlySelected = false;
+const PENDING_TOOL_TXN_KEY = 'mls_pending_tool_txn';
 
 function getParams() {
   const params = new URLSearchParams(window.location.search);
@@ -538,6 +540,7 @@ function getParams() {
   const country = params.get('country');
   const currency = params.get('currency');
   const installId = params.get('installId');
+  const txnId = params.get('_ptxn');
   // Accept pack key or priceId
   if (pack && PACKS[pack]) state.pack = pack;
   else {
@@ -553,6 +556,10 @@ function getParams() {
     currencyExplicitlySelected = true;
   }
   if (installId && /^[a-zA-Z0-9_-]{8,64}$/.test(installId)) state.installId = installId;
+  if (txnId && /^txn_[a-zA-Z0-9]+$/i.test(txnId)) {
+    state.txnId = txnId;
+    localStorage.setItem(PENDING_TOOL_TXN_KEY, txnId);
+  }
   if (!state.currency) state.currency = COUNTRY_DEFAULTS[state.country] || 'USD';
 }
 
@@ -562,8 +569,20 @@ function syncUrl() {
   params.set('country', state.country);
   params.set('currency', state.currency);
   if (state.installId) params.set('installId', state.installId);
+  if (state.txnId) params.set('_ptxn', state.txnId);
   const next = `${window.location.pathname}?${params.toString()}`;
   window.history.replaceState({}, '', next);
+}
+
+function getPendingToolTxnId() {
+  return state.txnId || localStorage.getItem(PENDING_TOOL_TXN_KEY) || '';
+}
+
+function clearPendingToolPurchase() {
+  localStorage.removeItem('mls_pending_zip_download');
+  localStorage.removeItem(PENDING_TOOL_TXN_KEY);
+  state.txnId = '';
+  syncUrl();
 }
 
 function getNumericUsdPrice(priceText) {
@@ -887,9 +906,19 @@ checkoutBtn.addEventListener('click', () => {
     if (!res.ok || !data.checkoutUrl) {
       throw new Error(data.detail || data.error || 'Could not create checkout.');
     }
+    if (data.txnId) {
+      state.txnId = data.txnId;
+      localStorage.setItem(PENDING_TOOL_TXN_KEY, data.txnId);
+      syncUrl();
+    }
     checkoutStatus.className = 'checkout-status ready';
-    checkoutStatus.textContent = 'Redirecting to checkout…';
-    window.location.href = data.checkoutUrl;
+    checkoutStatus.textContent = 'Opening Paddle checkout…';
+    if (data.txnId) {
+      Paddle.Checkout.open({ transactionId: data.txnId });
+    } else {
+      window.location.href = data.checkoutUrl;
+    }
+    checkoutBtn.disabled = false;
   })
   .catch((err) => {
     checkoutStatus.className = 'checkout-status error';
@@ -915,7 +944,14 @@ async function handlePaddleCheckoutError() {
     if (!res.ok || !data.checkoutUrl) {
       throw new Error(data.error || 'Could not create checkout.');
     }
-    window.location.href = data.checkoutUrl;
+    if (data.txnId) {
+      state.txnId = data.txnId;
+      localStorage.setItem(PENDING_TOOL_TXN_KEY, data.txnId);
+      syncUrl();
+      Paddle.Checkout.open({ transactionId: data.txnId });
+    } else {
+      window.location.href = data.checkoutUrl;
+    }
   } catch (err) {
     checkoutStatus.className = 'checkout-status error';
     checkoutStatus.textContent = err.message || 'Checkout failed. Please try again.';
@@ -927,10 +963,11 @@ async function handlePaddleCheckoutError() {
 // ══════════════════════════════════════════════════════
 async function triggerZipDownload() {
   const token = localStorage.getItem('mls_auth_token') || '';
+  const clientId = getClientId();
   const res = await fetch('/api/download-extension', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token }),
+    headers: { 'Content-Type': 'application/json', 'X-Client-Id': clientId },
+    body: JSON.stringify({ token, clientId }),
   });
   if (!res.ok) throw new Error('not_entitled');
   const blob = await res.blob();
@@ -944,63 +981,52 @@ async function triggerZipDownload() {
   URL.revokeObjectURL(url);
 }
 
+async function finalizeToolPurchase(options = {}) {
+  const token = localStorage.getItem('mls_auth_token') || '';
+  const txnId = getPendingToolTxnId();
+  if (!token || !txnId) return null;
+
+  const clientId = getClientId();
+  const installId = state.installId || localStorage.getItem('mls_web_install_id') || '';
+  const res = await fetch(`${BACKEND_BASE}/api/tool-deliver`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Client-Id': clientId },
+    body: JSON.stringify({
+      token,
+      clientId,
+      txnId,
+      installId,
+      forceResend: options.forceResend === true,
+    }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data.detail || data.error || 'Could not verify payment yet.');
+  }
+  authState.entitlements = data.entitlements || authState.entitlements;
+  return data;
+}
+
 async function handlePaymentSuccess() {
-  localStorage.removeItem('mls_pending_zip_download');
   const overlay = document.getElementById('paySuccess');
   const msg = document.getElementById('paySuccessMsg');
   const btn = document.getElementById('payDownloadBtn');
   overlay.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 
-  // Poll auth for entitlement — webhook may take a couple of seconds
   let entitled = false;
+  let delivery = null;
   const token = localStorage.getItem('mls_auth_token') || '';
-  for (let i = 0; i < 6; i++) {
-    await new Promise(r => setTimeout(r, i === 0 ? 2000 : 2500));
+  for (let i = 0; i < 8; i++) {
+    if (i > 0) await new Promise(r => setTimeout(r, i === 1 ? 1800 : 2500));
     try {
-      const r = await fetch('https://map-scraper-paddle-backend.vercel.app/api/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'me', token, clientId: getClientId() }),
-      });
-      const d = await r.json();
-      if (d.entitlements && d.entitlements.zipDownload) { entitled = true; break; }
+      delivery = await finalizeToolPurchase();
+      if (delivery && delivery.entitlements && delivery.entitlements.zipDownload) {
+        entitled = true;
+        break;
+      }
     } catch (_) {}
-  }
 
-  if (entitled) {
-    msg.textContent = 'Download starting…';
-    btn.style.display = 'inline-flex';
-    try {
-      await triggerZipDownload();
-      msg.textContent = '\u2714 Download started! If it didn\'t begin automatically, click the button below.';
-    } catch (_) {
-      msg.textContent = 'Ready to download — click the button below.';
-    }
-  } else {
-    msg.textContent = 'Payment received! Use the button below to download your extension.';
-    btn.style.display = 'inline-flex';
-  }
-}
-
-function handleDownloadClick(e) {
-  e.preventDefault();
-  triggerZipDownload().catch(() => {
-    window.location.href = '../index.html#install';
-  });
-}
-
-function startPendingZipAutoDownloadPollingOnPayment() {
-  if (localStorage.getItem('mls_pending_zip_download') !== '1') return;
-  const token = localStorage.getItem('mls_auth_token') || '';
-  if (!token) return;
-  let attempts = 0;
-  const maxAttempts = 18; // ~90s at 5s interval
-  checkoutStatus.style.display = 'block';
-  checkoutStatus.className = 'checkout-status pending';
-  checkoutStatus.textContent = 'Verifying payment and preparing your download…';
-  const timer = setInterval(async () => {
-    attempts += 1;
     try {
       const r = await fetch('https://map-scraper-paddle-backend.vercel.app/api/auth', {
         method: 'POST',
@@ -1008,26 +1034,49 @@ function startPendingZipAutoDownloadPollingOnPayment() {
         body: JSON.stringify({ action: 'me', token, clientId: getClientId() }),
       });
       const d = await r.json().catch(() => ({}));
-      if (r.ok && d.entitlements && d.entitlements.zipDownload) {
-        clearInterval(timer);
-        localStorage.removeItem('mls_pending_zip_download');
-        checkoutStatus.className = 'checkout-status ready';
-        checkoutStatus.textContent = 'Payment verified. Download starting…';
-        try {
-          await triggerZipDownload();
-        } catch (_) {
-          checkoutStatus.className = 'checkout-status error';
-          checkoutStatus.textContent = 'Verified, but automatic download failed. Use homepage install to download.';
-        }
-        return;
+      if (d.entitlements && d.entitlements.zipDownload) {
+        entitled = true;
+        break;
       }
     } catch (_) {}
-    if (attempts >= maxAttempts) {
-      clearInterval(timer);
-      checkoutStatus.className = 'checkout-status pending';
-      checkoutStatus.innerHTML = 'Payment received. Download will unlock shortly. <a href="../index.html#install" style="color:var(--g);font-weight:700;text-decoration:underline">Open install page</a>.';
+  }
+
+  if (entitled) {
+    clearPendingToolPurchase();
+    msg.textContent = 'Download starting…';
+    btn.style.display = 'inline-flex';
+    try {
+      await triggerZipDownload();
+      msg.textContent = delivery && delivery.zipEmailSent === false
+        ? '\u2714 Download started! Your purchase is active, but the ZIP email could not be sent right now.'
+        : '\u2714 Download started! If it didn\'t begin automatically, click the button below.';
+    } catch (_) {
+      msg.textContent = 'Ready to download — click the button below.';
     }
-  }, 5000);
+  } else {
+    msg.textContent = 'Payment received. We are still confirming the transaction. Use the button below again in a moment if the download is not ready yet.';
+    btn.style.display = 'inline-flex';
+  }
+}
+
+function handleDownloadClick(e) {
+  e.preventDefault();
+  finalizeToolPurchase()
+    .catch(() => null)
+    .then(() => triggerZipDownload())
+    .catch(() => {
+      window.location.href = '../index.html#install';
+    });
+}
+
+function startPendingZipAutoDownloadPollingOnPayment() {
+  const hasPendingZip = localStorage.getItem('mls_pending_zip_download') === '1';
+  if (!hasPendingZip && !getPendingToolTxnId()) return;
+  handlePaymentSuccess().catch(() => {
+    checkoutStatus.style.display = 'block';
+    checkoutStatus.className = 'checkout-status pending';
+    checkoutStatus.innerHTML = 'Payment received. Download will unlock shortly. <a href="../index.html#install" style="color:var(--g);font-weight:700;text-decoration:underline">Open install page</a>.';
+  });
 }
 
 document.getElementById('navBurger').addEventListener('click', () => {

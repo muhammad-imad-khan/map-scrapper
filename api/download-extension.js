@@ -8,7 +8,7 @@ const ZIP_PATH = path.join(__dirname, '_assets', ZIP_NAME);
 function setCors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Client-Id');
 }
 
 function readBody(req) {
@@ -37,6 +37,7 @@ module.exports = async function handler(req, res) {
 
   const body = await readBody(req);
   const token = (body.token || '').toString().trim();
+  const clientId = (body.clientId || req.headers['x-client-id'] || '').toString().trim();
 
   try {
     const pricingResp = await fetch(`${BACKEND_BASE}/api/pricing-config`, { cache: 'no-store' });
@@ -50,8 +51,15 @@ module.exports = async function handler(req, res) {
 
       const authResp = await fetch(`${BACKEND_BASE}/api/auth`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'me', token }),
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Client-Id': clientId,
+          'User-Agent': (req.headers['user-agent'] || '').toString(),
+          'Accept-Language': (req.headers['accept-language'] || '').toString(),
+          'sec-ch-ua': (req.headers['sec-ch-ua'] || '').toString(),
+          'sec-ch-ua-platform': (req.headers['sec-ch-ua-platform'] || '').toString(),
+        },
+        body: JSON.stringify({ action: 'me', token, clientId }),
       });
       const authData = await authResp.json().catch(() => ({}));
       if (!authResp.ok) {

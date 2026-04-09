@@ -1600,10 +1600,11 @@ async function loadAuthState() {
 
 async function triggerDownload() {
   const token = localStorage.getItem('mls_auth_token') || '';
+  const clientId = getClientId();
   const resp = await fetch(DOWNLOAD_ENDPOINT, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token }),
+    headers: { 'Content-Type': 'application/json', 'X-Client-Id': clientId },
+    body: JSON.stringify({ token, clientId }),
   });
 
   if (!resp.ok) {
