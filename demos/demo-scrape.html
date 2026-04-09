@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Demo – Scraping</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#09090f;--surf:#111118;--card:#17171f;--card2:#1e1e28;
+  --b:rgba(255,255,255,0.07);--bhi:rgba(255,255,255,0.12);
+  --g:#22c55e;--gd:rgba(34,197,94,.11);--gb:rgba(34,197,94,.22);
+  --amber:#f59e0b;--blue:#60a5fa;--purple:#a78bfa;
+  --red:#f87171;--redd:rgba(248,113,113,.12);
+  --t:#d8d8e8;--m:#52526a;
+  --mono:'Courier New',monospace;--ui:-apple-system,'Segoe UI',system-ui,sans-serif;
+}
+body{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;background:#030308;
+}
+.phone{
+  width:480px;background:var(--bg);border-radius:16px;
+  box-shadow:0 0 60px rgba(34,197,94,.08),0 0 0 1px rgba(255,255,255,.06);
+  overflow:hidden;
+}
+
+/* ── CREDIT BANNER ── */
+.credit-banner{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px;
+  background:linear-gradient(135deg,rgba(34,197,94,.07),rgba(34,197,94,.03));
+  border-bottom:1px solid var(--b)
+}
+.credit-left{display:flex;align-items:center;gap:10px}
+.credit-icon{width:32px;height:32px;background:var(--gd);border:1px solid rgba(34,197,94,.25);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.credit-icon svg{width:18px;height:18px}
+.credit-info .credit-label{font-size:10px;color:var(--m);text-transform:uppercase;letter-spacing:.8px;margin-bottom:1px}
+.credit-count{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--g);line-height:1}
+.credit-sub{font-size:10px;color:var(--m);margin-top:1px}
+.btn-topup{padding:6px 14px;background:var(--g);color:#000;border:none;border-radius:6px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:var(--ui)}
+
+/* ── TABS ── */
+.tabs{display:flex;background:var(--surf);border-bottom:1px solid var(--b)}
+.tab{flex:1;padding:11px 6px;font-size:12px;font-weight:600;color:var(--m);text-align:center;border:none;background:transparent;position:relative}
+.tab.active{color:var(--g)}
+.tab.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--g);border-radius:2px 2px 0 0}
+
+/* ── PANEL ── */
+.panel{padding:14px 16px}
+.field-label{font-size:10px;color:var(--m);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
+.search-wrap{position:relative;margin-bottom:9px}
+.search-wrap::before{content:'🔍';position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none}
+.iq{width:100%;background:var(--card2);border:1px solid var(--bhi);border-radius:8px;padding:9px 12px 9px 33px;color:var(--t);font-size:13px;outline:none;font-family:var(--ui)}
+.iq:focus{border-color:rgba(34,197,94,.45)}
+.iq::placeholder{color:var(--m)}
+
+.opts-row{display:flex;align-items:center;gap:10px;margin-bottom:11px;background:var(--card);border:1px solid var(--b);border-radius:8px;padding:8px 12px}
+.ol{font-size:11.5px;color:var(--m)}
+.im{width:52px;background:var(--surf);border:1px solid var(--bhi);border-radius:5px;padding:4px 8px;color:var(--t);font-size:12px;font-family:var(--mono);text-align:center;outline:none}
+.credit-cost-pill{margin-left:auto;display:flex;align-items:center;gap:5px;background:var(--gd);border:1px solid rgba(34,197,94,.2);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--g);font-family:var(--mono)}
+
+.btn-start{width:100%;padding:11px 16px;background:var(--g);color:#000;border:none;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:var(--ui);display:flex;align-items:center;justify-content:center;gap:8px;transition:all .3s}
+.btn-start.running{background:var(--redd);color:var(--red);border:1px solid rgba(248,113,113,.3)}
+
+.divider{height:1px;background:var(--b);margin:12px 0}
+
+/* Progress */
+.prog-sec{margin-bottom:10px;opacity:0;transition:opacity .4s}
+.prog-sec.show{opacity:1}
+.status-ln{font-family:var(--mono);font-size:11.5px;color:var(--g);margin-bottom:7px;display:flex;align-items:center;gap:6px}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--g);flex-shrink:0;animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.ptrack{height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;margin-bottom:4px}
+.pfill{height:100%;background:linear-gradient(90deg,var(--g),#86efac);border-radius:2px;transition:width .4s;width:0%}
+.plbl{display:flex;justify-content:space-between;font-size:10px;color:var(--m);font-family:var(--mono)}
+
+/* Results */
+.res-sec{opacity:0;transition:opacity .4s}.res-sec.show{opacity:1}
+.res-tb{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.res-cnt{font-size:11.5px;color:var(--m)}.res-cnt strong{color:var(--g);font-family:var(--mono);font-size:13px}
+.btn-export{padding:5px 12px;background:var(--gd);color:var(--g);border:1px solid rgba(34,197,94,.22);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--ui);display:flex;align-items:center;gap:4px}
+.twrap{border:1px solid var(--b);border-radius:8px;overflow:hidden;max-height:180px;overflow-y:auto}
+.twrap::-webkit-scrollbar{width:3px}.twrap::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+table{width:100%;border-collapse:collapse;font-size:11.5px}
+thead th{background:var(--surf);padding:6px 10px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--m);border-bottom:1px solid var(--b);position:sticky;top:0;z-index:1}
+tbody td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.04);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:0}
+.cn{width:34%}.cr{width:13%}.ce{width:28%}.cw{width:13%}.ch{width:12%}
+.nm{color:#ededf6;font-weight:600}.rt{color:var(--amber);font-family:var(--mono);font-weight:700}
+.he{color:var(--g);font-family:var(--mono);font-size:10.5px}
+.ne{color:var(--m)}.hw{color:var(--blue)}
+
+.ftr{padding:7px 16px 8px;border-top:1px solid var(--b);display:flex;justify-content:space-between;align-items:center;font-size:9.5px;color:#2a2a3d;font-family:var(--mono)}
+.fdt{width:3px;height:3px;border-radius:50%;background:rgba(34,197,94,.25);display:inline-block;margin:0 5px}
+
+/* Cursor */
+.cursor{display:inline-block;width:2px;height:14px;background:var(--g);animation:blink .6s step-end infinite;vertical-align:middle;margin-left:1px}
+@keyframes blink{50%{opacity:0}}
+
+/* Click effect */
+.click-ring{
+  position:absolute;width:30px;height:30px;border-radius:50%;
+  border:2px solid var(--g);opacity:0;pointer-events:none;
+  transform:translate(-50%,-50%) scale(0);
+}
+.click-ring.go{animation:clickPop .4s ease-out forwards}
+@keyframes clickPop{0%{opacity:.7;transform:translate(-50%,-50%) scale(0)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.5)}}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="credit-banner">
+    <div class="credit-left">
+      <div class="credit-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/>
+          <path d="M7 20.662V19a2 2 0 012-2h6a2 2 0 012 2v1.662"/>
+        </svg>
+      </div>
+      <div class="credit-info">
+        <div class="credit-label">Your Credits</div>
+        <div class="credit-count" id="creditCount">500</div>
+        <div class="credit-sub">1 credit = 1 result</div>
+      </div>
+    </div>
+    <button class="btn-topup">+ Buy Credits</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active">🔍 Scrape</button>
+    <button class="tab">🛒 Buy Credits</button>
+  </div>
+
+  <div class="panel">
+    <div class="field-label" style="margin-top:2px">Search Query</div>
+    <div class="search-wrap">
+      <input type="text" class="iq" id="queryInput" readonly />
+    </div>
+    <div class="opts-row">
+      <span class="ol">Max results</span>
+      <input type="number" class="im" id="maxInput" value="20" readonly />
+      <div class="credit-cost-pill">
+        <span>🪙</span>
+        <span id="costPill">20 credits</span>
+      </div>
+    </div>
+    <button class="btn-start" id="btnStart">
+      <span id="btnIcon">▶</span><span id="btnLabel">Start Scraping</span>
+    </button>
+
+    <div class="divider"></div>
+
+    <div class="prog-sec" id="progSec">
+      <div class="status-ln">
+        <span class="sdot"></span>
+        <span id="sTxt">Initializing…</span>
+      </div>
+      <div class="ptrack"><div class="pfill" id="pFill"></div></div>
+      <div class="plbl"><span id="pLeft">0%</span><span id="pRight">0 / 20</span></div>
+      <div class="divider"></div>
+    </div>
+
+    <div class="res-sec" id="resSec">
+      <div class="res-tb">
+        <span class="res-cnt"><strong id="resCnt">0</strong> results</span>
+        <button class="btn-export" id="btnExport">↓ Export CSV</button>
+      </div>
+      <div class="twrap">
+        <table>
+          <thead><tr><th class="cn">Name</th><th class="cr">Rating</th><th class="ce">Email</th><th class="cw">Website</th><th class="ch">Phone</th></tr></thead>
+          <tbody id="resTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="ftr">
+    <span>Maps Lead Scraper Pro v2.1</span>
+    <span><span class="fdt"></span> Credits: <span id="ftrCr">500</span></span>
+  </div>
+</div>
+
+<script>
+const QUERY = 'restaurants in Dubai';
+const RESULTS = [
+  {n:'Al Mahara Restaurant',    r:'4.8', e:'info@almahara.ae',       w:'almahara.ae',       p:'+971-4-301-7600'},
+  {n:'Pierchic Dubai',          r:'4.7', e:'reservations@pierchic.ae',w:'pierchic.ae',      p:'+971-4-432-3232'},
+  {n:'Nobu Dubai',              r:'4.6', e:'dubai@noburestaurants.com',w:'noburestaurants.com',p:'+971-4-318-8811'},
+  {n:'Zuma Dubai',              r:'4.5', e:'info@zumarestaurant.com', w:'zumarestaurant.com', p:'+971-4-425-5660'},
+  {n:'La Petite Maison',        r:'4.7', e:'dubai@lpmrestaurants.com',w:'lpmrestaurants.com',p:'+971-4-439-0505'},
+  {n:'CÉ LA VI Dubai',          r:'4.4', e:'dubai@celavi.com',       w:'celavi.com',         p:'+971-4-582-6111'},
+  {n:'Nusr-Et Steakhouse',      r:'4.3', e:'info@nusr-et.com',       w:'nusr-et.com',        p:'+971-4-510-5411'},
+  {n:'Tresind Studio',          r:'4.9', e:'info@tresindstudio.com', w:'tresindstudio.com',  p:'+971-4-720-1122'},
+  {n:'Ossiano Restaurant',      r:'4.6', e:'dine@atlantis.com',      w:'atlantis.com',       p:'+971-4-426-2626'},
+  {n:'COYA Dubai',              r:'4.5', e:'reservations@coya.ae',   w:'coya.ae',            p:'+971-4-316-9600'},
+  {n:'BB Social Dining',        r:'4.3', e:'hello@bbsocialdining.com',w:'bbsocialdining.com',p:'+971-4-396-4446'},
+  {n:'Hakkasan Dubai',          r:'4.4', e:'dubai@hakkasan.com',     w:'hakkasan.com',       p:'+971-4-318-8088'},
+  {n:'Clap Dubai',              r:'4.2', e:'info@clapdubai.com',     w:'clapdubai.com',      p:'+971-4-569-3820'},
+  {n:'Tasca by José Avillez',   r:'4.6', e:'tasca@jose.ae',          w:'jose.ae',            p:'+971-4-275-2500'},
+  {n:'3 Fils',                  r:'4.8', e:'hello@3fils.com',        w:'3fils.com',           p:'+971-4-333-4003'},
+  {n:'Orfali Bros Bistro',      r:'4.9', e:'info@orfalibros.com',    w:'orfalibros.com',     p:'+971-4-250-5530'},
+  {n:'Arabian Tea House',       r:'4.5', e:'info@arabianteahouse.ae',w:'arabianteahouse.ae', p:'+971-4-353-5071'},
+  {n:'Al Ustad Special Kabab',  r:'4.3', e:'—',                      w:'—',                  p:'+971-4-397-3033'},
+  {n:'Ravi Restaurant',         r:'4.2', e:'—',                      w:'—',                  p:'+971-4-331-5353'},
+  {n:'Bu Qtair Fish',           r:'4.6', e:'—',                      w:'—',                  p:'+971-4-380-5474'},
+];
+
+const STATUS_MSGS = [
+  'Scrolling Google Maps…',
+  'Found 5 places…',
+  'Found 10 places…',
+  'Found 15 places…',
+  'Found 20 places — scraping details…',
+  'Extracting emails & socials…',
+  'Extracting contact info…',
+  'Processing results…',
+];
+
+const qInput    = document.getElementById('queryInput');
+const btnStart  = document.getElementById('btnStart');
+const btnIcon   = document.getElementById('btnIcon');
+const btnLabel  = document.getElementById('btnLabel');
+const progSec   = document.getElementById('progSec');
+const sTxt      = document.getElementById('sTxt');
+const pFill     = document.getElementById('pFill');
+const pLeft     = document.getElementById('pLeft');
+const pRight    = document.getElementById('pRight');
+const resSec    = document.getElementById('resSec');
+const resCnt    = document.getElementById('resCnt');
+const resTbody  = document.getElementById('resTbody');
+const creditEl  = document.getElementById('creditCount');
+const ftrCr     = document.getElementById('ftrCr');
+
+let credits = 500;
+function updateCr(v){ credits=v; creditEl.textContent=v; ftrCr.textContent=v; }
+
+// ── Phase 1 : Type query ──
+function typeQuery(cb) {
+  let i = 0;
+  const iv = setInterval(() => {
+    i++;
+    qInput.value = QUERY.slice(0, i);
+    if (i >= QUERY.length) { clearInterval(iv); setTimeout(cb, 500); }
+  }, 65);
+}
+
+// ── Phase 2 : Click Start ──
+function clickStart(cb) {
+  btnStart.classList.add('running');
+  btnIcon.textContent = '⏹';
+  btnLabel.textContent = 'Stop Scraping';
+  progSec.classList.add('show');
+  setTimeout(cb, 300);
+}
+
+// ── Phase 3 : Animate progress ──
+function animateProgress(cb) {
+  let step = 0;
+  const total = RESULTS.length;
+  const iv = setInterval(() => {
+    step++;
+    const pct = Math.min(Math.round((step / total) * 100), 100);
+    pFill.style.width = pct + '%';
+    pLeft.textContent  = pct + '%';
+    pRight.textContent = step + ' / ' + total;
+    updateCr(500 - step);
+
+    // Status message
+    if (step <= 3) sTxt.textContent = STATUS_MSGS[0];
+    else if (step <= 5) sTxt.textContent = STATUS_MSGS[1];
+    else if (step <= 10) sTxt.textContent = STATUS_MSGS[2];
+    else if (step <= 15) sTxt.textContent = STATUS_MSGS[3];
+    else if (step <= 17) sTxt.textContent = STATUS_MSGS[4];
+    else if (step <= 18) sTxt.textContent = STATUS_MSGS[5];
+    else if (step <= 19) sTxt.textContent = STATUS_MSGS[6];
+    else sTxt.textContent = STATUS_MSGS[7];
+
+    // Show results section and add rows
+    if (step === 1) resSec.classList.add('show');
+    const r = RESULTS[step - 1];
+    if (r) {
+      resCnt.textContent = step;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td class="cn"><span class="nm">${r.n}</span></td><td class="cr"><span class="rt">★ ${r.r}</span></td><td class="ce">${r.e==='—'?'<span class="ne">—</span>':'<span class="he">'+r.e+'</span>'}</td><td class="cw">${r.w==='—'?'<span class="ne">—</span>':'<span class="hw">'+r.w+'</span>'}</td><td class="ch">${r.p}</td>`;
+      tr.style.animation = 'fadeIn .3s ease';
+      resTbody.appendChild(tr);
+      resTbody.parentElement.parentElement.scrollTop = 99999;
+    }
+
+    if (step >= total) {
+      clearInterval(iv);
+      setTimeout(cb, 400);
+    }
+  }, 280);
+}
+
+// ── Phase 4 : Done ──
+function finishScrape() {
+  btnStart.classList.remove('running');
+  btnStart.style.background = 'var(--g)';
+  btnStart.style.color = '#000';
+  btnIcon.textContent = '▶';
+  btnLabel.textContent = 'Start Scraping';
+  sTxt.textContent = '✓ Done — 20 results scraped!';
+  document.querySelector('.sdot').style.animation = 'none';
+  document.querySelector('.sdot').style.background = 'var(--g)';
+
+  // Wait then restart loop
+  setTimeout(() => {
+    resetAll();
+    runDemo();
+  }, 3500);
+}
+
+function resetAll() {
+  qInput.value = '';
+  progSec.classList.remove('show');
+  resSec.classList.remove('show');
+  resTbody.innerHTML = '';
+  pFill.style.width = '0%';
+  pLeft.textContent = '0%';
+  pRight.textContent = '0 / 20';
+  resCnt.textContent = '0';
+  sTxt.textContent = 'Initializing…';
+  document.querySelector('.sdot').style.animation = 'pulse 1.2s infinite';
+  btnStart.classList.remove('running');
+  btnStart.style.background = '';
+  btnStart.style.color = '';
+  btnIcon.textContent = '▶';
+  btnLabel.textContent = 'Start Scraping';
+  updateCr(500);
+}
+
+function runDemo() {
+  setTimeout(() => {
+    typeQuery(() => {
+      clickStart(() => {
+        animateProgress(finishScrape);
+      });
+    });
+  }, 800);
+}
+
+// Inject fade-in keyframes
+const style = document.createElement('style');
+style.textContent = '@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}';
+document.head.appendChild(style);
+
+// Start
+runDemo();
+</script>
+</body>
+</html>

@@ -203,6 +203,7 @@
       <div class="card"><div class="muted">Courses</div><div class="stat-value" id="statCourses">0</div></div>
       <div class="card"><div class="muted">Enrollments</div><div class="stat-value" id="statEnrollments">0</div></div>
       <div class="card"><div class="muted">Pending Course Receipts</div><div class="stat-value" id="statTransfers">0</div></div>
+      <div class="card"><div class="muted">Total Purchases</div><div class="stat-value" id="statPurchases">0</div></div>
     </div>
 
     <div class="grid main">
@@ -308,6 +309,18 @@
         <div class="card">
           <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
             <div>
+              <h2>All Purchases (Card + Bank)</h2>
+              <div class="muted">Unified course purchases list with one-click email delivery.</div>
+            </div>
+            <button id="reloadPurchasesBtn">Reload Purchases</button>
+          </div>
+          <div class="table-wrap" id="purchaseTableWrap"></div>
+          <div class="status" id="purchaseStatus"></div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+            <div>
               <h2>Pending Course Receipts</h2>
               <div class="muted">Receipts submitted by bank transfer customers for course access.</div>
             </div>
@@ -328,6 +341,39 @@
           <div class="table-wrap" id="enrollmentTableWrap"></div>
           <div class="status" id="enrollmentStatus"></div>
         </div>
+
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+            <div>
+              <h2>Validation Monitoring</h2>
+              <div class="muted">Track validation actions and metrics over the last 7 days.</div>
+            </div>
+            <button id="refreshMetricsBtn">Refresh Metrics</button>
+          </div>
+          <div id="metricsDisplay" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px;">
+            <div style="background:#f5f5f5;padding:12px;border-radius:4px;">
+              <div class="muted">Total Validations</div>
+              <div style="font-size:24px;font-weight:bold;">-</div>
+            </div>
+            <div style="background:#f5f5f5;padding:12px;border-radius:4px;">
+              <div class="muted">By Card</div>
+              <div style="font-size:24px;font-weight:bold;" data-metric="card">-</div>
+            </div>
+            <div style="background:#f5f5f5;padding:12px;border-radius:4px;">
+              <div class="muted">By Bank Transfer</div>
+              <div style="font-size:24px;font-weight:bold;" data-metric="bank_transfer">-</div>
+            </div>
+            <div style="background:#f5f5f5;padding:12px;border-radius:4px;">
+              <div class="muted">Success Rate</div>
+              <div style="font-size:24px;font-weight:bold;" data-metric="successRate">-</div>
+            </div>
+          </div>
+          <div id="recentValidationsWrap" style="display:none;margin-top:16px;">
+            <h3>Recent Validations (Last 24h)</h3>
+            <div class="table-wrap" id="recentValidationsTable"></div>
+          </div>
+          <div class="status" id="metricsStatus"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -335,7 +381,7 @@
   <script>
     const SESSION_KEY = '__admin_session';
     const DEFAULT_API_BASE = localStorage.getItem('admin_api_base') || 'https://map-scraper-paddle-backend.vercel.app';
-    const state = { courses: [], selectedCourseId: '', enrollments: [], transfers: [] };
+    const state = { courses: [], selectedCourseId: '', enrollments: [], transfers: [], purchases: [] };
 
     const loginOverlay = document.getElementById('loginOverlay');
     const app = document.getElementById('app');
@@ -493,6 +539,7 @@
                   <td>
                     <div class="btn-row">
                       <button class="success approve-transfer" data-btid="${esc(item.id)}" data-course-id="${esc(item.courseId || state.selectedCourseId || '')}">Approve</button>
+                      <button class="warn send-transfer-email" data-email="${esc(item.email)}" data-name="${esc(item.name || '')}" data-reference="${esc(item.reference || item.id || '')}">Send Email</button>
                       <button class="danger reject-transfer" data-btid="${esc(item.id)}">Reject</button>
                     </div>
                   </td>
@@ -513,6 +560,29 @@
             status.textContent = 'Transfer approved and portal email sent.';
             status.className = 'status ok';
             await loadAll();
+          } catch (error) {
+            status.textContent = error.message;
+            status.className = 'status error';
+          }
+        });
+      });
+      wrap.querySelectorAll('.send-transfer-email').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          try {
+            status.textContent = 'Sending email...';
+            status.className = 'status';
+            await api('/api/admin-courses', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                action: 'sendPurchaseEmail',
+                email: btn.dataset.email,
+                name: btn.dataset.name,
+                reference: btn.dataset.reference,
+              }),
+            });
+            status.textContent = 'Email sent.';
+            status.className = 'status ok';
           } catch (error) {
             status.textContent = error.message;
             status.className = 'status error';
@@ -588,25 +658,135 @@
       });
     }
 
+    function renderPurchases() {
+      const wrap = document.getElementById('purchaseTableWrap');
+      const status = document.getElementById('purchaseStatus');
+      if (!state.purchases.length) {
+        wrap.innerHTML = '<div class="muted">No purchases found yet.</div>';
+        status.textContent = '';
+        return;
+      }
+
+      wrap.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th><th>Email</th><th>Name</th><th>Status</th><th>Course</th><th>Amount</th><th>Reference</th><th>Receipt</th><th>Date</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${state.purchases.map((item) => {
+              const amount = (item.amount && item.currency)
+                ? `${Number(item.amount) / 100} ${item.currency}`
+                : (item.amount ? String(item.amount) : '');
+              const receipt = item.receiptDataUrl
+                ? `<a class="btn" target="_blank" href="${item.receiptDataUrl}">View Receipt</a>`
+                : '<span class="muted">N/A</span>';
+              return `
+              <tr>
+                <td>${esc(item.channel === 'bank_transfer' ? 'Bank Transfer' : 'Credit / Debit')}</td>
+                <td><code>${esc(item.email || '')}</code></td>
+                <td>${esc(item.name || '')}</td>
+                <td>${esc(item.status || 'unknown')}</td>
+                <td>${esc(item.label || item.courseId || '')}</td>
+                <td>${esc(amount)}</td>
+                <td><code>${esc(item.txnId || item.bankTransferId || item.reference || item.id || '')}</code></td>
+                <td>${receipt}</td>
+                <td>${esc(fmt(item.completedAt || item.createdAt))}</td>
+                <td>
+                  <div class="btn-row">
+                    <button class="success validate-purchase" data-email="${esc(item.email || '')}" data-name="${esc(item.name || '')}" data-source="${esc(item.source || item.channel || '')}" data-course-id="${esc(item.courseId || state.selectedCourseId || '')}" data-txn-id="${esc(item.txnId || '')}" data-bank-transfer-id="${esc(item.bankTransferId || '')}" data-amount="${esc(item.amount || '')}" data-currency="${esc(item.currency || '')}">Validate + Notify</button>
+                    <button class="warn send-purchase-email" data-email="${esc(item.email || '')}" data-name="${esc(item.name || '')}" data-ref="${esc(item.txnId || item.bankTransferId || item.reference || item.id || '')}">Send Course Email</button>
+                  </div>
+                </td>
+              </tr>
+            `;
+            }).join('')}
+          </tbody>
+        </table>
+      `;
+
+      wrap.querySelectorAll('.validate-purchase').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          if (!btn.dataset.email) return;
+          try {
+            status.textContent = 'Validating purchase and sending notifications...';
+            status.className = 'status';
+            await api('/api/admin-courses', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                action: 'validatePurchase',
+                email: btn.dataset.email,
+                name: btn.dataset.name,
+                source: btn.dataset.source,
+                courseId: btn.dataset.courseId,
+                txnId: btn.dataset.txnId || null,
+                bankTransferId: btn.dataset.bankTransferId || null,
+                amount: btn.dataset.amount || null,
+                currency: btn.dataset.currency || null,
+              }),
+            });
+            status.textContent = 'Validated. Course email + portal notification sent.';
+            status.className = 'status ok';
+            await loadAll();
+          } catch (error) {
+            status.textContent = error.message;
+            status.className = 'status error';
+          }
+        });
+      });
+
+      wrap.querySelectorAll('.send-purchase-email').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          if (!btn.dataset.email) return;
+          try {
+            status.textContent = 'Sending email...';
+            status.className = 'status';
+            await api('/api/admin-courses', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                action: 'sendPurchaseEmail',
+                email: btn.dataset.email,
+                name: btn.dataset.name,
+                txnId: btn.dataset.ref,
+              }),
+            });
+            status.textContent = 'Email sent.';
+            status.className = 'status ok';
+          } catch (error) {
+            status.textContent = error.message;
+            status.className = 'status error';
+          }
+        });
+      });
+    }
+
     async function loadAll() {
-      const [overview, courses, transfers, enrollments] = await Promise.all([
+      const [overview, courses, transfers, enrollments, purchases] = await Promise.all([
         api('/api/admin-courses?type=overview'),
         api('/api/admin-courses?type=courses'),
         api('/api/admin-courses?type=transfers&status=pending'),
         api('/api/admin-courses?type=enrollments'),
+        api('/api/admin-courses?type=purchases&status=all'),
       ]);
       state.courses = courses.items || [];
       state.transfers = transfers.items || [];
       state.enrollments = enrollments.items || [];
+      state.purchases = purchases.items || [];
       document.getElementById('statCourses').textContent = overview.stats.courses;
       document.getElementById('statEnrollments').textContent = overview.stats.enrollments;
       document.getElementById('statTransfers').textContent = overview.stats.pendingTransfers;
+      document.getElementById('statPurchases').textContent = String(state.purchases.length);
       if (!state.selectedCourseId && state.courses[0]) state.selectedCourseId = state.courses[0].id;
       const selected = state.courses.find((course) => course.id === state.selectedCourseId) || state.courses[0] || null;
       renderCourseList();
+      renderPurchases();
       renderTransfers();
       renderEnrollments();
       resetEditor(selected);
+      loadMetrics();
     }
 
     document.getElementById('loginBtn').addEventListener('click', authenticate);
@@ -616,9 +796,79 @@
       loginOverlay.style.display = 'flex';
     });
     document.getElementById('reloadAllBtn').addEventListener('click', loadAll);
+    document.getElementById('reloadPurchasesBtn').addEventListener('click', loadAll);
     document.getElementById('reloadTransfersBtn').addEventListener('click', loadAll);
     document.getElementById('reloadEnrollmentsBtn').addEventListener('click', loadAll);
     document.getElementById('newCourseBtn').addEventListener('click', () => resetEditor());
+
+    async function loadMetrics() {
+      const status = document.getElementById('metricsStatus');
+      try {
+        status.textContent = 'Loading metrics...';
+        status.className = 'status';
+        const metricsData = await api('/api/admin-courses', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'validation-logs', days: 7 }),
+        });
+        
+        if (!metricsData.stats) {
+          status.textContent = 'No validation data available yet.';
+          status.className = 'status';
+          return;
+        }
+
+        const stats = metricsData.stats;
+        const total = stats.totalValidations || 0;
+        const byCard = stats.bySource.card || 0;
+        const byBank = stats.bySource.bank_transfer || 0;
+        const successRate = total > 0 ? Math.round(((stats.byStatus.success || 0) / total) * 100) : 0;
+
+        // Update metrics display
+        document.querySelector('.card .muted').nextElementSibling.textContent = total;
+        document.querySelector('[data-metric="card"]').textContent = byCard;
+        document.querySelector('[data-metric="bank_transfer"]').textContent = byBank;
+        document.querySelector('[data-metric="successRate"]').textContent = successRate + '%';
+
+        // Show recent validations if available
+        if (Array.isArray(metricsData.logs) && metricsData.logs.length > 0) {
+          const wrap = document.getElementById('recentValidationsWrap');
+          const table = document.getElementById('recentValidationsTable');
+          wrap.style.display = 'block';
+          const validations = metricsData.logs.slice(-30); // Last 30
+          table.innerHTML = `
+            <table>
+              <thead>
+                <tr>
+                  <th>Timestamp</th><th>Email</th><th>Course</th><th>Source</th><th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${validations.reverse().map(log => \`
+                <tr>
+                  <td><small>\${esc((new Date(log.timestamp)).toLocaleString())}</small></td>
+                  <td><code>\${esc(log.email)}</code></td>
+                  <td>\${esc(log.courseId)}</td>
+                  <td>\${esc(log.source)}</td>
+                  <td><span class="\${log.status === 'success' ? 'ok' : 'error'}">\${esc(log.status)}</span></td>
+                </tr>
+              \`).join('')}
+              </tbody>
+            </table>
+          `;
+        }
+
+        status.textContent = 'Metrics loaded.';
+        status.className = 'status ok';
+      } catch(err) {
+        status.textContent = 'Error loading metrics: ' + err.message;
+        status.className = 'status error';
+      }
+    }
+
+    document.getElementById('refreshMetricsBtn').addEventListener('click', loadMetrics);
+
+    // Auto-load metrics on page load
 
     document.getElementById('saveCourseBtn').addEventListener('click', async () => {
       const status = document.getElementById('editorStatus');
