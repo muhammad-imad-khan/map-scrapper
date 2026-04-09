@@ -147,10 +147,11 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
     </a>
     <div class="nav-links-wrap" id="navLinks">
       <a href="../index.html#how">How it works</a>
+      <a href="../index.html#features">Features</a>
       <a href="../index.html#pricing">Pricing</a>
       <a href="../payment/">Payment</a>
       <a href="./" class="active">Course</a>
-      <a href="../about.html">About</a>
+      <a href="../portal/">Portal</a>
       <a href="../auth/">Account</a>
       <a href="../index.html#install" class="nav-cta">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -357,6 +358,21 @@ const BACKEND_BASE = window.location.hostname === 'localhost'
   : 'https://map-scraper-paddle-backend.vercel.app';
 const AUTH_API = `${BACKEND_BASE}/api/auth`;
 const TOKEN_KEY = 'mls_auth_token';
+const CLIENT_KEY = 'mls_client_id';
+
+function getClientId() {
+  let id = localStorage.getItem(CLIENT_KEY) || '';
+  if (/^[a-zA-Z0-9_-]{16,120}$/.test(id)) return id;
+  const bytes = new Uint8Array(24);
+  if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
+    window.crypto.getRandomValues(bytes);
+    id = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+  } else {
+    id = (Date.now().toString(16) + Math.random().toString(16).slice(2) + Math.random().toString(16).slice(2)).slice(0, 48);
+  }
+  localStorage.setItem(CLIENT_KEY, id);
+  return id;
+}
 const COUNTRY_DEFAULTS = {
   Pakistan: 'PKR',
   'United Arab Emirates': 'AED',
@@ -675,10 +691,13 @@ async function handlePaymentSuccess() {
     const data = await res.json().catch(() => ({}));
 
     if (res.ok && data.ok) {
+      const emailNotice = data.portalEmailSent === false
+        ? ' Portal access is active, but email delivery is unavailable in sandbox right now. You can continue from the customer portal.'
+        : '';
       if (data.alreadySent) {
-        showStatus(`Course access was already activated for ${buyerEmail}. Open your customer portal or check your inbox for the access email.`, 'success');
+        showStatus(`Course access was already activated for ${buyerEmail}. Open your customer portal or check your inbox for the access email.${emailNotice}`, 'success');
       } else {
-        showStatus(`🎉 Course access activated for ${buyerEmail}. Open the customer portal or check your inbox for the access email.`, 'success');
+        showStatus(`🎉 Course access activated for ${buyerEmail}. Open the customer portal or check your inbox for the access email.${emailNotice}`, 'success');
       }
       btnCard.textContent = '✓ Enrolled';
       localStorage.removeItem('mls_course_buyer_email');
@@ -714,7 +733,7 @@ loadCoursePricingConfig();
     const res = await fetch(AUTH_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'me', token }),
+      body: JSON.stringify({ action: 'me', token, clientId: getClientId() }),
     });
     const data = await res.json().catch(() => ({}));
     if (data.ok && data.user) {

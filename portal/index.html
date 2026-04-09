@@ -1,125 +1,395 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Customer Portal — Maps Lead Scraper</title>
+<title>Customer Portal - Maps Lead Scraper</title>
 <meta name="description" content="Access your purchased courses, watch lessons, open PDFs, and track your progress.">
+<meta name="theme-color" content="#06060c">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="128x128" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:'DM Sans',system-ui,sans-serif;background:#06060c;color:#d4d4e8;min-height:100vh}
-:root{--bg:#06060c;--p1:#0d111b;--p2:#121827;--line:rgba(255,255,255,.08);--txt:#d4d4e8;--muted:#9aa0b8;--green:#22c55e;--green-d:rgba(34,197,94,.12);--blue:#60a5fa;--danger:#f87171;--display:'Syne',sans-serif}
-[data-theme="light"]{--bg:#f4f6fb;--p1:#ffffff;--p2:#eef1f8;--line:rgba(0,0,0,.08);--txt:#1f2433;--muted:#5f6a84;--green:#16a34a;--green-d:rgba(22,163,74,.09);--blue:#2563eb;--danger:#dc2626}
-body{background:radial-gradient(circle at top,#171730 0%,var(--bg) 42%)}a{color:inherit}.container{max-width:1320px;margin:0 auto;padding:24px}
-.top{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;padding:18px 0 22px}.brand{font-family:var(--display);font-size:28px;font-weight:800;letter-spacing:-1px}.brand em{color:var(--green);font-style:normal}.hero-sub{color:var(--muted);max-width:700px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 16px;border-radius:12px;border:1px solid var(--line);background:var(--p2);color:var(--txt);text-decoration:none;font-weight:700;cursor:pointer}.btn.primary{background:var(--green);color:#02140a;border:none}
-.gate,.panel{background:rgba(13,17,27,.94);border:1px solid var(--line);border-radius:22px;box-shadow:0 26px 80px rgba(0,0,0,.28)}[data-theme="light"] .gate,[data-theme="light"] .panel{background:rgba(255,255,255,.96)}
-.gate{max-width:540px;margin:72px auto;padding:30px}.gate h1,.panel h2,.panel h3{margin:0}.muted{color:var(--muted)}
-.shell{display:none;grid-template-columns:340px 1fr;gap:18px}.sidebar{display:grid;gap:18px}.panel{padding:20px}.course-list{display:grid;gap:10px;max-height:560px;overflow:auto}.course-card{padding:16px;border-radius:16px;border:1px solid var(--line);background:var(--p2);cursor:pointer}.course-card.active{border-color:var(--green);background:var(--green-d)}.course-card strong{display:block;font-size:16px;margin-bottom:6px}.progress{height:8px;background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden;margin-top:10px}.progress>span{display:block;height:100%;background:linear-gradient(90deg,var(--green),#14b8a6)}
-.overview{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:18px}.stat{padding:16px;border-radius:16px;background:var(--p2);border:1px solid var(--line)}.stat b{display:block;font-size:28px;margin-top:8px}
-.course-layout{display:grid;grid-template-columns:320px 1fr;gap:18px}.module-list{display:grid;gap:12px}.module{padding:14px;border-radius:16px;background:var(--p2);border:1px solid var(--line)}.module h4{margin:0 0 6px;font-size:15px}.module-items{display:grid;gap:8px;margin-top:12px}.lesson{padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.02);cursor:pointer}.lesson.active{border-color:var(--blue)}.lesson.done{border-color:var(--green);background:var(--green-d)}.lesson small{display:block;color:var(--muted);margin-top:4px}
-.viewer{display:grid;gap:14px}.viewer-box{min-height:320px;background:var(--p2);border:1px solid var(--line);border-radius:18px;padding:18px}.viewer-box iframe,.viewer-box video{width:100%;min-height:360px;border:0;border-radius:14px;background:#000}.viewer-box .empty{color:var(--muted);line-height:1.7}.viewer-actions{display:flex;gap:10px;flex-wrap:wrap}.pill{display:inline-flex;align-items:center;padding:7px 11px;border-radius:999px;background:var(--green-d);border:1px solid rgba(34,197,94,.22);font-size:12px;font-weight:700;color:var(--green)}
-.status{min-height:20px;color:var(--muted);font-size:13px}.status.error{color:var(--danger)}.status.ok{color:var(--green)}
-@media(max-width:1024px){.shell,.course-layout{grid-template-columns:1fr}}@media(max-width:720px){.container{padding:18px}.gate{margin:28px auto;padding:22px}}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06060c;--s1:#0a0a12;--s2:#0f0f1a;--s3:#161622;--s4:#1c1c2e;
+  --b:rgba(255,255,255,.06);--bhi:rgba(255,255,255,.12);
+  --g:#22c55e;--g2:#16a34a;--gd:rgba(34,197,94,.1);--gb:rgba(34,197,94,.2);
+  --blue:#60a5fa;--red:#f87171;
+  --t:#d4d4e8;--t2:#9494b0;--t3:#52526a;
+  --heading:#fff;
+  --panel:#0d111b;--panel2:#121827;
+  --nav-h:64px;--nav-scroll:rgba(6,6,12,.95);
+  --display:'Syne',sans-serif;--body:'DM Sans',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+[data-theme="light"]{
+  --bg:#f4f6fb;--s1:#ebedf5;--s2:#e2e4ee;--s3:#d5d8e4;--s4:#c8ccda;
+  --b:rgba(0,0,0,.08);--bhi:rgba(0,0,0,.13);
+  --g:#16a34a;--g2:#15803d;--gd:rgba(22,163,74,.08);--gb:rgba(22,163,74,.18);
+  --blue:#2563eb;--red:#dc2626;
+  --t:#2e2e3e;--t2:#555568;--t3:#888898;
+  --heading:#1a1a2e;
+  --panel:#fff;--panel2:#f0f2f8;
+  --nav-scroll:rgba(244,246,251,.96);
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{font-family:var(--body);background:var(--bg);color:var(--t);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 900px 600px at 50% 0%,rgba(34,197,94,.06),transparent 70%);pointer-events:none;z-index:0}
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
+[data-theme="light"] .bg-grid{background-image:linear-gradient(rgba(0,0,0,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.04) 1px,transparent 1px)}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--s4);border-radius:3px}
+::selection{background:rgba(34,197,94,.22);color:var(--heading)}
+a{color:inherit;text-decoration:none}
+.muted{color:var(--t2);font-size:13.5px}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--nav-scroll);backdrop-filter:blur(20px);border-bottom:1px solid var(--b)}
+.nav-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;height:var(--nav-h);gap:28px;padding:0 24px}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
+.nav-logo-ic{width:34px;height:34px;background:var(--gd);border:1px solid var(--gb);border-radius:9px;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.nav-logo:hover .nav-logo-ic{background:var(--gb)}
+.nav-logo-txt{font-family:var(--display);font-size:15px;font-weight:800;color:var(--heading)}
+.nav-logo-txt em{color:var(--g);font-style:normal}
+.nav-links{margin-left:auto;display:flex;align-items:center;gap:20px}
+.nav-links a{font-size:13.5px;font-weight:500;color:var(--t2);text-decoration:none;transition:color .15s;position:relative;white-space:nowrap}
+.nav-links a::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:1px;background:var(--g);transform:scaleX(0);transition:transform .2s;transform-origin:left}
+.nav-links a:hover{color:var(--heading)}.nav-links a:hover::after{transform:scaleX(1)}
+.nav-links a.active{color:var(--heading)}.nav-links a.active::after{transform:scaleX(1)}
+.nav-cta{padding:8px 18px!important;background:var(--g)!important;color:#000!important;border-radius:8px;font-size:13px!important;font-weight:700!important;display:flex;align-items:center;gap:6px;transition:background .15s,box-shadow .2s,transform .1s!important;box-shadow:0 0 0 rgba(34,197,94,0)}
+.nav-cta::after{display:none!important}
+.nav-cta:hover{background:var(--g2)!important;box-shadow:0 0 24px rgba(34,197,94,.28)!important;transform:translateY(-1px)}
+.nav-bell{width:36px;height:36px;border-radius:10px;border:1px solid var(--b);background:var(--s2);color:var(--t2);display:none;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:border-color .15s,color .15s,background .15s}
+.nav-bell:hover{border-color:var(--bhi);color:var(--heading);background:var(--s3)}
+.bell-dot{position:absolute;top:7px;right:7px;width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 0 2px var(--s2)}
+.nav-theme{background:none;border:1px solid var(--b);border-radius:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);transition:border-color .2s,color .2s,background .2s;flex-shrink:0}
+.nav-theme:hover{border-color:var(--gb);color:var(--g);background:var(--gd)}
+.nav-theme .ic-sun{display:none}[data-theme="light"] .nav-theme .ic-sun{display:block}[data-theme="light"] .nav-theme .ic-moon{display:none}
+.nav-burger{display:none;background:none;border:1px solid var(--b);border-radius:6px;padding:7px 9px;cursor:pointer;color:var(--t2);margin-left:8px}
+@media(max-width:900px){.nav-links{display:none}.nav-burger{display:flex}.nav-links.mobile-open{display:flex;flex-direction:column;position:absolute;top:var(--nav-h);left:0;right:0;background:var(--nav-scroll);backdrop-filter:blur(20px);padding:16px 24px;gap:14px;border-bottom:1px solid var(--b)}}
+
+/* PAGE WRAP */
+.page-wrap{padding-top:var(--nav-h);min-height:100vh;position:relative;z-index:1}
+
+/* GATE */
+.gate-wrap{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - var(--nav-h));padding:40px 24px}
+.gate-card{background:linear-gradient(180deg,rgba(15,15,26,.97),rgba(10,10,18,.97));border:1px solid var(--b);border-radius:28px;padding:48px 44px;max-width:520px;width:100%;box-shadow:0 40px 120px rgba(0,0,0,.4);text-align:center}
+[data-theme="light"] .gate-card{background:#fff;border-color:rgba(0,0,0,.09);box-shadow:0 12px 40px rgba(0,0,0,.1)}
+.gate-icon{width:56px;height:56px;background:var(--gd);border:1px solid var(--gb);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 24px}
+.gate-card h1{font-family:var(--display);font-size:38px;font-weight:800;line-height:.95;letter-spacing:-1.2px;color:var(--heading);margin-bottom:14px}
+.gate-card h1 em{color:var(--g);font-style:normal}
+.gate-card p{color:var(--t2);line-height:1.7;font-size:15px;margin-bottom:22px}
+.gate-btns{display:flex;flex-direction:column;gap:10px}
+#gateStatus{min-height:18px;font-size:13px;color:var(--t2);margin-bottom:8px}
+#gateStatus:not(:empty){color:var(--red)}
+.btn-main{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 22px;background:var(--g);color:#000;border:none;border-radius:12px;font-size:15px;font-weight:700;font-family:var(--body);cursor:pointer;transition:background .15s,transform .1s;text-decoration:none}
+.btn-main:hover{background:var(--g2);transform:translateY(-1px)}
+.btn-ghost{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 22px;background:transparent;color:var(--t2);border:1px solid var(--b);border-radius:12px;font-size:14.5px;font-weight:600;font-family:var(--body);cursor:pointer;transition:border-color .15s,color .15s,background .15s;text-decoration:none}
+.btn-ghost:hover{border-color:var(--bhi);color:var(--heading);background:rgba(255,255,255,.04)}
+[data-theme="light"] .btn-ghost:hover{background:rgba(0,0,0,.04)}
+
+/* SHELL */
+.shell{display:none;max-width:1280px;margin:0 auto;padding:24px 24px 48px;gap:22px;grid-template-columns:290px 1fr}
+@media(max-width:1100px){.shell{grid-template-columns:250px 1fr}}
+@media(max-width:820px){.shell{grid-template-columns:1fr}}
+
+/* SIDEBAR */
+.sidebar{display:flex;flex-direction:column;gap:14px}
+
+.user-profile-card{background:linear-gradient(145deg,var(--panel),var(--panel2));border:1px solid var(--b);border-radius:20px;padding:20px;position:relative;overflow:hidden}
+.user-profile-card::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:radial-gradient(circle,var(--gd),transparent 70%);pointer-events:none}
+.user-avatar-wrap{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.user-avatar{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,var(--g),#14b8a6);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:17px;font-weight:800;color:#000;flex-shrink:0}
+.user-name{font-size:15px;font-weight:700;color:var(--heading);margin-bottom:2px}
+.user-email-txt{font-size:11px;color:var(--t2);font-family:var(--mono);word-break:break-all}
+.profile-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.profile-btn{display:flex;align-items:center;justify-content:center;gap:5px;padding:9px 10px;border-radius:10px;border:1px solid var(--b);background:var(--s2);color:var(--t2);font-size:12px;font-weight:600;font-family:var(--body);cursor:pointer;text-decoration:none;transition:border-color .15s,color .15s,background .15s;white-space:nowrap}
+.profile-btn:hover{border-color:var(--bhi);color:var(--heading);background:var(--s3)}
+.profile-btn.danger:hover{border-color:rgba(248,113,113,.4);color:var(--red);background:rgba(248,113,113,.08)}
+
+.courses-panel{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--b);border-radius:20px;padding:16px;flex:1}
+.panel-label{font-size:11px;font-family:var(--mono);letter-spacing:1.3px;text-transform:uppercase;color:var(--t3);margin-bottom:12px}
+.course-list{display:grid;gap:7px;max-height:460px;overflow-y:auto;padding-right:2px}
+.course-list::-webkit-scrollbar{width:3px}.course-list::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px}
+.course-card{padding:13px;border-radius:13px;border:1px solid var(--b);background:rgba(255,255,255,.02);cursor:pointer;transition:border-color .2s,background .2s,transform .15s}
+.course-card:hover{border-color:var(--bhi);background:rgba(255,255,255,.04);transform:translateX(2px)}
+.course-card.active{border-color:var(--gb);background:var(--gd)}
+[data-theme="light"] .course-card{background:rgba(0,0,0,.02)}
+[data-theme="light"] .course-card:hover{background:rgba(0,0,0,.04)}
+[data-theme="light"] .course-card.active{background:rgba(22,163,74,.07);border-color:rgba(22,163,74,.3)}
+.course-card strong{display:block;font-size:13.5px;font-weight:700;color:var(--heading);margin-bottom:3px;line-height:1.3}
+.course-card .muted{font-size:12px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.progress-bar{height:4px;background:rgba(255,255,255,.07);border-radius:999px;overflow:hidden;margin-top:9px}
+[data-theme="light"] .progress-bar{background:rgba(0,0,0,.08)}
+.progress-bar>span{display:block;height:100%;background:linear-gradient(90deg,var(--g),#14b8a6);border-radius:999px;transition:width .5s ease}
+.progress-pct{font-size:11px;color:var(--t3);font-family:var(--mono);margin-top:4px}
+
+/* MAIN CONTENT */
+.content-area{display:grid;gap:14px}
+
+/* Notifications */
+.notices-wrap{background:linear-gradient(145deg,var(--panel),var(--panel2));border:1px solid var(--b);border-radius:16px;padding:14px}
+.notices{display:grid;gap:10px}
+.notice{padding:12px 15px;border-radius:12px;border:1px solid var(--b);background:var(--s2);font-size:13.5px;line-height:1.5;display:flex;align-items:flex-start;gap:9px;justify-content:space-between}
+.notice span{flex:1}
+.notice-close{flex-shrink:0;background:none;border:none;cursor:pointer;color:var(--t3);padding:2px;display:flex;align-items:center;border-radius:6px;transition:color .15s,background .15s}
+.notice-close:hover{color:var(--t);background:var(--b)}
+.notice::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.notice.ok{border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.08);color:var(--g)}.notice.ok::before{background:var(--g)}
+.notice.pending{border-color:rgba(96,165,250,.3);background:rgba(96,165,250,.08);color:var(--blue)}.notice.pending::before{background:var(--blue)}
+.notice.error{border-color:rgba(248,113,113,.3);background:rgba(248,113,113,.08);color:var(--red)}.notice.error::before{background:var(--red)}
+
+/* Overview Stats */
+.overview{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:600px){.overview{grid-template-columns:1fr}}
+.stat{background:linear-gradient(145deg,var(--panel),var(--panel2));border:1px solid var(--b);border-radius:16px;padding:16px;transition:border-color .2s,transform .15s}
+.stat:hover{border-color:var(--bhi);transform:translateY(-2px)}
+.stat .stat-ic{width:34px;height:34px;border-radius:10px;background:var(--gd);border:1px solid var(--gb);display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.stat .muted{font-size:11px;font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase;color:var(--t3)}
+.stat b{display:block;font-family:var(--display);font-size:30px;font-weight:800;color:var(--heading);line-height:1;margin-top:4px}
+
+/* Course Header */
+.course-header-card{background:linear-gradient(145deg,var(--panel),var(--panel2));border:1px solid var(--b);border-radius:18px;padding:20px 22px;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.course-header-card h2{font-family:var(--display);font-size:22px;font-weight:800;color:var(--heading);letter-spacing:-.5px;margin-bottom:5px}
+.course-header-card .muted{font-size:13.5px;line-height:1.6;max-width:640px}
+.progress-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:999px;background:var(--gd);border:1px solid var(--gb);font-size:12px;font-weight:700;color:var(--g);font-family:var(--mono);white-space:nowrap;flex-shrink:0}
+
+/* Course Layout */
+.course-layout{display:grid;grid-template-columns:286px 1fr;gap:14px}
+@media(max-width:1100px){.course-layout{grid-template-columns:248px 1fr}}
+@media(max-width:760px){.course-layout{grid-template-columns:1fr}}
+
+/* Modules Panel */
+.modules-panel{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--b);border-radius:18px;padding:16px;display:flex;flex-direction:column;max-height:660px;overflow-y:auto}
+.modules-panel::-webkit-scrollbar{width:3px}.modules-panel::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px}
+.panel-head{font-size:12.5px;font-weight:700;color:var(--heading);margin-bottom:12px;letter-spacing:.3px}
+.module-list{display:grid;gap:10px}
+.module{background:rgba(255,255,255,.025);border:1px solid var(--b);border-radius:13px;padding:12px}
+[data-theme="light"] .module{background:rgba(0,0,0,.025)}
+.module h4{font-size:13px;font-weight:700;color:var(--heading);margin-bottom:3px}
+.module .muted{font-size:11.5px;margin-bottom:9px}
+.module-items{display:grid;gap:5px}
+.lesson{padding:8px 11px;border-radius:9px;border:1px solid var(--b);background:rgba(255,255,255,.02);cursor:pointer;transition:border-color .15s,background .15s,transform .1s;display:flex;align-items:flex-start;gap:8px}
+.lesson:hover{border-color:var(--bhi);transform:translateX(2px)}
+.lesson.active{border-color:var(--blue);background:rgba(96,165,250,.07)}
+.lesson.done{border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.06)}
+.lesson-check{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--b);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.lesson.done .lesson-check{border-color:var(--g);background:var(--g)}
+.lesson.active .lesson-check{border-color:var(--blue)}
+.lesson-text strong{display:block;font-size:13px;font-weight:600;color:var(--t);line-height:1.3}
+.lesson small{display:block;font-size:11px;color:var(--t3);font-family:var(--mono);margin-top:3px}
+
+/* Viewer */
+.viewer-col{display:grid;gap:12px}
+.viewer-box{min-height:360px;background:var(--panel);border:1px solid var(--b);border-radius:18px;padding:14px;overflow:hidden}
+.viewer-box iframe,.viewer-box video{width:100%;min-height:360px;border:0;border-radius:13px;background:#000;display:block}
+.viewer-box .empty{color:var(--t2);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;text-align:center;gap:10px;font-size:14px}
+.viewer-box .empty svg{width:36px;height:36px;color:var(--t3)}
+.viewer-info-panel{background:linear-gradient(145deg,var(--panel),var(--panel2));border:1px solid var(--b);border-radius:18px;padding:18px 20px}
+.viewer-info-panel h3{font-size:16px;font-weight:700;color:var(--heading);margin-bottom:4px;line-height:1.3}
+.viewer-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+.btn-action{display:inline-flex;align-items:center;gap:7px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:700;font-family:var(--body);cursor:pointer;transition:background .15s,transform .1s,border-color .15s;text-decoration:none}
+.btn-action.primary{background:var(--g);color:#000;border:none}
+.btn-action.primary:hover{background:var(--g2);transform:translateY(-1px)}
+.btn-action.secondary{background:var(--s2);color:var(--t2);border:1px solid var(--b)}
+.btn-action.secondary:hover{border-color:var(--bhi);color:var(--heading);background:var(--s3)}
+.status{min-height:18px;color:var(--t2);font-size:13px;margin-top:8px}
+.status.ok{color:var(--g)}.status.error{color:var(--red)}
+
+@media(max-width:820px){.course-layout{grid-template-columns:1fr}.shell{padding:16px 16px 40px}}
 </style>
 </head>
 <body>
-<div class="container">
-  <div class="top">
-    <div>
-      <div class="brand">Customer <em>Portal</em></div>
-      <div class="hero-sub">Open your purchased courses, continue lessons, view PDFs, and track what you’ve completed.</div>
+<div class="bg-grid"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-logo">
+      <div class="nav-logo-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+      <span class="nav-logo-txt">Maps Lead <em>Scraper</em></span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="../index.html#how">How it works</a>
+      <a href="../index.html#features">Features</a>
+      <a href="../index.html#pricing">Pricing</a>
+      <a href="../course/">Course</a>
+      <a href="../portal/" class="active">Portal</a>
+      <a href="../auth/" id="navAccountLink">Account</a>
+      <a href="../index.html#install" class="nav-cta">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Add to Browser
+      </a>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <a class="btn" href="../course/">Buy Course</a>
-      <a class="btn" href="../auth/" id="accountLink">Account</a>
-      <button class="btn" id="themeBtn">Theme</button>
+    <button class="nav-bell" id="bellBtn" aria-label="Notifications" style="display:none;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <span class="bell-dot" id="bellDot" style="display:none;"></span>
+    </button>
+    <button class="nav-theme" id="themeBtn" aria-label="Toggle theme">
+      <svg class="ic-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      <svg class="ic-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <button class="nav-burger" aria-label="Toggle menu" onclick="document.getElementById('navLinks').classList.toggle('mobile-open')">
+      <svg width="17" height="13" viewBox="0 0 17 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="0" y1="1" x2="17" y2="1"/><line x1="0" y1="6.5" x2="17" y2="6.5"/><line x1="0" y1="12" x2="17" y2="12"/></svg>
+    </button>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- GATE (logged out) -->
+  <div class="gate-wrap" id="gate">
+    <div class="gate-card">
+      <div class="gate-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <h1>Access Your <em>Courses</em></h1>
+      <p>Log in to open your purchased courses, continue lessons, view PDFs, and track your progress. Use the same email you purchased with.</p>
+      <div id="gateStatus"></div>
+      <div class="gate-btns">
+        <a class="btn-main" href="../auth/?redirect=/portal/">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          Log In / Register
+        </a>
+        <a class="btn-ghost" href="../course/">Go To Course Checkout</a>
+      </div>
     </div>
   </div>
 
-  <div class="gate" id="gate">
-    <h1 style="font-family:var(--display);font-size:40px;line-height:1;letter-spacing:-1px;margin-bottom:12px;">Log in to open<br>your purchased courses.</h1>
-    <p class="muted" style="line-height:1.7;margin-bottom:18px;">This portal uses the same account system as checkout. If your course was granted manually, log in with the same email address used for purchase. If we created an account for you, use the temporary password from your email.</p>
-    <div class="status" id="gateStatus"></div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <a class="btn primary" href="../auth/?redirect=/portal/">Log In / Register</a>
-      <a class="btn" href="../course/">Go To Course Checkout</a>
-    </div>
-  </div>
-
+  <!-- SHELL (logged in) -->
   <div class="shell" id="shell">
+
     <aside class="sidebar">
-      <div class="panel">
-        <div class="muted">Signed in as</div>
-        <h2 id="userName" style="margin-top:8px;">User</h2>
-        <div class="muted" id="userEmail" style="margin-top:4px;"></div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
-          <a class="btn" href="../course/">Buy Another Course</a>
-          <button class="btn" id="logoutBtn">Log Out</button>
+      <div class="user-profile-card">
+        <div class="user-avatar-wrap">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div>
+            <div class="user-name" id="userName">User</div>
+            <div class="user-email-txt" id="userEmail"></div>
+          </div>
+        </div>
+        <div class="profile-btns">
+          <a class="profile-btn" href="../course/">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+            Buy Course
+          </a>
+          <button class="profile-btn danger" id="logoutBtn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Log Out
+          </button>
         </div>
       </div>
 
-      <div class="panel">
-        <h3>Your Courses</h3>
-        <div class="course-list" id="courseList" style="margin-top:14px;"></div>
+      <div class="courses-panel">
+        <div class="panel-label">Your Courses</div>
+        <div class="course-list" id="courseList"></div>
       </div>
     </aside>
 
-    <main style="display:grid;gap:18px;">
+    <main class="content-area">
+      <!-- NOTIFICATIONS DRAWER (toggled by bell icon) -->
+      <div class="notices-wrap" id="noticesWrap" style="display:none;">
+        <div class="notices" id="portalNotices"></div>
+      </div>
+
       <div class="overview" id="overview"></div>
 
-      <div class="panel">
-        <div style="display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap;">
-          <div>
-            <h2 id="courseTitle">Select a course</h2>
-            <div class="muted" id="courseDescription" style="margin-top:8px;max-width:760px;"></div>
-          </div>
-          <div class="pill" id="courseProgressBadge">0% complete</div>
+      <div class="course-header-card">
+        <div>
+          <h2 id="courseTitle">Select a course</h2>
+          <div class="muted" id="courseDescription" style="margin-top:5px;"></div>
+        </div>
+        <div class="progress-pill" id="courseProgressBadge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          0% complete
         </div>
       </div>
 
       <div class="course-layout">
-        <div class="panel">
-          <h3>Lessons</h3>
-          <div class="module-list" id="moduleList" style="margin-top:14px;"></div>
+        <div class="modules-panel">
+          <div class="panel-head">Lessons</div>
+          <div class="module-list" id="moduleList"></div>
         </div>
-        <div class="viewer">
-          <div class="panel viewer-box" id="viewerBox"></div>
-          <div class="panel">
-            <div style="display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap;">
-              <div>
-                <h3 id="lessonTitle">No lesson selected</h3>
-                <div class="muted" id="lessonMeta" style="margin-top:6px;"></div>
-              </div>
-              <div class="viewer-actions">
-                <button class="btn primary" id="markDoneBtn">Mark Complete</button>
-                <a class="btn" id="openAssetBtn" target="_blank" rel="noopener">Open Asset</a>
-              </div>
+
+        <div class="viewer-col">
+          <div class="viewer-box" id="viewerBox">
+            <div class="empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              Select a lesson to start learning.
             </div>
-            <div class="status" id="portalStatus" style="margin-top:14px;"></div>
+          </div>
+          <div class="viewer-info-panel">
+            <h3 id="lessonTitle">No lesson selected</h3>
+            <div class="muted" id="lessonMeta" style="margin-top:4px;"></div>
+            <div class="viewer-actions">
+              <button class="btn-action primary" id="markDoneBtn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Mark Complete
+              </button>
+              <a class="btn-action secondary" id="openAssetBtn" target="_blank" rel="noopener">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                Open Asset
+              </a>
+            </div>
+            <div class="status" id="portalStatus"></div>
           </div>
         </div>
       </div>
     </main>
   </div>
-</div>
 
+</div>
 <script>
 const TOKEN_KEY='mls_auth_token';
+const CLIENT_KEY='mls_client_id';
 const API_BASE=window.location.hostname==='localhost'?'http://localhost:3000':'https://map-scraper-paddle-backend.vercel.app';
 const state={user:null,courses:[],selectedCourse:null,selectedLesson:null};
 
-(function(){const t=localStorage.getItem('mls_theme')||(matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t)})();
-document.getElementById('themeBtn').addEventListener('click',()=>{const next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',next);localStorage.setItem('mls_theme',next)});
+function getClientId(){
+  let id=localStorage.getItem(CLIENT_KEY)||'';
+  if(/^[a-zA-Z0-9_-]{16,120}$/.test(id)) return id;
+  const bytes=new Uint8Array(24);
+  if(window.crypto&&typeof window.crypto.getRandomValues==='function'){
+    window.crypto.getRandomValues(bytes);
+    id=Array.from(bytes,(b)=>b.toString(16).padStart(2,'0')).join('');
+  }else{
+    id=(Date.now().toString(16)+Math.random().toString(16).slice(2)+Math.random().toString(16).slice(2)).slice(0,48);
+  }
+  localStorage.setItem(CLIENT_KEY,id);
+  return id;
+}
+
+function applyTheme(theme){
+  const next=theme==='light'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  localStorage.setItem('mls_theme',next);
+  const meta=document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute('content',next==='light'?'#f4f6fb':'#06060c');
+}
+
+(function(){
+  const saved=localStorage.getItem('mls_theme');
+  const preferred=matchMedia('(prefers-color-scheme:light)').matches?'light':'dark';
+  applyTheme(saved||preferred);
+})();
+
+document.getElementById('themeBtn').addEventListener('click',()=>{
+  const next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  applyTheme(next);
+});
+
+window.addEventListener('storage',(event)=>{
+  if(event.key==='mls_theme'&&event.newValue) applyTheme(event.newValue);
+});
 
 function esc(value){return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
 function setStatus(msg,type=''){const el=document.getElementById('portalStatus');el.textContent=msg;el.className='status'+(type?` ${type}`:'')}
 function getToken(){return localStorage.getItem(TOKEN_KEY)||''}
 
 async function portalApi(action,payload={}){
-  const res=await fetch(`${API_BASE}/api/customer-portal`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,token:getToken(),...payload})});
+  const res=await fetch(`${API_BASE}/api/customer-portal`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,token:getToken(),clientId:getClientId(),...payload})});
   const data=await res.json().catch(()=>({}));
   if(!res.ok) throw new Error(data.error||'Request failed');
   return data;
@@ -134,6 +404,28 @@ function renderOverview(){
     <div class="stat"><div class="muted">Total Lessons</div><b>${totalLessons}</b></div>
     <div class="stat"><div class="muted">Average Progress</div><b>${averageProgress}%</b></div>`;
 }
+
+function updateBellDot(){
+  const count=document.querySelectorAll('#portalNotices .notice').length;
+  const dot=document.getElementById('bellDot');
+  if(dot) dot.style.display=count?'block':'none';
+}
+
+function renderNotifications(notifications){
+  const box=document.getElementById('portalNotices');
+  const bellBtn=document.getElementById('bellBtn');
+  const wrap=document.getElementById('noticesWrap');
+  const list=Array.isArray(notifications)?notifications.filter((n)=>n&&n.message):[];
+  if(!list.length){box.style.display='none';box.innerHTML='';if(bellBtn)bellBtn.style.display='none';if(wrap)wrap.style.display='none';updateBellDot();return}
+  box.style.display='grid';
+  box.innerHTML=list.map((n)=>`<div class="notice ${esc(n.type||'pending')}"><span>${esc(n.message||'')}</span><button class="notice-close" onclick="this.parentElement.remove();updateBellDot()" aria-label="Dismiss"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>`).join('');
+  if(bellBtn){bellBtn.style.display='flex';updateBellDot()}
+}
+document.getElementById('bellBtn').addEventListener('click',()=>{
+  const wrap=document.getElementById('noticesWrap');
+  if(wrap) wrap.style.display=(wrap.style.display==='none' || !wrap.style.display)?'grid':'none';
+});
+
 
 function renderCourseList(){
   const list=document.getElementById('courseList');
@@ -182,7 +474,7 @@ function renderSelectedCourse(){
         ${(module.items||[]).map((item)=>`
           <div class="lesson ${state.selectedLesson&&state.selectedLesson.id===item.id?'active':''} ${completedIds.has(item.id)?'done':''}" data-item-id="${esc(item.id)}">
             <strong>${esc(item.title)}</strong>
-            <small>${esc(item.type)}${item.durationMinutes?` · ${item.durationMinutes} min`:''}</small>
+            <small>${esc(item.type)}${item.durationMinutes?` - ${item.durationMinutes} min`:''}</small>
           </div>`).join('')}
       </div>
     </div>`).join('');
@@ -233,7 +525,7 @@ function renderViewer(){
   const completed=new Set(entry?.progress?.completedItemIds||[]);
   document.getElementById('viewerBox').innerHTML=viewerHtmlForLesson(lesson);
   document.getElementById('lessonTitle').textContent=lesson?lesson.title:'No lesson selected';
-  document.getElementById('lessonMeta').textContent=lesson?`${lesson.type}${lesson.durationMinutes?` · ${lesson.durationMinutes} min`:''}${lesson.description?` · ${lesson.description}`:''}`:'';
+  document.getElementById('lessonMeta').textContent=lesson?`${lesson.type}${lesson.durationMinutes?` - ${lesson.durationMinutes} min`:''}${lesson.description?` - ${lesson.description}`:''}`:'';
   const openAssetBtn=document.getElementById('openAssetBtn');
   if(lesson&&lesson.url){openAssetBtn.href=lesson.url;openAssetBtn.style.display='inline-flex'}else{openAssetBtn.removeAttribute('href');openAssetBtn.style.display='none'}
   const markDoneBtn=document.getElementById('markDoneBtn');
@@ -252,8 +544,11 @@ async function loadPortal(){
     state.courses=data.courses||[];
     document.getElementById('userName').textContent=data.user.name||'User';
     document.getElementById('userEmail').textContent=data.user.email||'';
+    const avatar=document.getElementById('userAvatar');
+    if(avatar) avatar.textContent=(data.user.name||data.user.email||'U').trim().charAt(0).toUpperCase()||'U';
     document.getElementById('gate').style.display='none';
     document.getElementById('shell').style.display='grid';
+    renderNotifications(data.notifications||[]);
     renderOverview();
     const requestedCourse=new URLSearchParams(location.search).get('course');
     state.selectedCourse=state.courses.find((entry)=>entry.courseId===requestedCourse)||state.courses[0]||null;
@@ -266,7 +561,7 @@ async function loadPortal(){
 }
 
 document.getElementById('logoutBtn').addEventListener('click',async()=>{
-  try{await fetch(`${API_BASE}/api/auth`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'logout',token:getToken()})})}catch{}
+  try{await fetch(`${API_BASE}/api/auth`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'logout',token:getToken(),clientId:getClientId()})})}catch{}
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem('mls_auth_user');
   location.reload();

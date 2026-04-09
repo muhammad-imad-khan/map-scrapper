@@ -346,6 +346,20 @@ nav.scrolled{background:var(--nav-scroll);backdrop-filter:blur(20px);border-bott
 .rb-name{font-size:13px;font-weight:600;color:var(--t)}
 .rb-name .rb-pack{color:var(--g);font-weight:700}
 .rb-meta{font-size:11px;color:var(--t3);font-family:var(--mono);margin-top:1px}
+
+/* One-time pricing layout: keep the card and social proof on one row */
+#pricing.one-time-layout .container{display:grid;grid-template-columns:minmax(270px,420px) minmax(280px,1fr);gap:16px;align-items:start}
+#pricing.one-time-layout .container > .rev:first-child{grid-column:1 / -1}
+#pricing.one-time-layout .p-grid{grid-column:1;grid-row:2 / span 2;grid-template-columns:1fr;margin-top:0}
+#pricing.one-time-layout .scarcity-bar{grid-column:2;grid-row:2;max-width:none;margin:0}
+#pricing.one-time-layout .recent-buys{grid-column:2;grid-row:3;max-width:none;margin:12px 0 0}
+@media(max-width:760px){
+  #pricing.one-time-layout .container{grid-template-columns:1fr}
+  #pricing.one-time-layout .container > .rev:first-child{grid-column:auto}
+  #pricing.one-time-layout .p-grid,#pricing.one-time-layout .scarcity-bar,#pricing.one-time-layout .recent-buys{grid-column:auto;grid-row:auto}
+  #pricing.one-time-layout .scarcity-bar{margin:18px 0 0}
+  #pricing.one-time-layout .recent-buys{margin:14px 0 0}
+}
 /* FLOATING TOAST */
 .purchase-toast{position:fixed;bottom:24px;left:24px;z-index:8000;background:var(--s2);border:1px solid var(--gb);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 20px 60px rgba(0,0,0,.5);max-width:340px;opacity:0;transform:translateY(20px) scale(.95);transition:opacity .4s ease,transform .4s ease;pointer-events:none}
 .purchase-toast.show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
@@ -424,7 +438,8 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
 </style>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
-  Paddle.Initialize({ token: 'live_a5e44dc571f960aec1814cb19be' });
+  Paddle.Environment.set('sandbox');
+  Paddle.Initialize({ token: 'test_72fcb1bf88e7b485d977abd74ac' });
 </script>
 </head>
 <body>
@@ -447,9 +462,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
       <a href="#" id="navZipDownload">Download ZIP</a>
       <a href="payment/">Payment</a>
       <a href="course/">Course</a>
-      <a href="#faq">FAQ</a>
-      <a href="about.html">About</a>
-      <a href="terms-and-conditions.html">Terms</a>
+      <a href="portal/">Portal</a>
       <a href="auth/">Account</a>
       <a href="#install" class="nav-cta" id="navCtaBtn">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -1398,6 +1411,21 @@ function detect() {
 const detected = detect();
 var activePricingMode = 'credit_based';
 var authState = { loaded: false, user: null, purchases: [], entitlements: { lifetimeAccess: false, zipDownload: false } };
+var CLIENT_KEY = 'mls_client_id';
+
+function getClientId(){
+  var id = localStorage.getItem(CLIENT_KEY) || '';
+  if (/^[a-zA-Z0-9_-]{16,120}$/.test(id)) return id;
+  var bytes = new Uint8Array(24);
+  if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
+    window.crypto.getRandomValues(bytes);
+    id = Array.from(bytes, function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+  } else {
+    id = (Date.now().toString(16) + Math.random().toString(16).slice(2) + Math.random().toString(16).slice(2)).slice(0, 48);
+  }
+  localStorage.setItem(CLIENT_KEY, id);
+  return id;
+}
 var autoDownloadAttempted = false;
 
 function applyBrowser(br) {
@@ -1477,6 +1505,8 @@ function applyPricingMode(mode, pricing) {
     const el = document.getElementById(id);
     if (el) el.innerHTML = text;
   };
+  const pricingSection = document.getElementById('pricing');
+  if (pricingSection) pricingSection.classList.toggle('one-time-layout', isOneTime);
 
   const freeStrip = document.getElementById('freeStrip');
   const freeCard = document.getElementById('freePlanCard');
@@ -1548,7 +1578,7 @@ async function loadAuthState() {
     const resp = await fetch(`${BACKEND_BASE}/api/auth`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'me', token }),
+      body: JSON.stringify({ action: 'me', token, clientId: getClientId() }),
     });
     const data = await resp.json();
     if (!resp.ok) throw new Error(data.error || 'Session expired');

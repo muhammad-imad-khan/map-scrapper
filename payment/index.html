@@ -159,8 +159,9 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
 </style>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
+  Paddle.Environment.set('sandbox');
   Paddle.Initialize({
-    token: 'live_a5e44dc571f960aec1814cb19be',
+    token: 'test_72fcb1bf88e7b485d977abd74ac',
     eventCallback: function(ev) {
       if (ev && ev.name === 'checkout.completed') {
         handlePaymentSuccess();
@@ -187,8 +188,8 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
       <a href="../index.html#features">Features</a>
       <a href="../index.html#pricing">Pricing</a>
       <a href="./" class="active">Payment</a>
-      <a href="../about.html">About</a>
-      <a href="../terms-and-conditions.html">Terms &amp; Conditions</a>
+      <a href="../course/">Course</a>
+      <a href="../portal/">Portal</a>
       <a href="../auth/" id="navAccountLink">Account</a>
       <a href="../index.html#install" class="nav-cta" id="navCtaLink">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -471,6 +472,21 @@ const USD_EXCHANGE_RATES = {
 const BACKEND_BASE = window.location.hostname === 'localhost'
   ? 'http://localhost:3000'
   : 'https://map-scraper-paddle-backend.vercel.app';
+const CLIENT_KEY = 'mls_client_id';
+
+function getClientId() {
+  let id = localStorage.getItem(CLIENT_KEY) || '';
+  if (/^[a-zA-Z0-9_-]{16,120}$/.test(id)) return id;
+  const bytes = new Uint8Array(24);
+  if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
+    window.crypto.getRandomValues(bytes);
+    id = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+  } else {
+    id = (Date.now().toString(16) + Math.random().toString(16).slice(2) + Math.random().toString(16).slice(2)).slice(0, 48);
+  }
+  localStorage.setItem(CLIENT_KEY, id);
+  return id;
+}
 
 const packOptions = document.getElementById('packOptions');
 const countrySelect = document.getElementById('countrySelect');
@@ -787,7 +803,7 @@ checkoutBtn.addEventListener('click', () => {
     localStorage.setItem('mls_pending_zip_download', '1');
   }
   const authToken = localStorage.getItem('mls_auth_token') || '';
-  pendingCheckout = { priceId: pack.priceId, installId: state.installId, token: authToken };
+  pendingCheckout = { priceId: pack.priceId, installId: state.installId, token: authToken, clientId: getClientId() };
   pendingCheckout.pack = pack.key;
   pendingCheckout.country = state.country;
   pendingCheckout.currency = state.currency;
@@ -880,7 +896,7 @@ async function handlePaymentSuccess() {
       const r = await fetch('https://map-scraper-paddle-backend.vercel.app/api/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'me', token }),
+        body: JSON.stringify({ action: 'me', token, clientId: getClientId() }),
       });
       const d = await r.json();
       if (d.entitlements && d.entitlements.zipDownload) { entitled = true; break; }
@@ -924,7 +940,7 @@ function startPendingZipAutoDownloadPollingOnPayment() {
       const r = await fetch('https://map-scraper-paddle-backend.vercel.app/api/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'me', token }),
+        body: JSON.stringify({ action: 'me', token, clientId: getClientId() }),
       });
       const d = await r.json().catch(() => ({}));
       if (r.ok && d.entitlements && d.entitlements.zipDownload) {
@@ -1017,7 +1033,7 @@ loadPricingMode().then(() => {
   fetch(AUTH_API, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'me', token: token }),
+    body: JSON.stringify({ action: 'me', token: token, clientId: getClientId() }),
   })
   .then(function(r) { return r.json(); })
   .then(function(data) {

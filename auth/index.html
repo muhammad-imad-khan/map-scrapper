@@ -139,6 +139,8 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
       <a href="../index.html#features">Features</a>
       <a href="../index.html#pricing">Pricing</a>
       <a href="../payment/">Payment</a>
+      <a href="../course/">Course</a>
+      <a href="../portal/">Portal</a>
       <a href="./" class="active">Account</a>
       <a href="../index.html#install" class="nav-cta">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -273,16 +275,60 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
 <script>
 'use strict';
 
+const CLIENT_KEY = 'mls_client_id';
+
+function getClientId() {
+  let id = localStorage.getItem(CLIENT_KEY) || '';
+  if (/^[a-zA-Z0-9_-]{16,120}$/.test(id)) return id;
+  const bytes = new Uint8Array(24);
+  if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
+    window.crypto.getRandomValues(bytes);
+    id = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+  } else {
+    id = (Date.now().toString(16) + Math.random().toString(16).slice(2) + Math.random().toString(16).slice(2)).slice(0, 48);
+  }
+  localStorage.setItem(CLIENT_KEY, id);
+  return id;
+}
+
+function applyTheme(theme) {
+  const next = theme === 'light' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('mls_theme', next);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', next === 'light' ? '#f4f6fb' : '#06060c');
+}
+
 /* ── theme ── */
 (function(){
-  const t=localStorage.getItem('mls_theme')||(matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');
-  document.documentElement.setAttribute('data-theme',t);
-  const btn=document.getElementById('themeToggle');
-  if(btn) btn.addEventListener('click',()=>{
-    const next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
-    document.documentElement.setAttribute('data-theme',next);
-    localStorage.setItem('mls_theme',next);
+  const saved = localStorage.getItem('mls_theme');
+  const preferred = matchMedia('(prefers-color-scheme:light)').matches ? 'light' : 'dark';
+  applyTheme(saved || preferred);
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme') || 'dark';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
   });
+  window.addEventListener('storage', (event) => {
+    if (event.key === 'mls_theme' && event.newValue) applyTheme(event.newValue);
+  });
+})();
+
+/* ── Strip sensitive query params if present ── */
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  let changed = false;
+  ['token', 'session', 'clientId'].forEach((key) => {
+    if (params.has(key)) {
+      params.delete(key);
+      changed = true;
+    }
+  });
+  if (changed) {
+    const nextQuery = params.toString();
+    const nextUrl = `${window.location.pathname}${nextQuery ? `?${nextQuery}` : ''}${window.location.hash || ''}`;
+    history.replaceState(null, '', nextUrl);
+  }
 })();
 
 const API = window.location.hostname === 'localhost'
@@ -338,14 +384,16 @@ loginForm.addEventListener('submit', async (e) => {
   btn.textContent = 'Logging in…';
 
   try {
+    const clientId = getClientId();
     const res = await fetch(API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'login', email, password }),
+      body: JSON.stringify({ action: 'login', email, password, clientId }),
     });
     const data = await res.json();
 
     if (data.ok) {
+      if (data.clientId) localStorage.setItem(CLIENT_KEY, data.clientId);
       localStorage.setItem(TOKEN_KEY, data.token);
       localStorage.setItem(USER_KEY, JSON.stringify(data.user));
       showMsg(loginMsg, 'Logged in! Redirecting…', 'success');
@@ -376,14 +424,16 @@ registerForm.addEventListener('submit', async (e) => {
   btn.textContent = 'Creating account…';
 
   try {
+    const clientId = getClientId();
     const res = await fetch(API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'register', name, email, password }),
+      body: JSON.stringify({ action: 'register', name, email, password, clientId }),
     });
     const data = await res.json();
 
     if (data.ok) {
+      if (data.clientId) localStorage.setItem(CLIENT_KEY, data.clientId);
       localStorage.setItem(TOKEN_KEY, data.token);
       localStorage.setItem(USER_KEY, JSON.stringify(data.user));
       showMsg(registerMsg, 'Account created! Redirecting…', 'success');
@@ -402,11 +452,12 @@ registerForm.addEventListener('submit', async (e) => {
 // ── Logout ──
 document.getElementById('logoutBtn').addEventListener('click', async () => {
   const token = localStorage.getItem(TOKEN_KEY);
+  const clientId = getClientId();
   try {
     await fetch(API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'logout', token }),
+      body: JSON.stringify({ action: 'logout', token, clientId }),
     });
   } catch {}
   localStorage.removeItem(TOKEN_KEY);
@@ -435,10 +486,11 @@ async function checkAuth() {
   if (!token) { showLoggedOut(); return; }
 
   try {
+    const clientId = getClientId();
     const res = await fetch(API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'me', token }),
+      body: JSON.stringify({ action: 'me', token, clientId }),
     });
     const data = await res.json();
     if (data.ok) {
@@ -450,10 +502,7 @@ async function checkAuth() {
       showLoggedOut();
     }
   } catch {
-    // Offline — use cached user
-    const cached = localStorage.getItem(USER_KEY);
-    if (cached) showLoggedIn(JSON.parse(cached));
-    else showLoggedOut();
+    showLoggedOut();
   }
 }
 
