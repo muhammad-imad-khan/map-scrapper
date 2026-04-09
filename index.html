@@ -436,11 +436,6 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
 [data-theme="light"] #installModalBox div[style*="border-top"]{border-color:rgba(0,0,0,.08)!important}
 [data-theme="light"] #installModalBox div[style*="letter-spacing:2px"]{color:#71718a!important}
 </style>
-<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
-<script>
-  Paddle.Environment.set('sandbox');
-  Paddle.Initialize({ token: 'test_72fcb1bf88e7b485d977abd74ac' });
-</script>
 </head>
 <body>
 
@@ -917,6 +912,13 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
 
 <script>
 'use strict';
+
+function revealDeferredSections() {
+  document.querySelectorAll('.rev').forEach(el => el.classList.add('in'));
+}
+
+window.addEventListener('error', revealDeferredSections);
+window.addEventListener('unhandledrejection', revealDeferredSections);
 
 // ══════════════════════════════════════════════════════
 //  THEME TOGGLE (light / dark)
@@ -1849,10 +1851,14 @@ document.querySelectorAll('.faq-q').forEach(q => {
   });
 });
 
-const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
-}, { threshold:0.08, rootMargin:'0px 0px -40px 0px' });
-document.querySelectorAll('.rev').forEach(el => obs.observe(el));
+if ('IntersectionObserver' in window) {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+  }, { threshold:0.08, rootMargin:'0px 0px -40px 0px' });
+  document.querySelectorAll('.rev').forEach(el => obs.observe(el));
+} else {
+  revealDeferredSections();
+}
 
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
