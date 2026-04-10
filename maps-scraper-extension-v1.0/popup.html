@@ -196,6 +196,25 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 </head>
 <body>
 
+<!-- AUTH GATE OVERLAY -->
+<div id="authGateOverlay" style="position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;">
+  <div style="max-width:360px;width:100%;padding:32px 24px;text-align:center;">
+    <div style="font-size:36px;margin-bottom:12px;">🔒</div>
+    <div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:6px;">Sign In Required</div>
+    <div style="font-size:13px;color:var(--m);margin-bottom:24px;line-height:1.5;">Enter the email & password you used to purchase the tool.</div>
+    <div style="margin-bottom:10px;text-align:left;">
+      <div style="font-size:10px;color:var(--m);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Email</div>
+      <input type="email" id="authGateEmail" placeholder="you@example.com" style="width:100%;background:var(--card2);border:1px solid var(--bhi);border-radius:8px;padding:10px 14px;color:var(--t);font-size:13px;outline:none;font-family:var(--ui);" />
+    </div>
+    <div style="margin-bottom:10px;text-align:left;">
+      <div style="font-size:10px;color:var(--m);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Password</div>
+      <input type="password" id="authGatePassword" placeholder="Enter your password" style="width:100%;background:var(--card2);border:1px solid var(--bhi);border-radius:8px;padding:10px 14px;color:var(--t);font-size:13px;outline:none;font-family:var(--ui);" />
+    </div>
+    <div id="authGateMsg" style="font-size:11px;font-family:var(--mono);min-height:16px;margin:8px 0;color:var(--red);"></div>
+    <button id="authGateLogin" style="width:100%;padding:12px;background:var(--g);color:#000;border:none;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:var(--ui);transition:background .15s;">Sign In & Activate</button>
+  </div>
+</div>
+
 <!-- NO-CREDITS OVERLAY -->
 <div class="overlay" id="noCreditsOverlay">
 
@@ -343,6 +362,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   <span id="ftrCredits">— credits</span>
 </div>
 
+<script src="popup-auth-gate.js"></script>
 <script src="popup.js"></script>
 <script src="pricing-mode.js"></script>
 <script src="popup-lifetime-ui.js"></script>

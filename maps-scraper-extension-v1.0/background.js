@@ -259,7 +259,55 @@ async function getUsedCodes() {
   return new Promise(r => chrome.storage.local.get(['usedCodes'], d => r(d.usedCodes || [])));
 }
 
-// ÔöÇÔöÇ Message router ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// ── Extension auth helpers ──────────────────────────────────
+
+async function extLogin(email, password) {
+  const installId = await getInstallId();
+  const res = await fetch(`${BACKEND_URL}/api/auth`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'ext-login', email, password, installId }),
+  });
+  const data = await res.json();
+  if (!res.ok) return { ok: false, error: data.error || 'Login failed.' };
+
+  // Store auth state
+  await chrome.storage.local.set({
+    extAuthEmail: data.user.email,
+    extAuthName: data.user.name,
+    extAuthLifetime: data.entitlements?.lifetimeAccess === true,
+    extAuthenticated: true,
+  });
+
+  // If lifetime access, refresh billing to pick up unlimited
+  if (data.entitlements?.lifetimeAccess) {
+    await getBillingState();
+  }
+
+  return { ok: true, user: data.user, entitlements: data.entitlements };
+}
+
+async function checkExtAuth() {
+  return new Promise(resolve => {
+    chrome.storage.local.get(['extAuthenticated', 'extAuthEmail', 'extAuthName', 'extAuthLifetime'], data => {
+      resolve({
+        authenticated: data.extAuthenticated === true,
+        email: data.extAuthEmail || '',
+        name: data.extAuthName || '',
+        lifetimeAccess: data.extAuthLifetime === true,
+      });
+    });
+  });
+}
+
+async function extLogout() {
+  await chrome.storage.local.remove([
+    'extAuthenticated', 'extAuthEmail', 'extAuthName', 'extAuthLifetime',
+  ]);
+  return { ok: true };
+}
+
+// ── Message router ──────────────────────────────────────────
 
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   (async () => {
@@ -377,6 +425,24 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
         const height = 700;
         chrome.action.openPopup().catch(() => {});
         sendResponse({ ok: true });
+        break;
+      }
+
+      case 'EXT_LOGIN': {
+        const result = await extLogin(msg.email, msg.password);
+        sendResponse(result);
+        break;
+      }
+
+      case 'CHECK_AUTH': {
+        const auth = await checkExtAuth();
+        sendResponse(auth);
+        break;
+      }
+
+      case 'EXT_LOGOUT': {
+        const result = await extLogout();
+        sendResponse(result);
         break;
       }
     }
