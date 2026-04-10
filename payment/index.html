@@ -167,6 +167,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
     token: 'test_72fcb1bf88e7b485d977abd74ac',
     eventCallback: function(ev) {
       if (ev && ev.name === 'checkout.completed') {
+        try { Paddle.Checkout.close(); } catch (_) {}
         handlePaymentSuccess();
       }
       if (ev && ev.name === 'checkout.error') {
