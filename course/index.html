@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Course — Lead Gen x AI Powered Web Design | Lead Gen X Map Scrapper</title>
+<title>Course — Lead Gen x AI Powered Web Design | LEAD GEN x AI Powered Tool</title>
 <meta name="description" content="Learn the complete 6-step system to scrape, qualify, build, deploy, pitch and close high-value leads using AI-powered web design.">
 <meta name="theme-color" content="#06060c">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -201,7 +201,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
         <div class="workflow">
           <div class="wf-step">
             <div class="wf-num">1</div>
-            <div><h4>SCRAPE</h4><p>Extract leads from Google Maps with the Lead Gen X Map Scrapper extension</p></div>
+            <div><h4>SCRAPE</h4><p>Extract leads from Google Maps with the LEAD GEN x AI Powered Tool extension</p></div>
           </div>
           <div class="wf-step">
             <div class="wf-num">2</div>
@@ -229,7 +229,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
         <div class="features">
           <div class="feat">Step-by-step video tutorials</div>
           <div class="feat">AI Prompts &amp; Pitch Templates</div>
-          <div class="feat">Lead Gen X Map Scrapper Extension</div>
+          <div class="feat">LEAD GEN x AI Powered Tool Extension</div>
           <div class="feat">Email Automation Setup</div>
           <div class="feat">Live Case Studies &amp; Results</div>
           <div class="feat">Lifetime Access &amp; Updates</div>
@@ -346,7 +346,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
 <footer>
   <div class="container">
     <div class="f-bottom">
-      <span>© <span id="yr">2026</span> Lead Gen X Map Scrapper. All rights reserved.</span>
+      <span>© <span id="yr">2026</span> LEAD GEN x AI Powered Tool. All rights reserved.</span>
       <span><a href="../terms-and-conditions.html">Terms</a> · <a href="../about.html">About</a> · <a href="mailto:courses@imadkhan.dev">Support</a></span>
     </div>
   </div>
@@ -442,9 +442,9 @@ const coursePricing = {
 };
 
 /* ── Initialize Paddle.js ── */
-Paddle.Environment.set('sandbox');
+Paddle.Environment.set('production');
 Paddle.Initialize({
-  token: 'test_72fcb1bf88e7b485d977abd74ac',
+  token: 'live_a5e44dc571f960aec1814cb19be',
   eventCallback: function(ev) {
     if (ev.name === 'checkout.completed') {
       window.location.href = window.location.origin + '/course/?success=true';

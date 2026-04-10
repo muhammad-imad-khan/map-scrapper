@@ -1,5 +1,5 @@
 """
-Generate a professional course PPTX for Lead Gen X Map Scrapper.
+Generate a professional course PPTX for LEAD GEN x AI Powered Tool.
 Dark theme, green accent - matches the product branding.
 """
 from pptx import Presentation
@@ -83,7 +83,7 @@ def green_bar(slide):
     shape.line.fill.background()
 
 
-def footer_text(slide, text="Lead Gen X Map Scrapper Course"):
+def footer_text(slide, text="LEAD GEN x AI Powered Tool Course"):
     add_text_box(slide, Inches(0.5), Inches(7.0), Inches(5), Inches(0.4),
                  text, font_size=9, color=GRAY)
 
@@ -101,7 +101,7 @@ set_bg(slide)
 green_bar(slide)
 
 add_text_box(slide, Inches(1), Inches(1.8), Inches(11), Inches(1.2),
-             "Lead Gen X Map Scrapper", font_size=44, color=GREEN, bold=True, alignment=PP_ALIGN.CENTER)
+             "LEAD GEN x AI Powered Tool", font_size=44, color=GREEN, bold=True, alignment=PP_ALIGN.CENTER)
 
 add_text_box(slide, Inches(1), Inches(3.2), Inches(11), Inches(1),
              "Complete Course: Scrape Leads, Build Websites, Pitch Clients", 
@@ -131,7 +131,7 @@ add_text_box(slide, Inches(0.8), Inches(0.4), Inches(8), Inches(0.7),
 
 modules = [
     ("Module 1", "Setup & Installation", "VS Code, Git, Node.js, GitHub, Vercel, Chrome"),
-    ("Module 2", "Lead Gen X Map Scrapper Walkthrough", "Install extension, run first scrape, export CSV"),
+    ("Module 2", "LEAD GEN x AI Powered Tool Walkthrough", "Install extension, run first scrape, export CSV"),
     ("Module 3", "Lead Qualification", "Identify HOT leads, audit websites, prioritize targets"),
     ("Module 4", "Building Websites with AI", "Claude prompts, HTML/CSS generation, local preview"),
     ("Module 5", "Free Deployment to Vercel", "Git push, auto-deploy, live demo URL"),
@@ -215,7 +215,7 @@ tools = [
     ("Node.js", "JavaScript runtime (LTS)", "nodejs.org", "Required by some tools & Vercel"),
     ("GitHub", "Free code hosting", "github.com", "Store your code online"),
     ("Vercel", "Free web hosting", "vercel.com", "Deploy websites instantly"),
-    ("Chrome", "Browser + extensions", "google.com/chrome", "Run Lead Gen X Map Scrapper"),
+    ("Chrome", "Browser + extensions", "google.com/chrome", "Run LEAD GEN x AI Powered Tool"),
 ]
 
 for i, (name, desc, url, purpose) in enumerate(tools):
@@ -255,7 +255,7 @@ steps = [
     "4. Download & install Node.js LTS - check 'Add to PATH'",
     "5. Create free GitHub account at github.com/signup",
     "6. Create free Vercel account - sign up with GitHub",
-    "7. Install Lead Gen X Map Scrapper extension in Chrome",
+    "7. Install LEAD GEN x AI Powered Tool extension in Chrome",
     "",
     "Verify in VS Code terminal (Ctrl + `):",
     "   code --version",
@@ -283,7 +283,7 @@ footer_text(slide)
 
 
 # ═══════════════════════════════════════════════════════
-#  MODULE 2: LEAD GEN X MAP SCRAPPER
+#  MODULE 2: LEAD GEN x AI POWERED TOOL
 # ═══════════════════════════════════════════════════════
 slide = prs.slides.add_slide(prs.slide_layouts[6])
 set_bg(slide)
@@ -291,7 +291,7 @@ green_bar(slide)
 section_number(slide, 2)
 
 add_text_box(slide, Inches(1.3), Inches(0.25), Inches(8), Inches(0.7),
-             "Module 2: Lead Gen X Map Scrapper Walkthrough", font_size=30, color=WHITE, bold=True)
+             "Module 2: LEAD GEN x AI Powered Tool Walkthrough", font_size=30, color=WHITE, bold=True)
 
 add_text_box(slide, Inches(0.8), Inches(1.2), Inches(5.5), Inches(0.4),
              "How It Works", font_size=20, color=GREEN, bold=True)
@@ -346,7 +346,7 @@ add_text_box(slide, Inches(1.5), Inches(1.8), Inches(10), Inches(0.5),
              "DEMO: Scraping 'plumbers in Chicago'", font_size=20, color=GREEN, bold=True)
 
 demo_steps = [
-    "1. Open Chrome > Click Lead Gen X Map Scrapper extension icon",
+    "1. Open Chrome > Click LEAD GEN x AI Powered Tool extension icon",
     "2. Type: plumbers in Chicago",
     "3. Set max results: 20",
     "4. Click 'Start Scraping'",
@@ -759,7 +759,7 @@ add_text_box(slide, Inches(0.8), Inches(4.8), Inches(10), Inches(0.4),
 resources = [
     "AI_Prompts_and_Pitch_Templates.pdf - All 6 prompts ready to use",
     "Beginner_Setup_Tutorial.pdf - Step-by-step installation guide",
-    "Lead Gen X Map Scrapper Extension - Chrome extension with free credits",
+    "LEAD GEN x AI Powered Tool Extension - Chrome extension with free credits",
 ]
 tf = add_text_box(slide, Inches(0.8), Inches(5.4), Inches(10), Inches(1.5),
                   resources[0], font_size=14, color=GREEN)
@@ -798,6 +798,6 @@ add_text_box(slide, Inches(1), Inches(5.5), Inches(11), Inches(0.6),
 # ═══════════════════════════════════════════════════════
 #  SAVE
 # ═══════════════════════════════════════════════════════
-output_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Lead_Gen_X_Map_Scrapper_Course.pptx')
+output_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'LEAD_GEN_x_AI_Powered_Tool_Course.pptx')
 prs.save(output_path)
 print(f'[OK] {output_path}')

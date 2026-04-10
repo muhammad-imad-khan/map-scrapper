@@ -47,7 +47,7 @@ class StyledPDF(FPDF):
         self.set_y(250)
         self.set_font('Helvetica', 'B', 11)
         self.set_text_color(*self.GREEN)
-        self.cell(0, 8, 'Lead Gen X Map Scrapper', align='C', new_x='LMARGIN', new_y='NEXT')
+        self.cell(0, 8, 'LEAD GEN x AI Powered Tool', align='C', new_x='LMARGIN', new_y='NEXT')
         self.set_font('Helvetica', '', 9)
         self.set_text_color(*self.GRAY)
         self.cell(0, 6, 'https://map-scrapper-five.vercel.app', align='C')
@@ -191,7 +191,7 @@ def generate_prompts_pdf():
     pdf = StyledPDF()
     pdf.cover_page(
         'AI Prompts &\nPitch Templates',
-        'Lead Gen X Map Scrapper Course\nComplete prompt library for building websites,\npitching clients, and closing deals - all for free.'
+        'LEAD GEN x AI Powered Tool Course\nComplete prompt library for building websites,\npitching clients, and closing deals - all for free.'
     )
 
     # ── PAGE: System Prompt ──
@@ -210,7 +210,7 @@ def generate_prompts_pdf():
         'zero upfront cost.\n'
         '\n'
         '## CONTEXT\n'
-        'The student has used Lead Gen X Map Scrapper (a Chrome\n'
+        'The student has used LEAD GEN x AI Powered Tool (a Chrome\n'
         'extension) to extract local business leads from Google\n'
         'Maps. Each lead includes: business name, address, phone,\n'
         'website (or lack of one), email, ratings, reviews, and\n'
@@ -409,7 +409,7 @@ def generate_prompts_pdf():
     # ── PAGE: Placeholder Reference ──
     pdf.new_page()
     pdf.section_title('7. Placeholder Quick Reference')
-    pdf.body_text('Map these placeholders to columns in your Lead Gen X Map Scrapper CSV export:')
+    pdf.body_text('Map these placeholders to columns in your LEAD GEN x AI Powered Tool CSV export:')
     pdf.ln(2)
     widths = [65, 55, 60]
     pdf.table_row(['PLACEHOLDER', 'CSV COLUMN', 'EXAMPLE'], widths, header=True)
@@ -432,7 +432,7 @@ def generate_prompts_pdf():
 
     pdf.ln(8)
     pdf.section_title('Workflow Summary')
-    pdf.numbered(1, 'Scrape leads with Lead Gen X Map Scrapper')
+    pdf.numbered(1, 'Scrape leads with LEAD GEN x AI Powered Tool')
     pdf.numbered(2, 'Open CSV - identify businesses with no/bad websites + good reviews')
     pdf.numbered(3, 'Use Prompt #5 (Bulk Qualification) to prioritize HOT leads')
     pdf.numbered(4, 'Use Prompt #2 (Full Website Build) to create their site in Claude')
@@ -455,7 +455,7 @@ def generate_tutorial_pdf():
     pdf = StyledPDF()
     pdf.cover_page(
         'Beginner Setup\nTutorial',
-        'Lead Gen X Map Scrapper Course\n\nComplete guide to install VS Code, Git, Node.js,\nGitHub, and deploy websites to Vercel for FREE.'
+        'LEAD GEN x AI Powered Tool Course\n\nComplete guide to install VS Code, Git, Node.js,\nGitHub, and deploy websites to Vercel for FREE.'
     )
 
     # ── Table of Contents ──

@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "javascript-obfuscator": "^5.4.1"
+    "javascript-obfuscator": "^5.4.1",
+    "puppeteer": "^24.40.0"
   }
 }
