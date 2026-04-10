@@ -72,7 +72,7 @@
     if (renderKey === lastRenderKey) return;
     lastRenderKey = renderKey;
 
-    if (state.pricingMode !== MODE_ONE_TIME) return;
+    if (state.pricingMode !== MODE_ONE_TIME && !state.unlimited) return;
 
     if (state.unlimited) {
       document.body.dataset.lifetimeAccess = 'true';
