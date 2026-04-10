@@ -159,6 +159,11 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
 [data-theme="light"] .btn-main[disabled]{background:rgba(0,0,0,.06);color:rgba(0,0,0,.35)}
 [data-theme="light"] .checkout-status.pending{background:rgba(37,99,235,.08);border-color:rgba(37,99,235,.2)}
 [data-theme="light"] .checkout-status.error{background:rgba(225,29,72,.08);border-color:rgba(225,29,72,.2)}
+.nav-badges{display:flex;gap:6px;align-items:center;margin-left:4px}
+.nav-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;font-family:var(--body);white-space:nowrap;line-height:1}
+.nav-badge.purchased{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#22c55e}
+.nav-badge.purchased svg{width:11px;height:11px}
+[data-theme="light"] .nav-badge.purchased{background:rgba(22,163,74,.1);border-color:rgba(22,163,74,.22);color:#16a34a}
 </style>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
@@ -201,6 +206,10 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         <span id="navCtaTxt">Add to Browser</span>
       </a>
+      <div class="nav-badges" id="navBadges" style="display:none">
+        <span class="nav-badge purchased" id="navBadgeTool" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Tool</span>
+        <span class="nav-badge purchased" id="navBadgeCourse" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Course</span>
+      </div>
     </div>
     <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
       <svg class="ic-sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
@@ -533,7 +542,7 @@ const authState = {
   loaded: false,
   user: null,
   purchases: [],
-  entitlements: { lifetimeAccess: false, zipDownload: false },
+  entitlements: { lifetimeAccess: false, zipDownload: false, courseAccess: false },
   latestToolPurchase: null,
 };
 let pendingCheckout = null;
@@ -818,6 +827,30 @@ function updateCardState() {
     checkoutStatus.textContent = 'Card payment for ' + (pack ? pack.name : 'this pack') + ' is coming soon. Use Bank Transfer for now.';
   } else {
     checkoutStatus.style.display = 'none';
+  }
+}
+
+function updateNavPurchaseStatus() {
+  var badges = document.getElementById('navBadges');
+  var toolBadge = document.getElementById('navBadgeTool');
+  var courseBadge = document.getElementById('navBadgeCourse');
+  var navCta = document.getElementById('navCtaLink');
+  if (!badges) return;
+  var hasTool = !!(authState.entitlements && authState.entitlements.lifetimeAccess);
+  var hasCourse = !!(authState.entitlements && authState.entitlements.courseAccess);
+  if (hasTool || hasCourse) {
+    badges.style.display = 'flex';
+    toolBadge.style.display = hasTool ? 'inline-flex' : 'none';
+    courseBadge.style.display = hasCourse ? 'inline-flex' : 'none';
+    if (hasTool && navCta) {
+      navCta.style.background = 'rgba(34,197,94,.12)';
+      navCta.style.color = '#22c55e';
+      navCta.style.pointerEvents = 'none';
+      var ctaTxt = document.getElementById('navCtaTxt');
+      if (ctaTxt) ctaTxt.textContent = 'Already Purchased';
+    }
+  } else {
+    badges.style.display = 'none';
   }
 }
 
@@ -1361,11 +1394,12 @@ loadPricingMode().then(() => {
       localStorage.setItem(USER_KEY, JSON.stringify(data.user));
       if (accountLink) accountLink.textContent = data.user.name || 'Account';
       if (cardMethod && !cardMethod.classList.contains('hidden')) updateCardState();
+      updateNavPurchaseStatus();
     } else {
       authState.loaded = true;
       authState.user = null;
       authState.purchases = [];
-      authState.entitlements = { lifetimeAccess: false, zipDownload: false };
+      authState.entitlements = { lifetimeAccess: false, zipDownload: false, courseAccess: false };
       authState.latestToolPurchase = null;
       localStorage.removeItem(TOKEN_KEY);
       localStorage.removeItem(USER_KEY);
