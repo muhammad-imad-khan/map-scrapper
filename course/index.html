@@ -511,6 +511,9 @@ const coursePricing = {
 };
 
 /* ── Initialize Paddle.js ── */
+const APPROVED_CHECKOUT_DOMAIN = 'map-scrapper-five.vercel.app';
+const IS_APPROVED_DOMAIN = window.location.hostname === APPROVED_CHECKOUT_DOMAIN;
+
 Paddle.Environment.set('production');
 Paddle.Initialize({
   token: 'live_a5e44dc571f960aec1814cb19be',
@@ -520,6 +523,27 @@ Paddle.Initialize({
     }
   }
 });
+
+/* ── Auto-open checkout if redirected from unapproved domain ── */
+(function autoOpenPaddleCheckout() {
+  const params = new URLSearchParams(window.location.search);
+  const autoTxn = params.get('auto_txn');
+  if (autoTxn && autoTxn.startsWith('txn_') && IS_APPROVED_DOMAIN) {
+    // Restore buyer info from query params
+    const buyerEmail = params.get('buyer_email');
+    const buyerName = params.get('buyer_name');
+    if (buyerEmail) localStorage.setItem('mls_course_buyer_email', buyerEmail);
+    if (buyerName) localStorage.setItem('mls_course_buyer_name', buyerName);
+    localStorage.setItem('mls_course_txn_id', autoTxn);
+    // Clean URL
+    const cleanUrl = window.location.pathname + (params.get('success') ? '?success=true' : '');
+    window.history.replaceState({}, '', cleanUrl);
+    // Open Paddle overlay
+    setTimeout(() => {
+      try { Paddle.Checkout.open({ transactionId: autoTxn }); } catch (e) { console.error('Paddle auto-open failed:', e); }
+    }, 600);
+  }
+})();
 
 /* ── DOM refs ── */
 const statusEl = document.getElementById('checkoutStatus');
@@ -746,9 +770,18 @@ btnCard.addEventListener('click', async () => {
     localStorage.setItem('mls_course_buyer_name', inputs.name);
     if (data.txnId) localStorage.setItem('mls_course_txn_id', data.txnId);
     showStatus('Opening Paddle checkout…', 'ready');
-    // Use redirect to hosted checkout while lead-genx.vercel.app domain approval is pending
-    // Once approved, switch back to: Paddle.Checkout.open({ transactionId: data.txnId });
-    window.location.href = data.checkoutUrl;
+
+    if (IS_APPROVED_DOMAIN) {
+      // Already on approved domain — open overlay directly
+      Paddle.Checkout.open({ transactionId: data.txnId });
+    } else {
+      // Redirect to approved domain with txnId so overlay opens there
+      const redirectUrl = new URL(`https://${APPROVED_CHECKOUT_DOMAIN}/course/`);
+      redirectUrl.searchParams.set('auto_txn', data.txnId);
+      redirectUrl.searchParams.set('buyer_email', inputs.email);
+      redirectUrl.searchParams.set('buyer_name', inputs.name);
+      window.location.href = redirectUrl.toString();
+    }
     btnCard.disabled = false;
     btnCard.textContent = '💳 Credit / Debit';
     return;

@@ -242,6 +242,9 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
 </style>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
+  const APPROVED_CHECKOUT_DOMAIN = 'map-scrapper-five.vercel.app';
+  const IS_APPROVED_DOMAIN = window.location.hostname === APPROVED_CHECKOUT_DOMAIN;
+
   Paddle.Environment.set('production');
   Paddle.Initialize({
     token: 'live_a5e44dc571f960aec1814cb19be',
@@ -255,6 +258,25 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
       }
     }
   });
+
+  /* ── Auto-open checkout if redirected from unapproved domain ── */
+  (function autoOpenPaddleCheckout() {
+    const params = new URLSearchParams(window.location.search);
+    const autoTxn = params.get('auto_txn');
+    if (autoTxn && autoTxn.startsWith('txn_') && IS_APPROVED_DOMAIN) {
+      // Restore state from query params
+      const installId = params.get('install_id');
+      if (installId) localStorage.setItem('mls_install_id', installId);
+      const pendingTxn = params.get('auto_txn');
+      if (pendingTxn) localStorage.setItem('mls_pending_tool_txn', pendingTxn);
+      // Clean URL
+      window.history.replaceState({}, '', window.location.pathname);
+      // Open Paddle overlay
+      setTimeout(() => {
+        try { Paddle.Checkout.open({ transactionId: autoTxn }); } catch (e) { console.error('Paddle auto-open failed:', e); }
+      }, 600);
+    }
+  })();
 </script>
 </head>
 <body>
@@ -1117,9 +1139,20 @@ checkoutBtn.addEventListener('click', () => {
     }
     checkoutStatus.className = 'checkout-status ready';
     checkoutStatus.textContent = 'Opening Paddle checkout…';
-    // Use redirect to hosted checkout while lead-genx.vercel.app domain approval is pending
-    // Once approved, switch back to: Paddle.Checkout.open({ transactionId: data.txnId });
-    window.location.href = data.checkoutUrl;
+    if (IS_APPROVED_DOMAIN) {
+      // Already on approved domain — open overlay directly
+      if (data.txnId) {
+        Paddle.Checkout.open({ transactionId: data.txnId });
+      } else {
+        window.location.href = data.checkoutUrl;
+      }
+    } else {
+      // Redirect to approved domain with txnId so overlay opens there
+      const redirectUrl = new URL(`https://${APPROVED_CHECKOUT_DOMAIN}/payment/`);
+      redirectUrl.searchParams.set('auto_txn', data.txnId);
+      if (state.installId) redirectUrl.searchParams.set('install_id', state.installId);
+      window.location.href = redirectUrl.toString();
+    }
     checkoutBtn.disabled = false;
   })
   .catch((err) => {
@@ -1151,9 +1184,18 @@ async function handlePaddleCheckoutError() {
       localStorage.setItem(PENDING_TOOL_TXN_KEY, data.txnId);
       syncUrl();
     }
-    // Use redirect to hosted checkout while lead-genx.vercel.app domain approval is pending
-    // Once approved, switch back to: Paddle.Checkout.open({ transactionId: data.txnId });
-    window.location.href = data.checkoutUrl;
+    if (IS_APPROVED_DOMAIN) {
+      if (data.txnId) {
+        Paddle.Checkout.open({ transactionId: data.txnId });
+      } else {
+        window.location.href = data.checkoutUrl;
+      }
+    } else {
+      const redirectUrl = new URL(`https://${APPROVED_CHECKOUT_DOMAIN}/payment/`);
+      redirectUrl.searchParams.set('auto_txn', data.txnId);
+      if (state.installId) redirectUrl.searchParams.set('install_id', state.installId);
+      window.location.href = redirectUrl.toString();
+    }
   } catch (err) {
     checkoutStatus.className = 'checkout-status error';
     checkoutStatus.textContent = err.message || 'Checkout failed. Please try again.';
