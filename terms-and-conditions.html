@@ -143,6 +143,72 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
 [data-theme="light"] .theme-toggle .icon-moon{display:none}
 [data-theme="light"] .bg-grid{opacity:.3}
 [data-theme="light"] .bg-glow{opacity:.3}
+
+/* ═══ COMPREHENSIVE RESPONSIVE ═══ */
+@supports(padding:env(safe-area-inset-top)){
+  nav .nav-inner{padding-left:max(24px,env(safe-area-inset-left));padding-right:max(24px,env(safe-area-inset-right))}
+  .main{padding-left:max(24px,env(safe-area-inset-left));padding-right:max(24px,env(safe-area-inset-right))}
+  footer{padding-bottom:max(24px,env(safe-area-inset-bottom))}
+}
+@media(pointer:coarse){
+  .nav-links-wrap a{min-height:44px;display:flex;align-items:center}
+  .btn-main,.btn-ghost{min-height:48px}
+}
+@media(max-width:720px){
+  .nav-links-wrap{max-height:calc(100vh - 64px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .nav-links-wrap a{font-size:15px;padding:4px 0}
+  .nav-cta{width:100%;justify-content:center;margin-top:4px}
+  .hero-strip{padding:95px 0 0}
+  .page-h{font-size:clamp(34px,6vw,56px)}
+}
+@media(max-width:600px){
+  .terms-card{padding:28px 20px;border-radius:12px}
+  .terms-card h2{font-size:19px;gap:8px}
+  .terms-card h2 .tc-num{width:26px;height:26px;font-size:11px}
+  .terms-card p{font-size:14px}
+  .terms-card ul li{font-size:13.5px}
+  .terms-meta{gap:10px}
+  .terms-meta-pill{font-size:11.5px;padding:5px 11px}
+  .terms-highlight{padding:16px 18px}
+  .terms-cta{padding:36px 24px;border-radius:14px;gap:20px}
+  .terms-cta-l .tc-h{font-size:22px}
+  .terms-cta-l .tc-s{font-size:14px}
+}
+@media(max-width:480px){
+  .main{padding:0 16px 72px}
+  .hero-strip .container{padding:0 16px}
+  .page-h{font-size:clamp(30px,8vw,48px);letter-spacing:-1px}
+  .terms-card{padding:22px 16px;margin-bottom:20px}
+  .terms-card h2{font-size:18px;flex-wrap:wrap}
+  .terms-card p{font-size:13.5px}
+  .terms-cta{flex-direction:column;text-align:center;padding:28px 18px;margin:56px 16px 0}
+  .terms-cta-r{justify-content:center;width:100%}
+  .terms-cta-r .btn-main,.terms-cta-r .btn-ghost{width:100%;justify-content:center}
+  .breadcrumb{font-size:12px;margin-bottom:20px}
+  .footer-inner{flex-direction:column;text-align:center;gap:12px}
+  .footer-links{justify-content:center}
+}
+@media(max-width:360px){
+  .main{padding:0 12px 56px}
+  .hero-strip .container{padding:0 12px}
+  .nav-inner{padding:0 12px;gap:8px}
+  .nav-logo-txt{font-size:13px}
+  .page-h{font-size:28px}
+  .terms-card{padding:18px 14px}
+  .terms-card h2{font-size:16px}
+  .terms-cta{padding:22px 14px;margin:40px 12px 0}
+  .terms-cta-l .tc-h{font-size:20px}
+}
+@media(max-width:320px){
+  .nav-logo-txt{font-size:12px}
+  .nav-logo-ic{width:28px;height:28px}
+  .page-h{font-size:26px}
+  .terms-card h2{font-size:15px}
+}
+@media(max-height:500px) and (orientation:landscape){
+  .hero-strip{padding:75px 0 0}
+  nav{position:relative}
+}
 </style>
 </head>
 <body>

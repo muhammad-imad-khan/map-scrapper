@@ -293,6 +293,37 @@ h1 { font-family: 'Syne', sans-serif; color: var(--heading); margin-bottom: 8px;
 .gif-section ol { padding-left: 20px; }
 .gif-section li { margin-bottom: 8px; color: var(--t); font-size: 14px; }
 .gif-section code { background: var(--s3); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--g); }
+
+/* ═══ COMPREHENSIVE RESPONSIVE ═══ */
+@media(max-width:900px){
+  body{padding:24px}
+  .assets-grid{gap:20px}
+  .preview-wrap.sq{transform:scale(.3);width:324px;height:324px}
+  .preview-wrap.port{transform:scale(.26);width:281px;height:351px}
+  .preview-wrap.story{transform:scale(.22);width:238px;height:422px}
+  .preview-wrap.wide{transform:scale(.24);width:461px;height:259px}
+}
+@media(max-width:600px){
+  body{padding:16px}
+  h1{font-size:22px}
+  .page-sub{font-size:13px;margin-bottom:24px}
+  .section-label{font-size:18px;margin:40px 0 6px}
+  .assets-grid{gap:14px;justify-content:center}
+  .preview-wrap.sq{transform:scale(.22);width:238px;height:238px}
+  .preview-wrap.port{transform:scale(.2);width:216px;height:270px}
+  .preview-wrap.story{transform:scale(.16);width:173px;height:307px}
+  .preview-wrap.wide{transform:scale(.18);width:346px;height:194px}
+  .gif-section{padding:20px;border-radius:12px}
+}
+@media(max-width:420px){
+  body{padding:12px}
+  h1{font-size:18px}
+  .assets-grid{flex-direction:column;align-items:center}
+  .preview-wrap.sq{transform:scale(.28);width:302px;height:302px}
+  .preview-wrap.port{transform:scale(.26);width:281px;height:351px}
+  .preview-wrap.story{transform:scale(.18);width:194px;height:346px}
+  .preview-wrap.wide{transform:scale(.16);width:307px;height:173px}
+}
 </style>
 </head>
 <body>

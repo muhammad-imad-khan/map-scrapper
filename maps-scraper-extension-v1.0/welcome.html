@@ -29,6 +29,26 @@ input::placeholder{color:#52526a}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 .access-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:20px;padding:6px 14px;font-size:13px;color:#22c55e;font-weight:600;margin-bottom:20px}
 .no-access{display:inline-flex;align-items:center;gap:6px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);border-radius:20px;padding:6px 14px;font-size:13px;color:#f87171;font-weight:600;margin-bottom:20px}
+
+/* ═══ COMPREHENSIVE RESPONSIVE ═══ */
+@media(max-width:500px){
+  body{padding:16px}
+  .card{padding:28px 20px;border-radius:14px;margin:16px auto}
+  h1{font-size:19px}
+  .sub{font-size:13px}
+  .features{flex-direction:column;gap:8px}
+  .feat{padding:12px 10px}
+  .feat-title{font-size:11px}
+  .feat-desc{font-size:10px}
+  input{padding:10px 12px;font-size:13px}
+  .btn{padding:12px;font-size:13px}
+}
+@media(max-width:360px){
+  .card{padding:22px 16px;margin:12px auto}
+  h1{font-size:17px}
+  .sub{font-size:12px}
+  .access-badge,.no-access{font-size:11px;padding:5px 11px}
+}
 </style>
 </head>
 <body>

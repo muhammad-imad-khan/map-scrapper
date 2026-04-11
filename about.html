@@ -263,6 +263,91 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
 [data-theme="light"] .theme-toggle .icon-moon{display:none}
 [data-theme="light"] .bg-grid{opacity:.3}
 [data-theme="light"] .bg-glow{opacity:.3}
+
+/* ═══ COMPREHENSIVE RESPONSIVE ═══ */
+@supports(padding:env(safe-area-inset-top)){
+  nav .nav-inner{padding-left:max(24px,env(safe-area-inset-left));padding-right:max(24px,env(safe-area-inset-right))}
+  .main{padding-left:max(24px,env(safe-area-inset-left));padding-right:max(24px,env(safe-area-inset-right))}
+  footer{padding-bottom:max(24px,env(safe-area-inset-bottom))}
+}
+@media(pointer:coarse){
+  .nav-links-wrap a{min-height:44px;display:flex;align-items:center}
+  .btn-main,.btn-ghost,.social-btn{min-height:48px}
+  .tl-item{gap:16px}
+}
+@media(max-width:720px){
+  .nav-links-wrap{max-height:calc(100vh - 64px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .nav-links-wrap a{font-size:15px;padding:4px 0}
+  .nav-cta{width:100%;justify-content:center;margin-top:4px}
+}
+@media(max-width:600px){
+  .hero-strip{padding:95px 0 0}
+  .page-h{font-size:clamp(34px,7vw,56px);letter-spacing:-1px}
+  .page-kicker{font-size:10px;letter-spacing:3px}
+  .breadcrumb{font-size:12px;margin-bottom:20px}
+  .main{padding:0 20px 80px}
+  .founder-photo{width:180px;height:180px}
+  .founder-name{font-size:24px}
+  .founder-title{font-size:13px}
+  .bio-block p{font-size:14.5px}
+  .why-card{padding:22px 20px}
+  .why-text{font-size:14.5px}
+  .skill-tags{gap:6px}
+  .stag{padding:5px 11px;font-size:12px}
+  .ts-h{font-size:clamp(26px,5vw,38px);margin-bottom:36px}
+  .tl-title{font-size:15px}
+  .tl-desc{font-size:13px}
+  .timeline::before{left:18px}
+  .tl-node{width:38px;height:38px}
+  .tl-item{gap:14px}
+  .about-cta{padding:36px 24px;border-radius:16px}
+  .about-cta-l .ac-h{font-size:24px}
+  .about-cta-l .ac-s{font-size:14px}
+}
+@media(max-width:480px){
+  .main{padding:0 16px 64px}
+  .hero-strip .container{padding:0 16px}
+  .page-h{font-size:clamp(30px,8vw,48px)}
+  .social-links{flex-wrap:wrap;gap:6px}
+  .social-btn{padding:7px 12px;font-size:12px}
+  .fstat{padding:10px 12px;flex-wrap:wrap;gap:4px}
+  .fstat-l{font-size:11.5px}
+  .fstat-r{font-size:11.5px}
+  .about-cta{flex-direction:column;text-align:center;padding:28px 18px;margin:56px 16px 0}
+  .about-cta-r{justify-content:center;width:100%}
+  .about-cta-r .btn-main,.about-cta-r .btn-ghost{width:100%;justify-content:center}
+  .btn-main{padding:12px 18px;font-size:13.5px}
+  .btn-ghost{padding:12px 16px;font-size:13.5px}
+  .footer-inner{flex-direction:column;text-align:center;gap:12px}
+  .footer-links{justify-content:center;gap:14px}
+  .tl-label{font-size:10px}
+  .ts-kicker{font-size:10px;letter-spacing:2px}
+}
+@media(max-width:360px){
+  .main{padding:0 12px 48px}
+  .hero-strip .container{padding:0 12px}
+  .nav-inner{padding:0 12px;gap:8px}
+  .nav-logo-txt{font-size:13px}
+  .page-h{font-size:28px}
+  .founder-photo{width:150px;height:150px}
+  .founder-name{font-size:22px}
+  .about-cta-l .ac-h{font-size:20px}
+  .about-cta{padding:24px 14px;margin:40px 12px 0}
+  .ts-h{font-size:24px}
+  .tl-node{width:34px;height:34px}
+  .timeline::before{left:16px}
+}
+@media(max-width:320px){
+  .nav-logo-txt{font-size:12px}
+  .nav-logo-ic{width:28px;height:28px}
+  .page-h{font-size:26px}
+  .founder-photo{width:130px;height:130px}
+  .social-btn{padding:6px 10px;font-size:11px}
+}
+@media(max-height:500px) and (orientation:landscape){
+  .hero-strip{padding:75px 0 0}
+  nav{position:relative}
+}
 </style>
 </head>
 <body>

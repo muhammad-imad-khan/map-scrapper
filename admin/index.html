@@ -338,6 +338,43 @@
       .stats-grid { grid-template-columns: 1fr 1fr; }
       .content { padding: 16px; }
     }
+
+    /* ═══ COMPREHENSIVE RESPONSIVE ═══ */
+    @media(pointer:coarse){
+      .nav-item{min-height:44px}
+      .topbar .toggle-sidebar,.topbar .theme-btn{min-width:40px;min-height:40px}
+      button,.btn{min-height:44px}
+    }
+    @media(max-width:600px){
+      .sidebar{width:240px;min-width:240px}
+      .topbar{padding:0 14px;gap:8px}
+      .topbar .page-title{font-size:14px}
+      .topbar .api-badge{display:none}
+      .stats-grid{grid-template-columns:1fr}
+      .content{padding:12px}
+      .content h2{font-size:18px}
+      .content h3{font-size:16px}
+      .login-box{padding:24px 20px;border-radius:14px}
+      .login-box h1{font-size:18px}
+    }
+    @media(max-width:480px){
+      .sidebar{width:220px;min-width:220px}
+      .topbar{padding:0 12px;gap:6px}
+      .topbar .page-title{font-size:13px}
+      .topbar .topbar-right{gap:6px}
+      .stats-grid{grid-template-columns:1fr}
+      .content{padding:10px}
+      .login-box{padding:20px 16px}
+      .login-field input{padding:10px 12px;font-size:13px}
+    }
+    @media(max-width:360px){
+      .sidebar{width:200px;min-width:200px}
+      .login-box{width:calc(100vw - 24px);padding:18px 14px}
+      .login-box h1{font-size:16px}
+    }
+    @media(max-height:500px) and (orientation:landscape){
+      .sidebar{max-height:100vh;overflow-y:auto}
+    }
   </style>
 </head>
 <body>

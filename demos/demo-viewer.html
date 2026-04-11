@@ -94,6 +94,62 @@ tbody tr{opacity:0;animation:fadeRow .4s ease forwards}
 /* filter click highlight */
 .filter-btn.flash{animation:flashBtn .4s ease}
 @keyframes flashBtn{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+
+/* ═══ COMPREHENSIVE RESPONSIVE ═══ */
+@media(max-width:900px){
+  .topbar{flex-wrap:wrap;height:auto;padding:10px 16px;gap:10px}
+  .stat-chip{padding:4px 10px}
+  .sc-val{font-size:12px}
+  .actions{margin-left:0;width:100%;justify-content:flex-start}
+}
+@media(max-width:600px){
+  .topbar{padding:10px 12px;gap:8px}
+  .tb-name{font-size:14px}
+  .tb-sep{display:none}
+  .stat-chip{padding:3px 8px;border-radius:6px}
+  .sc-val{font-size:11px}
+  .sc-lbl{font-size:10px}
+  .actions{flex-wrap:wrap;gap:6px}
+  .btn{padding:6px 12px;font-size:12px;border-radius:6px}
+  .content{padding:12px}
+  .query-bar{padding:10px 14px;border-radius:8px;gap:8px;flex-wrap:wrap}
+  .qb-query{font-size:12px}
+  .qb-time{font-size:10px}
+  .toolbar{gap:6px}
+  .search-box{min-width:160px;padding:5px 10px}
+  .search-box input{font-size:12px}
+  .filter-btn{padding:5px 10px;font-size:11px}
+  .table-wrap{border-radius:8px}
+  thead th{padding:8px 10px;font-size:9px}
+  tbody td{padding:8px 10px;font-size:12px;max-width:140px}
+  .footer{padding:10px 12px;font-size:10px}
+  .toast{font-size:11px;padding:7px 16px}
+}
+@media(max-width:480px){
+  .content{padding:10px}
+  .topbar{padding:8px 10px}
+  .tb-name{font-size:13px}
+  .stat-chip{font-size:10px}
+  .btn{padding:5px 10px;font-size:11px}
+  .query-bar{padding:8px 10px}
+  .qb-icon{font-size:14px}
+  .qb-query{font-size:11px}
+  thead th{padding:6px 8px;font-size:8px}
+  tbody td{padding:6px 8px;font-size:11px;max-width:110px}
+  .toolbar{flex-direction:column;align-items:stretch}
+  .search-box{min-width:0;width:100%}
+}
+@media(max-width:360px){
+  .topbar{padding:6px 8px}
+  .tb-logo{gap:6px}
+  .tb-ic{width:28px;height:28px}
+  .tb-name{font-size:12px}
+  .content{padding:8px}
+  .actions{gap:4px}
+  .btn{padding:4px 8px;font-size:10px}
+  thead th{font-size:7px;padding:5px 6px}
+  tbody td{font-size:10px;padding:5px 6px;max-width:90px}
+}
 </style>
 </head>
 <body>
