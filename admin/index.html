@@ -59,7 +59,7 @@
       overflow-x: hidden;
     }
 
-    /* ═══ LOGIN ═══ */
+    /* â•â•â• LOGIN â•â•â• */
     .login-overlay {
       position: fixed; inset: 0;
       display: flex; align-items: center; justify-content: center;
@@ -97,11 +97,11 @@
     .login-error.visible { display: block; }
     .login-hint { margin-top: 16px; font-size: 11px; color: var(--muted); text-align: center; }
 
-    /* ═══ LAYOUT ═══ */
+    /* â•â•â• LAYOUT â•â•â• */
     .app { display: none; height: 100vh; }
     .app.visible { display: flex; }
 
-    /* ── SIDEBAR ── */
+    /* â”€â”€ SIDEBAR â”€â”€ */
     .sidebar {
       width: var(--sidebar-w); min-width: var(--sidebar-w);
       background: var(--panel); border-right: 1px solid var(--line);
@@ -128,7 +128,7 @@
       white-space: nowrap; overflow: hidden;
     }
     .collapsed .nav-section-title { text-align: center; font-size: 0; }
-    .collapsed .nav-section-title::after { content: '···'; font-size: 10px; }
+    .collapsed .nav-section-title::after { content: 'Â·Â·Â·'; font-size: 10px; }
     .nav-item {
       display: flex; align-items: center; gap: 12px;
       padding: 10px 12px; border-radius: 10px;
@@ -172,10 +172,10 @@
     .collapsed .sidebar-footer .session-info span:not(.timer-dot) { display: none; }
     .collapsed .sidebar-footer .footer-actions button span { display: none; }
 
-    /* ── MAIN AREA ── */
+    /* â”€â”€ MAIN AREA â”€â”€ */
     .main-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
-    /* ── TOPBAR ── */
+    /* â”€â”€ TOPBAR â”€â”€ */
     .topbar {
       height: var(--topbar-h); display: flex; align-items: center;
       padding: 0 24px; border-bottom: 1px solid var(--line);
@@ -202,12 +202,12 @@
       max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
 
-    /* ── CONTENT ── */
+    /* â”€â”€ CONTENT â”€â”€ */
     .content { flex: 1; overflow-y: auto; padding: 24px; }
     .page { display: none; }
     .page.active { display: block; }
 
-    /* ── CARDS ── */
+    /* â”€â”€ CARDS â”€â”€ */
     .card {
       background: var(--panel); border: 1px solid var(--line);
       border-radius: 14px; padding: 20px; margin-bottom: 16px;
@@ -222,7 +222,7 @@
     .card-title { font-size: 16px; font-weight: 700; }
     .card-subtitle { font-size: 12px; color: var(--muted); margin-top: 2px; }
 
-    /* ── STAT CARDS ── */
+    /* â”€â”€ STAT CARDS â”€â”€ */
     .stats-grid {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 14px; margin-bottom: 20px;
@@ -248,7 +248,7 @@
     .stat-card .stat-value { font-size: 28px; font-weight: 800; line-height: 1; }
     .stat-card .stat-sub { font-size: 11px; color: var(--muted); }
 
-    /* ── TABLES ── */
+    /* â”€â”€ TABLES â”€â”€ */
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th, td { border-bottom: 1px solid var(--line); padding: 10px 8px; text-align: left; vertical-align: top; }
@@ -258,7 +258,7 @@
     code { color: var(--blue); font-size: 12px; }
     [data-theme="light"] code { color: #2563eb; }
 
-    /* ── BUTTONS ── */
+    /* â”€â”€ BUTTONS â”€â”€ */
     button { font-family: inherit; }
     .btn {
       display: inline-flex; align-items: center; gap: 6px;
@@ -279,7 +279,7 @@
     .btn-sm { padding: 5px 10px; font-size: 11px; }
     .btn-group { display: flex; gap: 6px; flex-wrap: wrap; }
 
-    /* ── FORMS ── */
+    /* â”€â”€ FORMS â”€â”€ */
     .form-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; margin-bottom: 12px; }
     .form-group { display: flex; flex-direction: column; gap: 4px; }
     .form-group label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .3px; }
@@ -290,16 +290,16 @@
     }
     .form-group input:focus, .form-group select:focus { border-color: var(--accent); }
 
-    /* ── STATUS ── */
+    /* â”€â”€ STATUS â”€â”€ */
     .status { font-size: 13px; color: var(--muted); min-height: 20px; margin: 8px 0; }
     .status.error { color: var(--danger); }
     .status.ok { color: var(--accent); }
 
-    /* ── PAGER ── */
+    /* â”€â”€ PAGER â”€â”€ */
     .pager { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
     .pager-info { font-size: 12px; color: var(--muted); }
 
-    /* ── REPORT SUMMARY ── */
+    /* â”€â”€ REPORT SUMMARY â”€â”€ */
     .report-summary { display: flex; gap: 14px; margin: 14px 0; flex-wrap: wrap; }
     .report-summary .summary-card {
       background: var(--panel-2); border: 1px solid var(--line);
@@ -309,7 +309,7 @@
     .report-summary .summary-value { font-size: 22px; font-weight: 700; }
     .report-summary .summary-value.revenue { color: var(--accent); }
 
-    /* ── RECENT ACTIVITY (Dashboard) ── */
+    /* â”€â”€ RECENT ACTIVITY (Dashboard) â”€â”€ */
     .activity-list { display: flex; flex-direction: column; gap: 0; }
     .activity-item {
       display: flex; align-items: center; gap: 12px;
@@ -323,12 +323,12 @@
     .activity-text { flex: 1; font-size: 13px; }
     .activity-time { font-size: 11px; color: var(--muted); white-space: nowrap; }
 
-    /* ── LOADING ── */
+    /* â”€â”€ LOADING â”€â”€ */
     .loading { text-align: center; padding: 40px; color: var(--muted); }
     .spinner { display: inline-block; width: 24px; height: 24px; border: 2.5px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── MOBILE ── */
+    /* â”€â”€ MOBILE â”€â”€ */
     @media (max-width: 768px) {
       .sidebar { position: fixed; left: 0; top: 0; bottom: 0; z-index: 200; transform: translateX(-100%); transition: transform .25s ease; }
       .sidebar.mobile-open { transform: translateX(0); }
@@ -339,7 +339,7 @@
       .content { padding: 16px; }
     }
 
-    /* ═══ COMPREHENSIVE RESPONSIVE ═══ */
+    /* â•â•â• COMPREHENSIVE RESPONSIVE â•â•â• */
     @media(pointer:coarse){
       .nav-item{min-height:44px}
       .topbar .toggle-sidebar,.topbar .theme-btn{min-width:40px;min-height:40px}
@@ -379,14 +379,14 @@
 </head>
 <body>
 
-<!-- ═══ LOGIN GATE ═══ -->
+<!-- â•â•â• LOGIN GATE â•â•â• -->
 <div class="login-overlay" id="loginOverlay">
   <div class="login-box">
     <h1>&#x1F512; Admin Access</h1>
     <div class="subtitle">Enter your credentials to access the admin dashboard.</div>
     <div class="login-field">
       <label>Backend API URL</label>
-      <input id="loginApiBase" type="url" placeholder="https://map-scraper-paddle-backend.vercel.app" autocomplete="url" />
+      <input id="loginApiBase" type="url" placeholder="https://leadgenx-api.vercel.app" autocomplete="url" />
     </div>
     <div class="login-field">
       <label>Admin API Key</label>
@@ -398,7 +398,7 @@
   </div>
 </div>
 
-<!-- ═══ APP SHELL ═══ -->
+<!-- â•â•â• APP SHELL â•â•â• -->
 <div class="app" id="app">
   <div class="mobile-overlay" id="mobileOverlay"></div>
 
@@ -482,7 +482,7 @@
 
     <div class="content">
 
-      <!-- ═══ DASHBOARD PAGE ═══ -->
+      <!-- â•â•â• DASHBOARD PAGE â•â•â• -->
       <div class="page active" id="page-dashboard">
         <div class="stats-grid" id="dashboardStats">
           <div class="stat-card">
@@ -541,7 +541,7 @@
         </div>
       </div>
 
-      <!-- ═══ USERS PAGE ═══ -->
+      <!-- â•â•â• USERS PAGE â•â•â• -->
       <div class="page" id="page-users">
         <div class="card">
           <div class="card-header">
@@ -571,7 +571,7 @@
         </div>
       </div>
 
-      <!-- ═══ INSTALLS PAGE ═══ -->
+      <!-- â•â•â• INSTALLS PAGE â•â•â• -->
       <div class="page" id="page-installs">
         <div class="card">
           <div class="card-header">
@@ -601,7 +601,7 @@
         </div>
       </div>
 
-      <!-- ═══ BANK TRANSFERS PAGE ═══ -->
+      <!-- â•â•â• BANK TRANSFERS PAGE â•â•â• -->
       <div class="page" id="page-bank-transfers">
         <div class="card">
           <div class="card-header">
@@ -626,7 +626,7 @@
         </div>
       </div>
 
-      <!-- ═══ REPORTS PAGE ═══ -->
+      <!-- â•â•â• REPORTS PAGE â•â•â• -->
       <div class="page" id="page-reports">
         <div class="card">
           <div class="card-header">
@@ -648,7 +648,7 @@
         </div>
       </div>
 
-      <!-- ═══ SETTINGS PAGE ═══ -->
+      <!-- â•â•â• SETTINGS PAGE â•â•â• -->
       <div class="page" id="page-tools">
         <div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));">
           <div class="card">
@@ -698,9 +698,9 @@
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════════════╗
-   SESSION MANAGEMENT & AUTH                              ║
-   ═══════════════════════════════════════════════════════*/
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+   SESSION MANAGEMENT & AUTH                              â•‘
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•*/
 const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
 const SESSION_KEY = '__admin_session';
 
@@ -738,7 +738,7 @@ async function validateAdminKey(apiBase, adminKey) {
   return true;
 }
 
-/* ═══ LOGIN ═══ */
+/* â•â•â• LOGIN â•â•â• */
 const loginOverlay = document.getElementById('loginOverlay');
 const appEl = document.getElementById('app');
 const loginBtn = document.getElementById('loginBtn');
@@ -786,7 +786,7 @@ function lockDashboard() {
   stopSessionTimer();
 }
 
-/* ═══ SESSION TIMER ═══ */
+/* â•â•â• SESSION TIMER â•â•â• */
 let timerInterval = null;
 const timerEl = document.getElementById('sessionTimer');
 function startSessionTimer() {
@@ -805,7 +805,7 @@ function updateTimer() {
 ['click','keydown','scroll'].forEach(e => document.addEventListener(e, () => { if (appEl.classList.contains('visible')) refreshSession(); }, { passive: true }));
 document.getElementById('lockBtn').addEventListener('click', lockDashboard);
 
-/* ═══ THEME ═══ */
+/* â•â•â• THEME â•â•â• */
 (function(){
   const t = localStorage.getItem('mls_theme') || (matchMedia('(prefers-color-scheme:light)').matches ? 'light' : 'dark');
   document.documentElement.setAttribute('data-theme', t);
@@ -816,7 +816,7 @@ document.getElementById('themeToggle').addEventListener('click', () => {
   localStorage.setItem('mls_theme', next);
 });
 
-/* ═══ SIDEBAR ═══ */
+/* â•â•â• SIDEBAR â•â•â• */
 const sidebar = document.getElementById('sidebar');
 const mobileOverlay = document.getElementById('mobileOverlay');
 const isMobile = () => window.innerWidth <= 768;
@@ -836,7 +836,7 @@ mobileOverlay.addEventListener('click', () => {
 });
 if (!isMobile() && localStorage.getItem('sidebar_collapsed') === '1') sidebar.classList.add('collapsed');
 
-/* ═══ NAVIGATION ═══ */
+/* â•â•â• NAVIGATION â•â•â• */
 const pageTitles = { dashboard: 'Dashboard', users: 'Users', installs: 'Installs', 'bank-transfers': 'Bank Transfers', reports: 'Sales Reports', tools: 'Settings & Tools' };
 let currentPage = 'dashboard';
 
@@ -861,7 +861,7 @@ function navigateTo(page) {
   if (page === 'tools') loadToolsPage();
 }
 
-/* ═══ API HELPER ═══ */
+/* â•â•â• API HELPER â•â•â• */
 function getCredentials() {
   const s = getSession();
   if (!s) { lockDashboard(); throw new Error('Session expired.'); }
@@ -885,14 +885,14 @@ function esc(str) {
 function promptValue(msg, initial) { const v = window.prompt(msg, initial); return v === null ? null : v.trim(); }
 function fmtDate(d) { if (!d) return ''; return String(d).slice(0,16).replace('T',' '); }
 
-/* ═══════════════════════════════════════════════════════╗
-   DASHBOARD PAGE                                         ║
-   ═══════════════════════════════════════════════════════*/
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+   DASHBOARD PAGE                                         â•‘
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•*/
 let dashLoaded = false;
 async function loadDashboardData() {
   if (dashLoaded) return;
   try {
-    // Load all data in parallel — all using GET to avoid POST body parsing issues
+    // Load all data in parallel â€” all using GET to avoid POST body parsing issues
     const [usersData, installsData, reportData, btData, statsData] = await Promise.all([
       callApi('/api/admin-users?type=users&limit=200&cursor=0'),
       callApi('/api/admin-users?type=installs&limit=200&cursor=0'),
@@ -965,9 +965,9 @@ async function loadDashboardData() {
   }
 }
 
-/* ═══════════════════════════════════════════════════════╗
-   USERS PAGE                                             ║
-   ═══════════════════════════════════════════════════════*/
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+   USERS PAGE                                             â•‘
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•*/
 const usersState = { cursor: '0', stack: [], nextCursor: '0', hasMore: false, items: [] };
 
 async function loadUsersPage(cursor) {
@@ -1024,9 +1024,9 @@ document.getElementById('usersRefresh').addEventListener('click', () => { usersS
 document.getElementById('usersPrev').addEventListener('click', () => { if (usersState.stack.length) loadUsersPage(usersState.stack.pop()); });
 document.getElementById('usersNext').addEventListener('click', () => { if (usersState.hasMore) { usersState.stack.push(usersState.cursor); loadUsersPage(usersState.nextCursor); } });
 
-/* ═══════════════════════════════════════════════════════╗
-   INSTALLS PAGE                                          ║
-   ═══════════════════════════════════════════════════════*/
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+   INSTALLS PAGE                                          â•‘
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•*/
 const installsState = { cursor: '0', stack: [], nextCursor: '0', hasMore: false, items: [] };
 
 async function loadInstallsPage(cursor) {
@@ -1111,9 +1111,9 @@ document.getElementById('installsRefresh').addEventListener('click', () => { ins
 document.getElementById('installsPrev').addEventListener('click', () => { if (installsState.stack.length) loadInstallsPage(installsState.stack.pop()); });
 document.getElementById('installsNext').addEventListener('click', () => { if (installsState.hasMore) { installsState.stack.push(installsState.cursor); loadInstallsPage(installsState.nextCursor); } });
 
-/* ═══════════════════════════════════════════════════════╗
-   BANK TRANSFERS PAGE                                    ║
-   ═══════════════════════════════════════════════════════*/
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+   BANK TRANSFERS PAGE                                    â•‘
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•*/
 async function loadBankTransfers() {
   const status = document.getElementById('btStatusFilter').value;
   document.getElementById('btStatus').textContent = 'Loading...';
@@ -1182,9 +1182,9 @@ async function loadBankTransfers() {
 }
 document.getElementById('btLoad').addEventListener('click', loadBankTransfers);
 
-/* ═══════════════════════════════════════════════════════╗
-   REPORTS PAGE                                           ║
-   ═══════════════════════════════════════════════════════*/
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+   REPORTS PAGE                                           â•‘
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•*/
 let reportLoaded = false;
 async function loadReportPage() {
   if (reportLoaded) return;
@@ -1236,9 +1236,9 @@ async function doLoadReport() {
 }
 document.getElementById('loadReport').addEventListener('click', () => { reportLoaded = false; doLoadReport(); });
 
-/* ═══════════════════════════════════════════════════════╗
-   SETTINGS PAGE                                          ║
-   ═══════════════════════════════════════════════════════*/
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+   SETTINGS PAGE                                          â•‘
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•*/
 function loadToolsPage() {
   const sess = getSession();
   if (sess) {
@@ -1320,7 +1320,7 @@ document.getElementById('savePricingMode').addEventListener('click', async () =>
   }
 });
 
-/* ═══ AUTO-LOGIN ═══ */
+/* â•â•â• AUTO-LOGIN â•â•â• */
 (function() { if (getSession()) enterDashboard(); })();
 </script>
 </body>

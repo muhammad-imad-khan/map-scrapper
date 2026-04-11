@@ -1,17 +1,17 @@
-﻿// ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-//  LEAD GEN x AI Powered Tool v2 ÔÇö Background Service Worker
+// Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰
+//  LEAD GEN x AI Powered Tool v2 Ã”Ã‡Ã¶ Background Service Worker
 //  Monetization: SERVER-SIDE CREDIT SYSTEM (Paddle + Redis)
-//  ÔÇó New installs: 3 free starter credits (server-granted)
-//  ÔÇó Each scraped result costs 1 credit (server-deducted)
-//  ÔÇó 500 cr / $10 ÔÇö emails + social media (Pro)
-//  ÔÇó 2500 cr / $25 ÔÇö emails + social media (Enterprise)
-//  ÔÇó Each install has a unique installId (UUID) for RLS
-// ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+//  Ã”Ã‡Ã³ New installs: 3 free starter credits (server-granted)
+//  Ã”Ã‡Ã³ Each scraped result costs 1 credit (server-deducted)
+//  Ã”Ã‡Ã³ 500 cr / $10 Ã”Ã‡Ã¶ emails + social media (Pro)
+//  Ã”Ã‡Ã³ 2500 cr / $25 Ã”Ã‡Ã¶ emails + social media (Enterprise)
+//  Ã”Ã‡Ã³ Each install has a unique installId (UUID) for RLS
+// Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰Ã”Ã²Ã‰
 
-// ÔöÇÔöÇ CONFIG ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
-const BACKEND_URL = 'https://map-scraper-paddle-backend.vercel.app';
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ CONFIG Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
+const BACKEND_URL = 'https://leadgenx-api.vercel.app';
 
-// ÔöÇÔöÇ Open welcome page on first install ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Open welcome page on first install Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
     chrome.tabs.create({ url: chrome.runtime.getURL('welcome.html') });
@@ -24,7 +24,7 @@ const CREDIT_PACKS = [
 ];
 const COST_PER_RESULT = 1;
 
-// ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 
 let state = {
   running: false, results: [], progress: 0, total: 0,
@@ -60,7 +60,7 @@ async function exec(tabId, fn, args = []) {
   }
 }
 
-// ÔöÇÔöÇ Install ID (unique per browser install, used as RLS key) ÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Install ID (unique per browser install, used as RLS key) Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 
 function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
@@ -83,7 +83,7 @@ async function getInstallId() {
   });
 }
 
-// ÔöÇÔöÇ Server-side credit operations ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Server-side credit operations Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 
 async function getCredits() {
   try {
@@ -109,7 +109,7 @@ async function getCredits() {
 }
 
 async function setCredits(n) {
-  // Only update local cache ÔÇö server is the source of truth
+  // Only update local cache Ã”Ã‡Ã¶ server is the source of truth
   const val = Math.max(0, n);
   await chrome.storage.local.set({ credits: val });
   broadcast('CREDITS_UPDATE', { credits: val });
@@ -134,7 +134,7 @@ async function deductCredit() {
   }
 }
 
-// ÔöÇÔöÇ License / credit pack redemption (kept for manual codes) ÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ License / credit pack redemption (kept for manual codes) Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 
 async function verifyLicense(key) {
   if (!key || key.length < 8) return false;
@@ -184,7 +184,7 @@ async function getUsedCodes() {
   return new Promise(r => chrome.storage.local.get(['usedCodes'], d => r(d.usedCodes || [])));
 }
 
-// ÔöÇÔöÇ Message router ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Message router Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   (async () => {
@@ -226,7 +226,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
         if (!pack) { sendResponse({ ok: false }); break; }
         const installId = await getInstallId().catch(() => '');
         // Open payment page directly with installId so credits get linked
-        chrome.tabs.create({ url: `https://map-scrapper-five.vercel.app/payment/?pack=${pack.slug}&installId=${installId}` });
+        chrome.tabs.create({ url: `https://lead-genx.vercel.app/payment/?pack=${pack.slug}&installId=${installId}` });
         sendResponse({ ok: true });
         break;
       }
@@ -290,7 +290,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   return true;
 });
 
-// ÔöÇÔöÇ Main scraper ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Main scraper Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 
 async function runScraper(query, requestedMax, startCredits) {
   // Cap max by available credits
@@ -299,7 +299,7 @@ async function runScraper(query, requestedMax, startCredits) {
 
   state = {
     running: true, results: [], progress: 0, total: 0,
-    status: 'Opening Google MapsÔÇª', tabId: null,
+    status: 'Opening Google MapsÃ”Ã‡Âª', tabId: null,
     credits: startCredits
   };
   broadcast('STATE', state);
@@ -344,7 +344,7 @@ async function runScraper(query, requestedMax, startCredits) {
             || [...dialog.querySelectorAll('button')].find(b => /not now|no thanks|skip|stay signed out|maybe later|close|dismiss/i.test(b.textContent));
           if (dismissBtn) { dismissBtn.click(); return 'dialog-dismiss'; }
         }
-        // "Sign in" bottom bar (not a full overlay ÔÇö just hide it)
+        // "Sign in" bottom bar (not a full overlay Ã”Ã‡Ã¶ just hide it)
         const signInBar = document.querySelector('.kwuIFd, .PwqnGe');
         if (signInBar) { signInBar.style.display = 'none'; return 'signin-bar-hidden'; }
         // Generic dismiss buttons (be very specific to avoid closing results)
@@ -362,14 +362,14 @@ async function runScraper(query, requestedMax, startCredits) {
     await sleep(2000);
 
     // Wait for results to actually appear in the DOM (up to 15s)
-    state.status = 'Waiting for Maps results to loadÔÇª';
+    state.status = 'Waiting for Maps results to loadÃ”Ã‡Âª';
     broadcast('STATE', state);
 
     // Test that script injection works at all
     const canExec = await exec(tabId, () => 'ping');
     console.log('[Scraper] exec test:', canExec);
     if (canExec !== 'ping') {
-      // Script injection failed ÔÇö try getting tab info
+      // Script injection failed Ã”Ã‡Ã¶ try getting tab info
       const tab = await chrome.tabs.get(tabId).catch(() => null);
       console.error('[Scraper] Cannot inject scripts. Tab URL:', tab?.url, 'Status:', tab?.status);
       throw new Error('Cannot access Google Maps page. Check extension permissions.');
@@ -380,7 +380,7 @@ async function runScraper(query, requestedMax, startCredits) {
     console.log('[Scraper] Maps page URL:', pageUrl);
 
     // Wait for results to load (up to 40 seconds)
-    state.status = 'Waiting for results to loadÔÇª';
+    state.status = 'Waiting for results to loadÃ”Ã‡Âª';
     broadcast('STATE', state);
     
     let hasResults = false;
@@ -404,13 +404,13 @@ async function runScraper(query, requestedMax, startCredits) {
     }
 
     // Collect listing URLs (or prep for card-click fallback)
-    state.status = 'Collecting listings from resultsÔÇª';
+    state.status = 'Collecting listings from resultsÃ”Ã‡Âª';
     broadcast('STATE', state);
     const urls = await collectUrls(tabId, maxResults);
     state.total = urls.length || maxResults;
     if (!urls.length) {
       // Fallback mode: scrape by clicking result cards directly in the left panel.
-      state.status = 'URL selectors failed. Switching to card-click modeÔÇª';
+      state.status = 'URL selectors failed. Switching to card-click modeÃ”Ã‡Âª';
       broadcast('STATE', state);
       await sleep(900);
 
@@ -455,13 +455,13 @@ async function runScraper(query, requestedMax, startCredits) {
       chrome.tabs.remove(state.tabId).catch(() => {});
       const finalCredits = await getCredits();
       state.running = false; state.tabId = null; state.credits = finalCredits;
-      state.status = `Done ÔÇö ${state.results.length} listings. ${finalCredits} credits remaining.`;
+      state.status = `Done Ã”Ã‡Ã¶ ${state.results.length} listings. ${finalCredits} credits remaining.`;
       if (state.results.length > 0) await autoExportAndView(state.results, query);
       broadcast('DONE', { ...state });
       return;
     }
 
-    broadcast('STATE', { ...state, status: `Found ${urls.length} listings. StartingÔÇª` });
+    broadcast('STATE', { ...state, status: `Found ${urls.length} listings. StartingÃ”Ã‡Âª` });
     await sleep(400);
 
     // Scrape each listing
@@ -476,7 +476,7 @@ async function runScraper(query, requestedMax, startCredits) {
       }
 
       state.progress = i + 1;
-      state.status = `[${currentCredits} cr] Extracting ${i + 1} / ${urls.length}ÔÇª`;
+      state.status = `[${currentCredits} cr] Extracting ${i + 1} / ${urls.length}Ã”Ã‡Âª`;
       broadcast('STATE', state);
 
       try {
@@ -496,7 +496,7 @@ async function runScraper(query, requestedMax, startCredits) {
 
         // Fetch email + socials from business website
         if (data.website && data.website !== 'N/A') {
-            state.status = `Finding email for "${data.name}"ÔÇª`;
+            state.status = `Finding email for "${data.name}"Ã”Ã‡Âª`;
             broadcast('STATE', state);
             const webData = await fetchWebsiteData(data.website, true);
             data.email = webData.email;
@@ -513,9 +513,9 @@ async function runScraper(query, requestedMax, startCredits) {
     chrome.tabs.remove(state.tabId).catch(() => {});
     const finalCredits = await getCredits();
     state.running = false; state.tabId = null; state.credits = finalCredits;
-    state.status = `Done ÔÇö ${state.results.length} listings. ${finalCredits} credits remaining.`;
+    state.status = `Done Ã”Ã‡Ã¶ ${state.results.length} listings. ${finalCredits} credits remaining.`;
 
-    // ÔöÇÔöÇ Auto-export CSV + open viewer tab ÔöÇÔöÇ
+    // Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Auto-export CSV + open viewer tab Ã”Ã¶Ã‡Ã”Ã¶Ã‡
     if (state.results.length > 0) {
       await autoExportAndView(state.results, query);
     }
@@ -543,7 +543,7 @@ async function scrapeByClickingResults(tabId, maxResults) {
     }
 
     state.progress = successCount + 1;
-    state.status = `[${currentCredits} cr] Scraping result ${successCount + 1} / ${maxResults}ÔÇª`;
+    state.status = `[${currentCredits} cr] Scraping result ${successCount + 1} / ${maxResults}Ã”Ã‡Âª`;
     broadcast('STATE', state);
 
     const clicked = await exec(tabId, () => {
@@ -638,7 +638,7 @@ async function scrapeByClickingResults(tabId, maxResults) {
 
     // Fetch email/socials if website exists
     if (data.website && data.website !== 'N/A') {
-      state.status = `Finding email for "${data.name}"ÔÇª`;
+      state.status = `Finding email for "${data.name}"Ã”Ã‡Âª`;
       broadcast('STATE', state);
       try {
         const webData = await fetchWebsiteData(data.website, true);
@@ -672,7 +672,7 @@ async function scrapeByClickingResults(tabId, maxResults) {
   console.log('[Scraper] Card-click mode completed:', successCount, 'results after', attempts, 'attempts');
 }
 
-// ÔöÇÔöÇ URL Collector ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ URL Collector Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 
 async function collectUrls(tabId, max) {
   const seen = new Set();
@@ -786,7 +786,7 @@ async function collectUrls(tabId, max) {
   return [...seen].slice(0, max);
 }
 
-// ÔöÇÔöÇ Detail extractor (injected into Maps page) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Detail extractor (injected into Maps page) Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 
 function extractDetails() {
   const $ = s => document.querySelector(s);
@@ -864,7 +864,7 @@ function extractDetails() {
   return { name, rating, website, email: 'N/A', phone, address, hours, category, socials: 'N/A' };
 }
 
-// ÔöÇÔöÇ Website data fetcher (email + social media) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Website data fetcher (email + social media) Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 
 async function fetchWebsiteData(url, includeSocials) {
   const BL = ['example','domain','sentry','wixpress','schema','noreply','@2x','.png','.jpg','.svg'];
@@ -932,7 +932,7 @@ async function fetchWebsiteData(url, includeSocials) {
   }
 }
 
-// ÔöÇÔöÇ Auto Export & Open Viewer ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Auto Export & Open Viewer Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 
 function resultsToCSV(rows) {
   const COLS  = ['Name','Website','Email','Social Media','Rating','Opening Hours','Phone','Address','Category'];
@@ -969,7 +969,7 @@ async function autoExportAndView(results, query) {
     await chrome.downloads.download({
       url:      dataUrl,
       filename: filename,
-      saveAs:   false    // silent ÔÇö goes straight to Downloads
+      saveAs:   false    // silent Ã”Ã‡Ã¶ goes straight to Downloads
     });
 
     // 3. Open viewer tab
@@ -980,6 +980,6 @@ async function autoExportAndView(results, query) {
 
   } catch (e) {
     console.warn('[AutoExport] Error:', e);
-    // Don't block ÔÇö DONE still fires even if export fails
+    // Don't block Ã”Ã‡Ã¶ DONE still fires even if export fails
   }
 }

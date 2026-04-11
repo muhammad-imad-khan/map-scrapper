@@ -200,7 +200,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--nav-scroll)
 
 @media(max-width:820px){.course-layout{grid-template-columns:1fr}.shell{padding:16px 16px 40px}}
 
-/* ═══ COMPREHENSIVE RESPONSIVE ═══ */
+/* â•â•â• COMPREHENSIVE RESPONSIVE â•â•â• */
 @supports(padding:env(safe-area-inset-top)){
   nav .nav-inner{padding-left:max(24px,env(safe-area-inset-left));padding-right:max(24px,env(safe-area-inset-right))}
   .page-wrap{padding-bottom:env(safe-area-inset-bottom)}
@@ -433,7 +433,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--nav-scroll)
 <script>
 const TOKEN_KEY='mls_auth_token';
 const CLIENT_KEY='mls_client_id';
-const API_BASE=window.location.hostname==='localhost'?'http://localhost:3000':'https://map-scraper-paddle-backend.vercel.app';
+const API_BASE=window.location.hostname==='localhost'?'http://localhost:3000':'https://leadgenx-api.vercel.app';
 const state={user:null,courses:[],selectedCourse:null,selectedLesson:null};
 
 function getClientId(){

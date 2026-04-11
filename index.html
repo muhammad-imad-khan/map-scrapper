@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LEAD GEN x AI Powered Tool — Get Business Leads from Google Maps Instantly</title>
-<meta name="description" content="Scrape Google Maps search results into a CSV with emails, ratings, opening hours and websites. Credit-based browser extension — 3 free credits on install.">
-<meta property="og:title" content="LEAD GEN x AI Powered Tool — Google Maps → CSV in 60 Seconds">
+<title>LEAD GEN x AI Powered Tool â€” Get Business Leads from Google Maps Instantly</title>
+<meta name="description" content="Scrape Google Maps search results into a CSV with emails, ratings, opening hours and websites. Credit-based browser extension â€” 3 free credits on install.">
+<meta property="og:title" content="LEAD GEN x AI Powered Tool â€” Google Maps â†’ CSV in 60 Seconds">
 <meta property="og:description" content="Type any search. Get a spreadsheet of business leads with emails, ratings and hours. 3 free credits on install.">
 <meta name="theme-color" content="#06060c">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -48,17 +48,17 @@ body{font-family:var(--body);background:var(--bg);color:var(--t);overflow-x:hidd
 ::selection{background:rgba(34,197,94,.22);color:var(--heading)}
 .container{max-width:1100px;margin:0 auto;padding:0 24px}
 
-/* ── CUSTOM CURSOR ── */
+/* â”€â”€ CUSTOM CURSOR â”€â”€ */
 #cursor{position:fixed;top:0;left:0;pointer-events:none;z-index:99999;mix-blend-mode:difference}
 #cursor-dot{position:absolute;width:6px;height:6px;background:#22c55e;border-radius:50%;will-change:transform}
 #cursor-ring{position:absolute;width:32px;height:32px;border:1.5px solid rgba(34,197,94,.5);border-radius:50%;transition:width .22s ease,height .22s ease,border-color .22s ease;will-change:transform}
 body.hovering #cursor-ring{width:48px;height:48px;border-color:rgba(34,197,94,.9)}
 @media(pointer:coarse){#cursor{display:none}}
 
-/* ── BG CANVAS ── */
+/* â”€â”€ BG CANVAS â”€â”€ */
 #bgCanvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.6}
 
-/* ── NAV ── */
+/* â”€â”€ NAV â”€â”€ */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;transition:background .3s,border-color .3s}
 nav.scrolled{background:var(--nav-scroll);backdrop-filter:blur(20px);border-bottom:1px solid var(--b)}
 .nav-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;height:64px;gap:32px;padding:0 24px}
@@ -83,7 +83,7 @@ nav.scrolled{background:var(--nav-scroll);backdrop-filter:blur(20px);border-bott
   .nav-links-wrap.open{display:flex}.nav-burger{display:flex;align-items:center}
 }
 
-/* ── HERO ── */
+/* â”€â”€ HERO â”€â”€ */
 .hero{position:relative;z-index:1;padding:140px 0 60px;text-align:center;min-height:100vh;display:flex;flex-direction:column;justify-content:center}
 .hero-kicker{display:inline-flex;align-items:center;gap:8px;background:var(--gd);border:1px solid var(--gb);border-radius:100px;padding:6px 18px;margin-bottom:28px;animation:fadeUp .7s ease both}
 .kd{width:7px;height:7px;border-radius:50%;background:var(--g);animation:dot-pulse 2s infinite}
@@ -116,7 +116,7 @@ nav.scrolled{background:var(--nav-scroll);backdrop-filter:blur(20px);border-bott
 .hc-sep{font-family:var(--display);font-size:26px;color:var(--t3);padding:0 2px;margin-top:-12px}
 @media(max-width:480px){.hc-unit{min-width:40px}.hc-unit span{font-size:26px}.hc-sep{font-size:20px}.hero-countdown{padding:12px 20px}}
 
-/* ── LIVE SCRAPER DEMO ── */
+/* â”€â”€ LIVE SCRAPER DEMO â”€â”€ */
 .demo-section{position:relative;z-index:1;padding:20px 0 80px}
 .demo-wrap{max-width:960px;margin:0 auto;padding:0 24px;position:relative}
 .demo-label{text-align:center;font-family:var(--mono);font-size:11px;color:var(--t3);letter-spacing:3px;text-transform:uppercase;margin-bottom:24px}
@@ -135,7 +135,7 @@ nav.scrolled{background:var(--nav-scroll);backdrop-filter:blur(20px);border-bott
 .ep-cr{background:var(--gd);border:1px solid var(--gb);border-radius:9px;padding:2px 9px;font-family:var(--mono);font-size:11px;color:var(--g);display:flex;align-items:center;gap:4px}
 .ep-body{padding:12px 13px}
 .ep-inp-w{position:relative;margin-bottom:7px}
-.ep-inp-w::before{content:'🔍';position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:10px;z-index:1;pointer-events:none}
+.ep-inp-w::before{content:'ðŸ”';position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:10px;z-index:1;pointer-events:none}
 .ep-inp{width:100%;background:var(--panel-input);border:1px solid var(--bhi);border-radius:6px;padding:8px 10px 8px 26px;font-size:11px;color:var(--t);font-family:var(--mono);outline:none;transition:border-color .2s;caret-color:var(--g)}
 .ep-inp:focus{border-color:rgba(34,197,94,.4)}
 .ep-opts{display:flex;align-items:center;gap:8px;background:var(--panel-opt);border:1px solid var(--b);border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:10.5px;color:var(--t3)}
@@ -192,7 +192,7 @@ nav.scrolled{background:var(--nav-scroll);backdrop-filter:blur(20px);border-bott
 .sl-email{color:var(--g);flex-shrink:0}
 .sl-rating{color:var(--amber);flex-shrink:0}
 
-/* ── TICKER ── */
+/* â”€â”€ TICKER â”€â”€ */
 .ticker{border-top:1px solid var(--b);border-bottom:1px solid var(--b);background:var(--s1);overflow:hidden;position:relative;z-index:1;padding:12px 0}
 .ticker::before{content:'';position:absolute;left:0;top:0;bottom:0;width:80px;background:linear-gradient(90deg,var(--s1),transparent);z-index:2;pointer-events:none}
 .ticker::after{content:'';position:absolute;right:0;top:0;bottom:0;width:80px;background:linear-gradient(-90deg,var(--s1),transparent);z-index:2;pointer-events:none}
@@ -203,7 +203,7 @@ nav.scrolled{background:var(--nav-scroll);backdrop-filter:blur(20px);border-bott
 .ti .v{font-family:var(--mono);color:var(--g);font-size:13.5px;font-weight:700}
 @keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
-/* ── SECTIONS ── */
+/* â”€â”€ SECTIONS â”€â”€ */
 .section{position:relative;z-index:1;padding:96px 0;content-visibility:auto;contain-intrinsic-size:0 600px}
 .sk{font-family:var(--mono);font-size:11.5px;font-weight:500;color:var(--g);letter-spacing:3px;text-transform:uppercase;margin-bottom:13px}
 .sh{font-family:var(--display);font-size:clamp(34px,5vw,56px);font-weight:800;line-height:.95;letter-spacing:-1.5px;color:var(--heading);margin-bottom:16px}
@@ -223,7 +223,7 @@ nav.scrolled{background:var(--nav-scroll);backdrop-filter:blur(20px);border-bott
 .step-t{font-size:15px;font-weight:700;color:var(--heading);margin-bottom:7px}
 .step-d{font-size:13.5px;color:var(--t2);line-height:1.6}
 
-/* ── INTERACTIVE DEMO SECTION ── */
+/* â”€â”€ INTERACTIVE DEMO SECTION â”€â”€ */
 .idemo-section{position:relative;z-index:1;padding:80px 0;background:var(--s1);border-top:1px solid var(--b);border-bottom:1px solid var(--b)}
 .idemo-inner{display:grid;grid-template-columns:1fr 460px;gap:56px;align-items:center;max-width:1100px;margin:0 auto;padding:0 24px}
 @media(max-width:900px){.idemo-inner{grid-template-columns:1fr;gap:36px}}
@@ -321,7 +321,7 @@ nav.scrolled{background:var(--nav-scroll);backdrop-filter:blur(20px);border-bott
 .p-per{font-family:var(--mono);font-size:10.5px;color:var(--t3);margin-bottom:20px}
 .p-feats{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:22px}
 .p-feats li{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--t2)}
-.p-feats li::before{content:'✓';color:var(--g);font-weight:700;flex-shrink:0}
+.p-feats li::before{content:'âœ“';color:var(--g);font-weight:700;flex-shrink:0}
 .btn-p{width:100%;padding:11px;background:var(--g);color:#000;border:none;border-radius:8px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:var(--body);transition:background .15s,transform .1s;text-decoration:none;display:block;text-align:center}
 .btn-p:hover{background:var(--g2);transform:translateY(-1px)}
 .p-card:not(.pop) .btn-p{background:var(--s4);color:var(--t);border:1px solid var(--bhi)}
@@ -412,7 +412,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
 @keyframes fadeUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
 @media(max-width:600px){.hero{padding:105px 0 50px;min-height:auto}.cta-band{padding:44px 22px}}
 
-/* ── THEME TOGGLE ── */
+/* â”€â”€ THEME TOGGLE â”€â”€ */
 .theme-toggle{background:none;border:1px solid var(--b);border-radius:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);transition:border-color .2s,color .2s,background .2s;flex-shrink:0}
 .theme-toggle:hover{border-color:var(--gb);color:var(--g);background:var(--gd)}
 .theme-toggle .icon-sun,.theme-toggle .icon-moon{width:18px;height:18px}
@@ -423,7 +423,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
 [data-theme="light"] #cursor{display:none}
 [data-theme="light"] .sc-left strong{color:var(--amber)}
 [data-theme="light"] .sc-dot{background:var(--amber)}
-/* ── light mode: install modal ── */
+/* â”€â”€ light mode: install modal â”€â”€ */
 [data-theme="light"] #installModal{background:rgba(0,0,0,.35)!important}
 [data-theme="light"] #installModalBox{background:#fff!important;border-color:rgba(0,0,0,.1)!important;box-shadow:0 48px 140px rgba(0,0,0,.15)!important}
 [data-theme="light"] #installModalBox div[style*="border-bottom"]{border-color:rgba(0,0,0,.08)!important}
@@ -436,9 +436,9 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
 [data-theme="light"] #installModalBox div[style*="border-top"]{border-color:rgba(0,0,0,.08)!important}
 [data-theme="light"] #installModalBox div[style*="letter-spacing:2px"]{color:#71718a!important}
 
-/* ═══════════════════════════════════════════════════════════
-   COMPREHENSIVE RESPONSIVE — every device, no compromise
-   ═══════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   COMPREHENSIVE RESPONSIVE â€” every device, no compromise
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 /* Safe area insets for notched / Dynamic Island phones */
 @supports(padding:env(safe-area-inset-top)){
@@ -459,14 +459,14 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
   .cp{min-height:36px}
 }
 
-/* ── Large tablets / small laptops (1024px) ── */
+/* â”€â”€ Large tablets / small laptops (1024px) â”€â”€ */
 @media(max-width:1024px){
   .idemo-inner{grid-template-columns:1fr 420px;gap:36px}
   .footer-g{grid-template-columns:1.5fr 1fr 1fr 1fr;gap:28px}
   #pricing.one-time-layout .container{grid-template-columns:1fr}
 }
 
-/* ── Tablets portrait (900px) ── */
+/* â”€â”€ Tablets portrait (900px) â”€â”€ */
 @media(max-width:900px){
   .idemo-inner{grid-template-columns:1fr;gap:32px}
   .idemo-left{text-align:center}
@@ -476,7 +476,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
   .bcr{flex-direction:row;justify-content:center}
 }
 
-/* ── Landscape phones / small tablets (760px) ── */
+/* â”€â”€ Landscape phones / small tablets (760px) â”€â”€ */
 @media(max-width:760px){
   .hero{padding:110px 0 40px;min-height:auto}
   .hero-h1{letter-spacing:-1.5px}
@@ -498,14 +498,14 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
   .cta-band p{font-size:15px}
 }
 
-/* ── Nav breakpoint (720px) — already exists, enhancing ── */
+/* â”€â”€ Nav breakpoint (720px) â€” already exists, enhancing â”€â”€ */
 @media(max-width:720px){
   .nav-links-wrap{max-height:calc(100vh - 64px);overflow-y:auto;-webkit-overflow-scrolling:touch}
   .nav-links-wrap a{font-size:15px;padding:4px 0}
   .nav-cta{width:100%;justify-content:center;margin-top:4px}
 }
 
-/* ── Pricing for mobile (680px) — refining ── */
+/* â”€â”€ Pricing for mobile (680px) â€” refining â”€â”€ */
 @media(max-width:680px){
   .p-grid{grid-template-columns:1fr}
   .free-strip{flex-direction:column;text-align:center;gap:16px}
@@ -513,7 +513,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
   .p-card{max-width:400px;margin:0 auto}
 }
 
-/* ── Small screens (600px) ── */
+/* â”€â”€ Small screens (600px) â”€â”€ */
 @media(max-width:600px){
   .hero{padding:100px 0 36px;min-height:auto}
   .hero-h1{font-size:clamp(38px,10vw,56px);letter-spacing:-1px}
@@ -535,7 +535,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
   .footer-g{gap:24px}
 }
 
-/* ── Standard phones (480px) ── */
+/* â”€â”€ Standard phones (480px) â”€â”€ */
 @media(max-width:480px){
   .container{padding:0 16px}
   .nav-inner{padding:0 16px}
@@ -602,7 +602,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
   .rb-meta{font-size:10px}
 }
 
-/* ── Very small phones — iPhone SE, Galaxy S mini (360px) ── */
+/* â”€â”€ Very small phones â€” iPhone SE, Galaxy S mini (360px) â”€â”€ */
 @media(max-width:360px){
   .container{padding:0 12px}
   .nav-inner{padding:0 12px;gap:8px}
@@ -644,7 +644,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
   .footer-g{gap:16px}
 }
 
-/* ── Tiny screens (320px) — iPhone SE 1st gen, older devices ── */
+/* â”€â”€ Tiny screens (320px) â€” iPhone SE 1st gen, older devices â”€â”€ */
 @media(max-width:320px){
   .container{padding:0 10px}
   .nav-inner{padding:0 10px}
@@ -662,7 +662,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
   .sh{font-size:22px}
 }
 
-/* ── Landscape orientation on phones ── */
+/* â”€â”€ Landscape orientation on phones â”€â”€ */
 @media(max-height:500px) and (orientation:landscape){
   .hero{padding:80px 0 20px;min-height:auto}
   .hero-h1{font-size:clamp(28px,5vh,44px)}
@@ -671,7 +671,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
   .mp-body{height:160px}
 }
 
-/* ── High-DPI scaling for readability ── */
+/* â”€â”€ High-DPI scaling for readability â”€â”€ */
 @media(-webkit-min-device-pixel-ratio:3),(min-resolution:3dppx){
   .ep-rth,.ep-row{font-size:10px}
   .ep-inp{font-size:12px}
@@ -720,14 +720,14 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
 <!-- HERO -->
 <section class="hero" id="home">
   <div class="container">
-    <div class="hero-kicker"><span class="kd"></span><span class="kt" id="heroKickerText">3 FREE CREDITS ON INSTALL — NO SIGN-UP REQUIRED</span></div>
+    <div class="hero-kicker"><span class="kd"></span><span class="kt" id="heroKickerText">3 FREE CREDITS ON INSTALL â€” NO SIGN-UP REQUIRED</span></div>
     <h1 class="hero-h1">
       <span class="acc">Google Maps</span> Leads<br>
       <span class="line2">Into Your Spreadsheet.</span>
     </h1>
-    <p class="hero-sub">Type any search — get business <strong>names, emails, ratings, hours and websites</strong> auto-exported to CSV in under 60 seconds.</p>
+    <p class="hero-sub">Type any search â€” get business <strong>names, emails, ratings, hours and websites</strong> auto-exported to CSV in under 60 seconds.</p>
     <div class="hero-countdown">
-      <div class="hc-label">🔥 SALE ENDS IN</div>
+      <div class="hc-label">ðŸ”¥ SALE ENDS IN</div>
       <div class="hc-timer">
         <div class="hc-unit"><span id="hcHours">00</span><small>Hours</small></div>
         <div class="hc-sep">:</div>
@@ -739,12 +739,12 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
     <div class="hero-btns">
       <a class="btn-main" href="#" id="heroCta">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        <span id="heroCtaTxt">Add to Chrome — Free</span>
+        <span id="heroCtaTxt">Add to Chrome â€” Free</span>
       </a>
       <a class="btn-ghost" href="#" id="heroZipDownload">Download ZIP</a>
-      <a class="btn-ghost" href="#how">Watch it scrape →</a>
+      <a class="btn-ghost" href="#how">Watch it scrape â†’</a>
     </div>
-    <p class="hero-note" id="heroNoteText"><strong>3 free credits</strong> on install · 1 credit = 1 lead · Bought credits never expire</p>
+    <p class="hero-note" id="heroNoteText"><strong>3 free credits</strong> on install Â· 1 credit = 1 lead Â· Bought credits never expire</p>
     <div class="compat-pills">
       <span style="font-size:11.5px;color:var(--t3)">Works on</span>
       <span class="cp"><svg width="13" height="13" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#4285f4"/><circle cx="12" cy="12" r="4.5" fill="white"/><path d="M12 0a12 12 0 0110.39 6H12V0z" fill="#ea4335"/><path d="M2.54 6A12 12 0 0012 24V12L2.54 6z" fill="#34a853"/><path d="M21.46 18A12 12 0 012.54 6L12 12l9.46-6z" fill="#fbbc05"/></svg> Chrome</span>
@@ -758,7 +758,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
 <!-- LIVE DEMO SECTION -->
 <section class="demo-section" id="how">
   <div class="demo-wrap">
-    <div class="demo-label">● <span>LIVE</span> — Interactive scraping demo</div>
+    <div class="demo-label">â— <span>LIVE</span> â€” Interactive scraping demo</div>
     <div class="demo-grid">
 
       <!-- Extension Panel -->
@@ -768,7 +768,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
             <div class="ep-ic"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
             <span class="ep-nm">Lead Gen X Map <em>Scrapper</em></span>
           </div>
-          <div class="ep-cr">🪙 <span id="demoCredits">3</span> <span style="font-size:9px;color:rgba(34,197,94,.55)">cr</span></div>
+          <div class="ep-cr">ðŸª™ <span id="demoCredits">3</span> <span style="font-size:9px;color:rgba(34,197,94,.55)">cr</span></div>
         </div>
         <div class="ep-body">
           <div class="ep-inp-w">
@@ -777,12 +777,12 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
           <div class="ep-opts">
             <span>Max results</span>
             <span style="font-family:var(--mono);font-size:10.5px;color:var(--t)">10</span>
-            <span class="ep-cpill">🪙 10 credits</span>
+            <span class="ep-cpill">ðŸª™ 10 credits</span>
           </div>
-          <button class="ep-btn" id="demoBtn">▶ Start Scraping</button>
+          <button class="ep-btn" id="demoBtn">â–¶ Start Scraping</button>
           <div class="ep-div"></div>
           <div class="ep-prog" id="demoProgWrap" style="display:none">
-            <div class="ep-stat" id="demoStat"><span class="ep-sdot pulse" id="demoDot"></span><span id="demoStatTxt">Initializing…</span></div>
+            <div class="ep-stat" id="demoStat"><span class="ep-sdot pulse" id="demoDot"></span><span id="demoStatTxt">Initializingâ€¦</span></div>
             <div class="ep-bar-wrap"><div class="ep-bar" id="demoBar"></div></div>
             <div class="ep-plbl"><span id="demoPct">0%</span><span id="demoCount">0 / 10</span></div>
           </div>
@@ -790,15 +790,15 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
             <div class="ep-rth"><span>Name</span><span>Rating</span><span>Email</span></div>
             <div id="demoRows"></div>
           </div>
-          <button class="ep-export" id="demoExport">↓ Download CSV · 10 results</button>
+          <button class="ep-export" id="demoExport">â†“ Download CSV Â· 10 results</button>
         </div>
       </div>
 
       <!-- Map Radar Panel -->
       <div class="map-panel">
         <div class="mp-hdr">
-          <span class="mp-title">📍 Scanning Google Maps</span>
-          <div class="mp-ping" id="mpPing"><span class="mp-ping-dot"></span><span id="mpPingTxt">Searching…</span></div>
+          <span class="mp-title">ðŸ“ Scanning Google Maps</span>
+          <div class="mp-ping" id="mpPing"><span class="mp-ping-dot"></span><span id="mpPingTxt">Searchingâ€¦</span></div>
         </div>
         <div class="mp-body">
           <canvas id="mapCanvas"></canvas>
@@ -823,9 +823,9 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
     <span class="ti"><span class="v">1</span> credit per result</span>
     <span class="ti">Auto email finder</span>
     <span class="ti">CSV + Google Sheets + Excel</span>
-    <span class="ti"><span class="v">∞</span> credits never expire</span>
-    <span class="ti">Chrome · Edge · Brave · Opera</span>
-    <span class="ti">No monthly fees · No sign-up</span>
+    <span class="ti"><span class="v">âˆž</span> credits never expire</span>
+    <span class="ti">Chrome Â· Edge Â· Brave Â· Opera</span>
+    <span class="ti">No monthly fees Â· No sign-up</span>
     <span class="ti"><span class="v">0</span> coding required</span>
     <span class="ti"><span class="v">8</span> data fields per lead</span>
     <span class="ti"><span class="v">60s</span> average scrape time</span>
@@ -833,9 +833,9 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
     <span class="ti"><span class="v">1</span> credit per result</span>
     <span class="ti">Auto email finder</span>
     <span class="ti">CSV + Google Sheets + Excel</span>
-    <span class="ti"><span class="v">∞</span> credits never expire</span>
-    <span class="ti">Chrome · Edge · Brave · Opera</span>
-    <span class="ti">No monthly fees · No sign-up</span>
+    <span class="ti"><span class="v">âˆž</span> credits never expire</span>
+    <span class="ti">Chrome Â· Edge Â· Brave Â· Opera</span>
+    <span class="ti">No monthly fees Â· No sign-up</span>
     <span class="ti"><span class="v">0</span> coding required</span>
   </div>
 </div>
@@ -846,7 +846,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
     <div class="idemo-left rev">
       <div class="sk">Try it live</div>
       <div class="idemo-h">Watch the<br><em>data flow in</em><br>real time</div>
-      <p class="idemo-p">The extension scrapes each listing, visits its website to find emails, and streams results directly into the popup — credit balance ticking down live as each lead comes in.</p>
+      <p class="idemo-p">The extension scrapes each listing, visits its website to find emails, and streams results directly into the popup â€” credit balance ticking down live as each lead comes in.</p>
       <div class="idemo-stats">
         <div class="idemo-stat"><div class="is-n" id="cntTotal">0</div><div class="is-l">leads found</div></div>
         <div class="idemo-stat"><div class="is-n" id="cntEmails">0</div><div class="is-l">emails found</div></div>
@@ -858,7 +858,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
         <div class="td-dot" style="background:#f87171"></div>
         <div class="td-dot" style="background:#f59e0b;margin-left:4px"></div>
         <div class="td-dot" style="background:#22c55e;margin-left:4px"></div>
-        <span style="margin-left:10px;font-size:10.5px;color:var(--t3);font-family:var(--mono)">LEAD GEN x AI Powered Tool · Active</span>
+        <span style="margin-left:10px;font-size:10.5px;color:var(--t3);font-family:var(--mono)">LEAD GEN x AI Powered Tool Â· Active</span>
       </div>
       <div class="td-inp-row">
         <div class="td-inp-label">Search Query</div>
@@ -888,7 +888,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
       <p class="ss">No Python. No API keys. No terminal. Just install, type and click.</p>
     </div>
     <div class="steps-wrap rev">
-      <div class="step"><div class="step-bg-n">1</div><div class="step-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></div><div class="step-t">Type your search</div><div class="step-d">Enter any Google Maps query — "Best barbers in Chicago", "Dentists near Dubai", anything.</div></div>
+      <div class="step"><div class="step-bg-n">1</div><div class="step-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></div><div class="step-t">Type your search</div><div class="step-d">Enter any Google Maps query â€” "Best barbers in Chicago", "Dentists near Dubai", anything.</div></div>
       <div class="step"><div class="step-bg-n">2</div><div class="step-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><div class="step-t">Click Start Scraping</div><div class="step-d">A hidden tab opens, navigates Maps, scrolls all results and visits each listing automatically.</div></div>
       <div class="step"><div class="step-bg-n">3</div><div class="step-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div class="step-t">Emails auto-found</div><div class="step-d">Visits each business website and contact pages, extracting email addresses automatically.</div></div>
       <div class="step"><div class="step-bg-n">4</div><div class="step-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div><div class="step-t">CSV auto-downloads</div><div class="step-d">File saves to Downloads automatically. A viewer tab opens with Google Sheets and Excel buttons.</div></div>
@@ -905,8 +905,8 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
       <p class="ss">Built for marketers, sales teams, freelancers and lead gen agencies who need data fast.</p>
     </div>
     <div class="feat-wrap rev">
-      <div class="feat"><div class="feat-ic fi-g"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div class="feat-t">Auto Email Finder</div><div class="feat-d">Visits each business website and contact pages, extracting emails via pattern matching — all hands-free.</div></div>
-      <div class="feat"><div class="feat-ic fi-a"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="feat-t">One-click CSV Export</div><div class="feat-d">Auto-saves to Downloads when scraping finishes. UTF-8 BOM encoded — no encoding issues in Excel.</div></div>
+      <div class="feat"><div class="feat-ic fi-g"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div class="feat-t">Auto Email Finder</div><div class="feat-d">Visits each business website and contact pages, extracting emails via pattern matching â€” all hands-free.</div></div>
+      <div class="feat"><div class="feat-ic fi-a"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="feat-t">One-click CSV Export</div><div class="feat-d">Auto-saves to Downloads when scraping finishes. UTF-8 BOM encoded â€” no encoding issues in Excel.</div></div>
       <div class="feat"><div class="feat-ic fi-b"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div><div class="feat-t">Built-in Results Viewer</div><div class="feat-d">Full-screen tab with sortable columns, search filter, and direct Open in Sheets / Excel buttons.</div></div>
       <div class="feat"><div class="feat-ic fi-p"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div><div class="feat-t">Any City, Any Niche</div><div class="feat-d">Works on any Maps search in any language or country. No limits on search types or geography.</div></div>
       <div class="feat"><div class="feat-ic fi-g"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="feat-t">Live Progress Tracking</div><div class="feat-d">Watch results stream in real-time. Credit balance updates per-scrape so you always know your spend.</div></div>
@@ -937,37 +937,37 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
       <p class="ss">Click your browser for personalised install instructions. Detected browser is pre-selected.</p>
     </div>
     <div class="b-grid rev" id="bGrid">
-      <a class="b-card" id="bbc-chrome" href="#" data-br="chrome"><svg class="b-icon" width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="18" r="18" fill="#4285f4"/><circle cx="18" cy="18" r="7.2" fill="white"/><circle cx="18" cy="18" r="4.5" fill="#4285f4"/><path d="M18 3.6A14.4 14.4 0 0130.48 10.8H18V3.6z" fill="#ea4335"/><path d="M3.64 12.6A14.4 14.4 0 0018 32.4V18L3.64 12.6z" fill="#34a853"/><path d="M32.36 12.6A14.4 14.4 0 013.64 12.6L18 18l14.36-5.4z" fill="#fbbc05"/></svg><div class="b-name">Chrome</div><div class="b-status ok">✓ Supported</div></a>
-      <a class="b-card" id="bbc-edge" href="#" data-br="edge"><svg class="b-icon" width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="18" r="18" fill="#0078d4"/><path d="M9 23c0-7 5.5-12.5 12.5-12.5 3.5 0 6.5 1.5 8.5 4H18c-3 0-5.5 2.2-5.5 5.5s2.5 5.5 5.5 5.5h13a14.4 14.4 0 01-13 8.1c-7.5 0-9-5-9-10.6z" fill="white"/></svg><div class="b-name">Edge</div><div class="b-status ok">✓ Supported</div></a>
-      <a class="b-card" id="bbc-brave" href="#" data-br="brave"><svg class="b-icon" width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="18" r="18" fill="#ff6600"/><path d="M18 7l7 3.5v3.5L23.5 15.5 25 17v3.5L18 29l-7-8.5V17l1.5-1.5L11 14v-3.5z" fill="white" opacity=".9"/><circle cx="18" cy="18" r="3.5" fill="#ff6600"/></svg><div class="b-name">Brave</div><div class="b-status ok">✓ Supported</div></a>
-      <a class="b-card" id="bbc-opera" href="#" data-br="opera"><svg class="b-icon" width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="18" r="18" fill="#ff1b2d"/><ellipse cx="18" cy="18" rx="6.5" ry="10" fill="none" stroke="white" stroke-width="2.5"/></svg><div class="b-name">Opera</div><div class="b-status ok">✓ Supported</div></a>
+      <a class="b-card" id="bbc-chrome" href="#" data-br="chrome"><svg class="b-icon" width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="18" r="18" fill="#4285f4"/><circle cx="18" cy="18" r="7.2" fill="white"/><circle cx="18" cy="18" r="4.5" fill="#4285f4"/><path d="M18 3.6A14.4 14.4 0 0130.48 10.8H18V3.6z" fill="#ea4335"/><path d="M3.64 12.6A14.4 14.4 0 0018 32.4V18L3.64 12.6z" fill="#34a853"/><path d="M32.36 12.6A14.4 14.4 0 013.64 12.6L18 18l14.36-5.4z" fill="#fbbc05"/></svg><div class="b-name">Chrome</div><div class="b-status ok">âœ“ Supported</div></a>
+      <a class="b-card" id="bbc-edge" href="#" data-br="edge"><svg class="b-icon" width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="18" r="18" fill="#0078d4"/><path d="M9 23c0-7 5.5-12.5 12.5-12.5 3.5 0 6.5 1.5 8.5 4H18c-3 0-5.5 2.2-5.5 5.5s2.5 5.5 5.5 5.5h13a14.4 14.4 0 01-13 8.1c-7.5 0-9-5-9-10.6z" fill="white"/></svg><div class="b-name">Edge</div><div class="b-status ok">âœ“ Supported</div></a>
+      <a class="b-card" id="bbc-brave" href="#" data-br="brave"><svg class="b-icon" width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="18" r="18" fill="#ff6600"/><path d="M18 7l7 3.5v3.5L23.5 15.5 25 17v3.5L18 29l-7-8.5V17l1.5-1.5L11 14v-3.5z" fill="white" opacity=".9"/><circle cx="18" cy="18" r="3.5" fill="#ff6600"/></svg><div class="b-name">Brave</div><div class="b-status ok">âœ“ Supported</div></a>
+      <a class="b-card" id="bbc-opera" href="#" data-br="opera"><svg class="b-icon" width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="18" r="18" fill="#ff1b2d"/><ellipse cx="18" cy="18" rx="6.5" ry="10" fill="none" stroke="white" stroke-width="2.5"/></svg><div class="b-name">Opera</div><div class="b-status ok">âœ“ Supported</div></a>
       <a class="b-card na" id="bbc-firefox" href="#" data-br="firefox"><svg class="b-icon" width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="18" r="18" fill="#ff9500"/><circle cx="18" cy="18" r="11" fill="#ff6000"/><circle cx="18" cy="18" r="5.5" fill="#ff9500"/></svg><div class="b-name">Firefox</div><div class="b-status na">Coming soon</div></a>
     </div>
     <div class="b-cta-box rev" id="bCtaBox">
       <div class="bcl">
         <div class="bcl-browser" id="bclBrowser">Chrome detected</div>
-        <div class="bcl-h" id="bclH">Install on Chrome — Free</div>
-        <div class="bcl-s" id="bclS">Click the button below — your ZIP downloads automatically and step-by-step install instructions appear.</div>
+        <div class="bcl-h" id="bclH">Install on Chrome â€” Free</div>
+        <div class="bcl-s" id="bclS">Click the button below â€” your ZIP downloads automatically and step-by-step install instructions appear.</div>
       </div>
       <div class="bcr">
         <label id="termsCheckLabel" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:10px 14px;background:var(--s2);border:1px solid var(--b);border-radius:10px;transition:border-color .2s;margin-bottom:2px">
           <input type="checkbox" id="termsCheck" style="accent-color:#22c55e;width:18px;height:18px;margin-top:2px;flex-shrink:0;cursor:pointer">
           <span style="font-size:13px;color:var(--t2);line-height:1.5">I have read and agree to the <a href="terms-and-conditions.html" target="_blank" style="color:#22c55e;text-decoration:none;font-weight:600" onclick="event.stopPropagation()">Terms &amp; Conditions</a></span>
         </label>
-        <div id="termsError" style="display:none;font-size:12px;color:#f87171;text-align:center;padding:4px 0;animation:fadeUp .3s ease">⚠ Please agree to the Terms &amp; Conditions before installing</div>
+        <div id="termsError" style="display:none;font-size:12px;color:#f87171;text-align:center;padding:4px 0;animation:fadeUp .3s ease">âš  Please agree to the Terms &amp; Conditions before installing</div>
         <a class="btn-main" id="installBtn" href="#" style="opacity:.5;pointer-events:none">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          <span id="installBtnTxt">Install — Free</span>
+          <span id="installBtnTxt">Install â€” Free</span>
         </a>
-        <div id="installCreditNote" style="font-size:11.5px;color:var(--t3);text-align:center">3 free credits · No sign-up</div>
+        <div id="installCreditNote" style="font-size:11.5px;color:var(--t3);text-align:center">3 free credits Â· No sign-up</div>
       </div>
     </div>
     <div class="after-install rev" id="afterInstallSection">
-      <div class="ai-label">After installing — 3 steps</div>
+      <div class="ai-label">After installing â€” 3 steps</div>
       <div class="ai-steps">
-        <div class="ai-step"><span class="ai-num">1</span><span class="ai-txt">Pin the extension: click the puzzle 🧩 icon in your toolbar → pin <strong style="color:var(--t)">LEAD GEN x AI Powered Tool</strong></span></div>
-        <div class="ai-step"><span class="ai-num">2</span><span class="ai-txt">Click the map pin icon — the popup opens with <strong style="color:var(--g)">3 free credits</strong> ready</span></div>
-        <div class="ai-step"><span class="ai-num">3</span><span class="ai-txt">Type your first search and click <strong style="color:var(--g)">▶ Start Scraping</strong></span></div>
+        <div class="ai-step"><span class="ai-num">1</span><span class="ai-txt">Pin the extension: click the puzzle ðŸ§© icon in your toolbar â†’ pin <strong style="color:var(--t)">LEAD GEN x AI Powered Tool</strong></span></div>
+        <div class="ai-step"><span class="ai-num">2</span><span class="ai-txt">Click the map pin icon â€” the popup opens with <strong style="color:var(--g)">3 free credits</strong> ready</span></div>
+        <div class="ai-step"><span class="ai-num">3</span><span class="ai-txt">Type your first search and click <strong style="color:var(--g)">â–¶ Start Scraping</strong></span></div>
       </div>
     </div>
   </div>
@@ -976,16 +976,16 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
 <!-- PRICING -->
 <section class="section price-s" id="pricing">
   <div class="container">
-    <div class="rev"><div class="sk">Pricing</div><h2 class="sh" id="pricingHeading">Pay per lead.<br><em>Not per month.</em></h2><p class="ss" id="pricingSubtitle">Buy credits once — they never expire. No subscription. No monthly fees.</p></div>
+    <div class="rev"><div class="sk">Pricing</div><h2 class="sh" id="pricingHeading">Pay per lead.<br><em>Not per month.</em></h2><p class="ss" id="pricingSubtitle">Buy credits once â€” they never expire. No subscription. No monthly fees.</p></div>
     <div class="free-strip rev" id="freeStrip">
-      <div class="fs-l"><div class="fs-h" id="freeStripTitle">Start for free — no card needed</div><div class="fs-s" id="freeStripSubtitle">Every install gets <strong>3 free credits</strong> automatically. No sign-up. Just install and go.</div></div>
+      <div class="fs-l"><div class="fs-h" id="freeStripTitle">Start for free â€” no card needed</div><div class="fs-s" id="freeStripSubtitle">Every install gets <strong>3 free credits</strong> automatically. No sign-up. Just install and go.</div></div>
       <div class="fs-n" id="freeStripNumber">3 <span>free credits</span></div>
     </div>
     <div class="p-grid rev">
 
       <!-- FREE -->
       <div class="p-card" tabindex="0" id="freePlanCard">
-        <div class="p-card-ico" style="background:rgba(148,148,176,.1);border:1px solid rgba(148,148,176,.2)">🆓</div>
+        <div class="p-card-ico" style="background:rgba(148,148,176,.1);border:1px solid rgba(148,148,176,.2)">ðŸ†“</div>
         <div class="p-creds">3 <span>cr</span></div>
         <div class="p-lbl">Free Starter</div>
         <div class="p-price">$0</div>
@@ -995,46 +995,46 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
           <li>Name, Rating, Phone</li>
           <li>Address, Hours, Category</li>
           <li>Website URL</li>
-          <li style="opacity:.4;text-decoration:line-through">Email auto-finder — Pro</li>
-          <li style="opacity:.4;text-decoration:line-through">Social media — Pro</li>
+          <li style="opacity:.4;text-decoration:line-through">Email auto-finder â€” Pro</li>
+          <li style="opacity:.4;text-decoration:line-through">Social media â€” Pro</li>
         </ul>
-        <a href="#install" class="btn-p" style="background:var(--s4);color:var(--t);border:1px solid var(--bhi)">Install Free →</a>
+        <a href="#install" class="btn-p" style="background:var(--s4);color:var(--t);border:1px solid var(--bhi)">Install Free â†’</a>
       </div>
 
       <!-- PRO -->
       <div class="p-card pop" data-payment-pack="pro" tabindex="0" role="link" aria-label="Open payment page for Pro Pack">
         <div class="pop-tag">POPULAR</div>
-        <div class="p-card-ico" style="background:var(--gd);border:1px solid var(--gb)">⚡</div>
+        <div class="p-card-ico" style="background:var(--gd);border:1px solid var(--gb)">âš¡</div>
         <div class="p-creds" id="proCardCredits">500 <span>cr</span></div>
         <div class="p-lbl" id="proCardLabel">Pro Pack</div>
         <div class="p-price" id="proCardPrice">$5</div>
-        <div class="p-per" id="proCardPer">1¢ per lead</div>
+        <div class="p-per" id="proCardPer">1Â¢ per lead</div>
         <ul class="p-feats">
           <li id="proFeat1">500 scraping credits</li>
           <li>All basic data columns</li>
-          <li><strong style="color:var(--g)">✓ Email auto-finder</strong></li>
-          <li style="opacity:.4;text-decoration:line-through">Social media handles — Enterprise</li>
+          <li><strong style="color:var(--g)">âœ“ Email auto-finder</strong></li>
+          <li style="opacity:.4;text-decoration:line-through">Social media handles â€” Enterprise</li>
           <li id="proFeat5">Credits never expire</li>
         </ul>
-        <a href="payment/?pack=pro" class="btn-p" id="proCardButton">Buy Pro →</a>
+        <a href="payment/?pack=pro" class="btn-p" id="proCardButton">Buy Pro â†’</a>
       </div>
 
       <!-- ENTERPRISE -->
       <div class="p-card" data-payment-pack="enterprise" id="enterprisePlanCard" tabindex="0" role="link" aria-label="Open payment page for Enterprise Pack" style="border-color:rgba(167,139,250,.25);background:linear-gradient(135deg,rgba(167,139,250,.07),rgba(167,139,250,.02))">
         <div class="pop-tag" style="background:#a78bfa">BEST VALUE</div>
-        <div class="p-card-ico" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2)">🚀</div>
+        <div class="p-card-ico" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2)">ðŸš€</div>
         <div class="p-creds">2500 <span>cr</span></div>
         <div class="p-lbl">Enterprise Pack</div>
         <div class="p-price">$25</div>
-        <div class="p-per">1¢ per lead</div>
+        <div class="p-per">1Â¢ per lead</div>
         <ul class="p-feats">
           <li>2,500 scraping credits</li>
           <li>All basic data columns</li>
-          <li><strong style="color:var(--g)">✓ Email auto-finder</strong></li>
-          <li><strong style="color:#a78bfa">✓ Social media handles</strong></li>
+          <li><strong style="color:var(--g)">âœ“ Email auto-finder</strong></li>
+          <li><strong style="color:#a78bfa">âœ“ Social media handles</strong></li>
           <li>Priority email support</li>
         </ul>
-        <a href="payment/?pack=enterprise" class="btn-p" style="background:#a78bfa;color:#fff">Buy Enterprise →</a>
+        <a href="payment/?pack=enterprise" class="btn-p" style="background:#a78bfa;color:#fff">Buy Enterprise â†’</a>
       </div>
 
     </div>
@@ -1042,7 +1042,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
     <div class="scarcity-bar rev">
       <div class="sc-left">
         <span class="sc-dot"></span>
-        <span class="sc-text">🔥 Only <strong id="packsLeft">100</strong> packs left at this price</span>
+        <span class="sc-text">ðŸ”¥ Only <strong id="packsLeft">100</strong> packs left at this price</span>
       </div>
       <div class="sc-bar-wrap"><div class="sc-bar-fill" id="scBarFill" style="width:100%"></div></div>
     </div>
@@ -1059,12 +1059,12 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
   <div class="container">
     <div class="rev"><div class="sk">FAQ</div><h2 class="sh">Common <em>questions</em></h2></div>
     <div class="faq-wrap rev">
-      <div class="faq-item op"><div class="faq-q"><span>What is a credit and when is it deducted?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">One credit = one successfully scraped Maps listing. Credits are only deducted for successfully scraped results — if a listing fails, no credit is spent.</div></div></div>
-      <div class="faq-item"><div class="faq-q"><span>Do credits expire?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">No — credits <strong>never expire</strong>. Your 3 free starter credits and any purchased packs (Pro 500 credits / Enterprise 2,500 credits) stay in your account forever. Use them at your own pace.</div></div></div>
+      <div class="faq-item op"><div class="faq-q"><span>What is a credit and when is it deducted?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">One credit = one successfully scraped Maps listing. Credits are only deducted for successfully scraped results â€” if a listing fails, no credit is spent.</div></div></div>
+      <div class="faq-item"><div class="faq-q"><span>Do credits expire?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">No â€” credits <strong>never expire</strong>. Your 3 free starter credits and any purchased packs (Pro 500 credits / Enterprise 2,500 credits) stay in your account forever. Use them at your own pace.</div></div></div>
       <div class="faq-item"><div class="faq-q"><span>Which browsers are supported?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">The extension works on all Chromium-based browsers: <strong>Chrome, Edge, Brave and Opera</strong>. Firefox support is in development.</div></div></div>
-      <div class="faq-item"><div class="faq-q"><span>How accurate is the email finder?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">The scraper visits each business website and contact/about pages, extracting emails via regex. Typical hit rates are 40–65% depending on niche and city.</div></div></div>
+      <div class="faq-item"><div class="faq-q"><span>How accurate is the email finder?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">The scraper visits each business website and contact/about pages, extracting emails via regex. Typical hit rates are 40â€“65% depending on niche and city.</div></div></div>
       <div class="faq-item"><div class="faq-q"><span>How do I activate credits after purchasing?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">After payment you'll receive activation instructions for your selected method. Paddle customers continue through hosted checkout, and Pakistan bank or Sadapay payments are confirmed manually before credits are issued.</div></div></div>
-      <div class="faq-item"><div class="faq-q"><span>Is there a refund policy?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">Yes — 7-day money-back guarantee. If you are not satisfied, contact support within 7 days and include your order details so we can review the refund request.</div></div></div>
+      <div class="faq-item"><div class="faq-q"><span>Is there a refund policy?</span><span class="faq-arr">+</span></div><div class="faq-a"><div class="faq-a-in">Yes â€” 7-day money-back guarantee. If you are not satisfied, contact support within 7 days and include your order details so we can review the refund request.</div></div></div>
     </div>
   </div>
 </section>
@@ -1073,9 +1073,9 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
 <div class="container">
   <div class="cta-band rev">
     <h2>Start collecting leads<br><em>in the next 60 seconds</em></h2>
-    <p id="ctaBandSub">3 free credits on install · No sign-up · No credit card</p>
+    <p id="ctaBandSub">3 free credits on install Â· No sign-up Â· No credit card</p>
     <div class="cta-band-btns">
-      <a class="btn-main" id="ctaBtn" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span id="ctaBtnTxt">Add to Chrome — Free</span></a>
+      <a class="btn-main" id="ctaBtn" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span id="ctaBtnTxt">Add to Chrome â€” Free</span></a>
       <a class="btn-ghost" href="#pricing">View Pricing</a>
     </div>
   </div>
@@ -1085,12 +1085,12 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
 <footer>
   <div class="container">
     <div class="footer-g">
-      <div class="f-brand"><a href="#" class="f-logo"><div class="nav-logo-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div><span class="nav-logo-txt">Lead Gen X Map <em>Scrapper</em></span></a><p>Scrape Google Maps listings into a CSV with names, emails, ratings and hours. Credit-based — pay only for what you use.</p></div>
+      <div class="f-brand"><a href="#" class="f-logo"><div class="nav-logo-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div><span class="nav-logo-txt">Lead Gen X Map <em>Scrapper</em></span></a><p>Scrape Google Maps listings into a CSV with names, emails, ratings and hours. Credit-based â€” pay only for what you use.</p></div>
       <div class="f-col"><h4>Product</h4><a href="#how">How it works</a><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="payment/">Payment</a><a href="course/">Course</a><a href="#install">Install</a></div>
       <div class="f-col"><h4>Browsers</h4><a href="#install">Chrome</a><a href="#install">Edge</a><a href="#install">Brave</a><a href="#install">Opera</a><a href="#install">Firefox (soon)</a></div>
       <div class="f-col"><h4>Support</h4><a href="#faq">FAQ</a><a href="about.html">About the Founder</a><a href="mailto:kimad9963@gmail.com">Contact Us</a><a href="#">Privacy Policy</a><a href="terms-and-conditions.html">Terms &amp; Conditions</a></div>
     </div>
-    <div class="f-bottom"><span>© <span id="yr">2026</span> LEAD GEN x AI Powered Tool. All rights reserved.</span><span>Built for marketers &amp; sales teams worldwide</span></div>
+    <div class="f-bottom"><span>Â© <span id="yr">2026</span> LEAD GEN x AI Powered Tool. All rights reserved.</span><span>Built for marketers &amp; sales teams worldwide</span></div>
   </div>
 </footer>
 
@@ -1099,7 +1099,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
 <div id="emailModal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px">
   <div style="background:var(--modal-bg);border:1px solid rgba(255,255,255,.13);border-radius:20px;width:100%;max-width:440px;overflow:hidden;box-shadow:var(--shadow-modal);animation:modalIn .35s cubic-bezier(.34,1.56,.64,1) both">
     <div style="padding:28px 24px 20px;text-align:center">
-      <div style="font-size:38px;margin-bottom:12px">📧</div>
+      <div style="font-size:38px;margin-bottom:12px">ðŸ“§</div>
       <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--t);margin-bottom:6px">One more step!</div>
       <div style="font-size:13px;color:var(--t5);line-height:1.6;margin-bottom:20px">Enter your email to get <strong style="color:var(--g)">exclusive offers</strong>, credit deals &amp; product updates.</div>
       <div style="text-align:left;margin-bottom:10px">
@@ -1111,7 +1111,7 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
         <input id="dlEmail" type="email" placeholder="you@example.com" style="width:100%;background:var(--s2);border:1px solid var(--bhi);border-radius:8px;padding:10px 14px;color:var(--t);font-size:14px;outline:none;font-family:inherit" />
       </div>
       <div id="dlEmailMsg" style="font-size:12px;min-height:18px;margin:6px 0;color:#f87171"></div>
-      <button id="dlEmailSubmit" style="width:100%;padding:12px;background:var(--g);color:#000;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px">Continue to Download →</button>
+      <button id="dlEmailSubmit" style="width:100%;padding:12px;background:var(--g);color:#000;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px">Continue to Download â†’</button>
     </div>
   </div>
 </div>
@@ -1122,26 +1122,26 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
     <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 22px 18px;border-bottom:1px solid rgba(255,255,255,.07)">
       <div style="display:flex;align-items:center;gap:10px">
         <div style="width:34px;height:34px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25);border-radius:9px;display:flex;align-items:center;justify-content:center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-        <div><div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#fff">Direct store install coming soon</div><div style="font-size:11.5px;color:rgba(255,255,255,.35);margin-top:1px">For now — install takes under 2 minutes manually</div></div>
+        <div><div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#fff">Direct store install coming soon</div><div style="font-size:11.5px;color:rgba(255,255,255,.35);margin-top:1px">For now â€” install takes under 2 minutes manually</div></div>
       </div>
-      <button id="modalClose" style="width:30px;height:30px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);font-size:16px;transition:all .15s">×</button>
+      <button id="modalClose" style="width:30px;height:30px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);font-size:16px;transition:all .15s">Ã—</button>
     </div>
     <div style="background:linear-gradient(135deg,rgba(34,197,94,.1),rgba(34,197,94,.04));border-bottom:1px solid rgba(34,197,94,.18);padding:18px 22px;display:flex;align-items:center;gap:14px">
       <div style="width:42px;height:42px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
-      <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:2px">Step 1 — Downloading your extension ZIP…</div><div style="font-size:12.5px;color:rgba(255,255,255,.4)">maps-scraper-extension-v1.0.zip · saved to Downloads</div></div>
+      <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:2px">Step 1 â€” Downloading your extension ZIPâ€¦</div><div style="font-size:12.5px;color:rgba(255,255,255,.4)">maps-scraper-extension-v1.0.zip Â· saved to Downloads</div></div>
       <div id="dlSpinner" style="width:22px;height:22px;border:2px solid rgba(34,197,94,.2);border-top-color:#22c55e;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0"></div>
-      <div id="dlCheck" style="display:none;color:#22c55e;font-size:20px;flex-shrink:0">✓</div>
+      <div id="dlCheck" style="display:none;color:#22c55e;font-size:20px;flex-shrink:0">âœ“</div>
     </div>
     <div style="padding:20px 22px 22px">
       <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px">Follow these steps to install</div>
-      <div style="display:flex;gap:13px;margin-bottom:14px"><div style="width:26px;height:26px;border-radius:50%;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#22c55e;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">1</div><div><div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:3px">Unzip the downloaded file</div><div style="font-size:13px;color:rgba(255,255,255,.45);line-height:1.55">Right-click <code style="font-family:'JetBrains Mono',monospace;font-size:11.5px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);padding:1px 6px;border-radius:4px;color:#f59e0b">maps-scraper-extension-v1.0.zip</code> → Extract / Unzip</div></div></div>
-      <div style="display:flex;gap:13px;margin-bottom:14px"><div style="width:26px;height:26px;border-radius:50%;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#22c55e;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">2</div><div><div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:5px">Open Extensions page</div><div style="display:flex;gap:7px;flex-wrap:wrap"><a id="extPageLink" href="chrome://extensions" style="display:inline-flex;align-items:center;gap:5px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.22);border-radius:7px;padding:5px 12px;font-size:12.5px;color:#22c55e;text-decoration:none;font-weight:600" target="_blank">Open Extensions Page →</a><code id="extPageCode" style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);padding:5px 10px;border-radius:6px;color:#f59e0b;align-self:center">chrome://extensions</code></div></div></div>
-      <div style="display:flex;gap:13px;margin-bottom:14px"><div style="width:26px;height:26px;border-radius:50%;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#22c55e;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">3</div><div><div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:3px">Enable Developer Mode</div><div style="font-size:13px;color:rgba(255,255,255,.45);line-height:1.55">Top-right corner — toggle <strong style="color:rgba(255,255,255,.7)">Developer mode</strong> ON</div></div></div>
-      <div style="display:flex;gap:13px;margin-bottom:14px"><div style="width:26px;height:26px;border-radius:50%;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#22c55e;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">4</div><div><div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:3px">Click "Load unpacked"</div><div style="font-size:13px;color:rgba(255,255,255,.45);line-height:1.55">Click <strong style="color:rgba(255,255,255,.7)">Load unpacked</strong> → select the unzipped folder</div></div></div>
-      <div style="display:flex;gap:13px;margin-bottom:18px"><div style="width:26px;height:26px;border-radius:50%;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#22c55e;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">5</div><div><div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:3px">Pin it and start scraping</div><div style="font-size:13px;color:rgba(255,255,255,.45);line-height:1.55">Puzzle 🧩 icon → pin LEAD GEN x AI Powered Tool → click icon → 3 free credits ready</div></div></div>
+      <div style="display:flex;gap:13px;margin-bottom:14px"><div style="width:26px;height:26px;border-radius:50%;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#22c55e;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">1</div><div><div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:3px">Unzip the downloaded file</div><div style="font-size:13px;color:rgba(255,255,255,.45);line-height:1.55">Right-click <code style="font-family:'JetBrains Mono',monospace;font-size:11.5px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);padding:1px 6px;border-radius:4px;color:#f59e0b">maps-scraper-extension-v1.0.zip</code> â†’ Extract / Unzip</div></div></div>
+      <div style="display:flex;gap:13px;margin-bottom:14px"><div style="width:26px;height:26px;border-radius:50%;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#22c55e;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">2</div><div><div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:5px">Open Extensions page</div><div style="display:flex;gap:7px;flex-wrap:wrap"><a id="extPageLink" href="chrome://extensions" style="display:inline-flex;align-items:center;gap:5px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.22);border-radius:7px;padding:5px 12px;font-size:12.5px;color:#22c55e;text-decoration:none;font-weight:600" target="_blank">Open Extensions Page â†’</a><code id="extPageCode" style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);padding:5px 10px;border-radius:6px;color:#f59e0b;align-self:center">chrome://extensions</code></div></div></div>
+      <div style="display:flex;gap:13px;margin-bottom:14px"><div style="width:26px;height:26px;border-radius:50%;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#22c55e;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">3</div><div><div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:3px">Enable Developer Mode</div><div style="font-size:13px;color:rgba(255,255,255,.45);line-height:1.55">Top-right corner â€” toggle <strong style="color:rgba(255,255,255,.7)">Developer mode</strong> ON</div></div></div>
+      <div style="display:flex;gap:13px;margin-bottom:14px"><div style="width:26px;height:26px;border-radius:50%;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#22c55e;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">4</div><div><div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:3px">Click "Load unpacked"</div><div style="font-size:13px;color:rgba(255,255,255,.45);line-height:1.55">Click <strong style="color:rgba(255,255,255,.7)">Load unpacked</strong> â†’ select the unzipped folder</div></div></div>
+      <div style="display:flex;gap:13px;margin-bottom:18px"><div style="width:26px;height:26px;border-radius:50%;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#22c55e;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">5</div><div><div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:3px">Pin it and start scraping</div><div style="font-size:13px;color:rgba(255,255,255,.45);line-height:1.55">Puzzle ðŸ§© icon â†’ pin LEAD GEN x AI Powered Tool â†’ click icon â†’ 3 free credits ready</div></div></div>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.07);padding-top:14px">
         <div style="font-size:12px;color:rgba(255,255,255,.25)">Having trouble? <a href="mailto:mapscrapper7@gmail.com" style="color:rgba(34,197,94,.7);text-decoration:none">Email support</a></div>
-        <button id="reDownload" style="display:flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.22);border-radius:8px;font-size:12.5px;color:#22c55e;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">↓ Re-download ZIP</button>
+        <button id="reDownload" style="display:flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.22);border-radius:8px;font-size:12.5px;color:#22c55e;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">â†“ Re-download ZIP</button>
       </div>
     </div>
   </div>
@@ -1162,9 +1162,9 @@ function revealDeferredSections() {
 window.addEventListener('error', revealDeferredSections);
 window.addEventListener('unhandledrejection', revealDeferredSections);
 
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  THEME TOGGLE (light / dark)
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 (function(){
   var STORAGE_KEY = 'mls_theme';
   var html = document.documentElement;
@@ -1183,9 +1183,9 @@ window.addEventListener('unhandledrejection', revealDeferredSections);
   });
 })();
 
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  PARTICLE BG CANVAS
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 const bgCanvas = document.getElementById('bgCanvas');
 const bgCtx    = bgCanvas.getContext('2d');
 let particles  = [];
@@ -1257,9 +1257,9 @@ animBg();
 
 
 
-// ══════════════════════════════════════════════════════
-//  MAP CANVAS — pre-rendered offscreen, never redraws
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+//  MAP CANVAS â€” pre-rendered offscreen, never redraws
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 const mapCanvas   = document.getElementById('mapCanvas');
 const mCtx        = mapCanvas.getContext('2d');
 let   mapOffscreen = null; // cached pre-render
@@ -1324,7 +1324,7 @@ function resizeMap() {
   mapCanvas.width  = box.width;
   mapCanvas.height = box.height;
   mapOffscreen = buildMapGrid(box.width, box.height); // re-render offscreen
-  mCtx.drawImage(mapOffscreen, 0, 0); // blit instantly — no per-frame cost
+  mCtx.drawImage(mapOffscreen, 0, 0); // blit instantly â€” no per-frame cost
 }
 
 let mapResizeTimer;
@@ -1334,9 +1334,9 @@ window.addEventListener('resize', () => {
 }, { passive:true });
 setTimeout(resizeMap, 150);
 
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  SCRAPING DATA
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 const BUSINESSES = [
   { name:'The Barber Co.',   rating:'4.9', email:'info@barberco.pk',   x:'28%', y:'35%' },
   { name:'Fade Masters DHA', rating:'4.7', email:'N/A',                x:'65%', y:'22%' },
@@ -1358,9 +1358,9 @@ const QUERIES = [
   'Restaurants in London',
 ];
 
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  DEMO SCRAPER ENGINE
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 let demoRunning   = false;
 let demoTimer     = null;
 let demoAutoTimer = null;
@@ -1405,7 +1405,7 @@ function addStreamLine(biz) {
     <span class="sl-time">${time}</span>
     <span class="sl-type" style="color:rgba(34,197,94,.6)">SCRAPED</span>
     <span class="sl-name">${biz.name}</span>
-    <span class="sl-rating" style="color:#f59e0b">★${biz.rating}</span>
+    <span class="sl-rating" style="color:#f59e0b">â˜…${biz.rating}</span>
     ${hasEmail ? `<span class="sl-email">${biz.email}</span>` : '<span style="color:rgba(255,255,255,.2)">no email</span>'}
   `;
   streamLog.insertBefore(line, streamLog.firstChild);
@@ -1418,7 +1418,7 @@ function addDemoRow(biz) {
   const hasEmail = biz.email !== 'N/A';
   row.innerHTML = `
     <span class="rn">${biz.name}</span>
-    <span class="rr">★${biz.rating}</span>
+    <span class="rr">â˜…${biz.rating}</span>
     <span class="re ${hasEmail ? 'found' : 'na'}">${hasEmail ? biz.email : 'N/A'}</span>
   `;
   demoRows.appendChild(row);
@@ -1438,24 +1438,24 @@ function runDemoScrape() {
   demoBar.style.width = '0%';
   demoPct.textContent = '0%';
   demoCount.textContent = '0 / 10';
-  demoBtn.textContent = '⏹ Stop';
+  demoBtn.textContent = 'â¹ Stop';
   demoBtn.classList.add('stop');
-  mpPingTxt.textContent = 'Scanning…';
+  mpPingTxt.textContent = 'Scanningâ€¦';
 
   let localTotal = 0, localEmails = 0, localCreds = demoCredits;
   let bizIdx = 0;
 
-  demoStatTxt.textContent = 'Opening Google Maps…';
+  demoStatTxt.textContent = 'Opening Google Mapsâ€¦';
 
   function processNext() {
     if (!demoRunning || bizIdx >= BUSINESSES.length) {
       if (demoRunning) {
-        demoStatTxt.textContent = '✓ Done — 10 results scraped';
+        demoStatTxt.textContent = 'âœ“ Done â€” 10 results scraped';
         demoDot.classList.remove('pulse');
         demoExport.classList.add('show');
         mpPingTxt.textContent = 'Complete';
       }
-      demoBtn.textContent = '▶ Run Again';
+      demoBtn.textContent = 'â–¶ Run Again';
       demoBtn.classList.remove('stop');
       demoRunning = false;
       return;
@@ -1465,7 +1465,7 @@ function runDemoScrape() {
     const biz = BUSINESSES[i];
     const pct = Math.round(((i+1) / BUSINESSES.length) * 100);
 
-    demoStatTxt.textContent = `Extracting "${biz.name}"…`;
+    demoStatTxt.textContent = `Extracting "${biz.name}"â€¦`;
     mpPingTxt.textContent   = biz.name;
     addMapPin(biz);
 
@@ -1502,7 +1502,7 @@ function runDemoScrape() {
 
 function stopDemo() {
   demoRunning = false;
-  demoBtn.textContent = '▶ Start Scraping';
+  demoBtn.textContent = 'â–¶ Start Scraping';
   demoBtn.classList.remove('stop');
   demoStatTxt.textContent = 'Stopped';
   demoDot.classList.remove('pulse');
@@ -1510,8 +1510,8 @@ function stopDemo() {
 
 demoBtn.addEventListener('click', runDemoScrape);
 demoExport.addEventListener('click', () => {
-  demoExport.textContent = '✓ Downloading…';
-  setTimeout(() => { demoExport.textContent = '↓ Download CSV · 10 results'; }, 1800);
+  demoExport.textContent = 'âœ“ Downloadingâ€¦';
+  setTimeout(() => { demoExport.textContent = 'â†“ Download CSV Â· 10 results'; }, 1800);
 });
 
 // Auto-start demo when in view
@@ -1525,9 +1525,9 @@ const demoObserver = new IntersectionObserver(entries => {
 }, { threshold: 0.3 });
 demoObserver.observe(document.querySelector('.demo-section'));
 
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  TYPING DEMO (second animation section)
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 const typedQuery  = document.getElementById('typedQuery');
 const typedCaret  = document.getElementById('typedCaret');
 const tdRows      = document.getElementById('tdRows');
@@ -1591,7 +1591,7 @@ function runTypingDemo() {
         const row  = document.createElement('div');
         row.className = 'td-row';
         const hasE = lead.e !== 'N/A';
-        row.innerHTML = `<span class="dn">${lead.n}</span><span class="dr">★${lead.r}</span><span class="de ${hasE?'ok':'no'}">${hasE?lead.e:'N/A'}</span>`;
+        row.innerHTML = `<span class="dn">${lead.n}</span><span class="dr">â˜…${lead.r}</span><span class="de ${hasE?'ok':'no'}">${hasE?lead.e:'N/A'}</span>`;
         tdRows.appendChild(row);
         tdBar.style.width = pct + '%';
         tdCount.textContent = `${ri+1} / 5`;
@@ -1628,9 +1628,9 @@ const tdObs = new IntersectionObserver(entries => {
 }, { threshold: 0.2 });
 tdObs.observe(document.querySelector('.idemo-section'));
 
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  BROWSER DETECTION
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 const ua       = navigator.userAgent.toLowerCase();
 const isBrave  = !!navigator.brave;
 const isEdge   = ua.includes('edg/');
@@ -1640,12 +1640,12 @@ const isChrome = ua.includes('chrome') && !isBrave && !isEdge && !isOpera;
 
 const EXT_PAGES = { chrome:'chrome://extensions', edge:'edge://extensions', brave:'brave://extensions', opera:'opera://extensions', firefox:'about:addons', unknown:'chrome://extensions' };
 const BR = {
-  chrome:  { name:'Chrome',  btn:'Add to Chrome — Free',  sub:'Your ZIP downloads automatically with step-by-step install instructions.', ok:true },
-  edge:    { name:'Edge',    btn:'Add to Edge — Free',    sub:'Your ZIP downloads with full Edge install instructions.', ok:true },
-  brave:   { name:'Brave',   btn:'Add to Brave — Free',   sub:'Brave supports Chrome extensions. ZIP downloads with install guide.', ok:true },
-  opera:   { name:'Opera',   btn:'Add to Opera — Free',   sub:'ZIP downloads with Opera install instructions.', ok:true },
-  firefox: { name:'Firefox', btn:'Firefox — Coming Soon', sub:'Firefox support is in development. Try Chrome, Edge, Brave or Opera.', ok:false },
-  unknown: { name:'Chrome',  btn:'Add to Chrome — Free',  sub:'ZIP downloads automatically with step-by-step install instructions.', ok:true },
+  chrome:  { name:'Chrome',  btn:'Add to Chrome â€” Free',  sub:'Your ZIP downloads automatically with step-by-step install instructions.', ok:true },
+  edge:    { name:'Edge',    btn:'Add to Edge â€” Free',    sub:'Your ZIP downloads with full Edge install instructions.', ok:true },
+  brave:   { name:'Brave',   btn:'Add to Brave â€” Free',   sub:'Brave supports Chrome extensions. ZIP downloads with install guide.', ok:true },
+  opera:   { name:'Opera',   btn:'Add to Opera â€” Free',   sub:'ZIP downloads with Opera install instructions.', ok:true },
+  firefox: { name:'Firefox', btn:'Firefox â€” Coming Soon', sub:'Firefox support is in development. Try Chrome, Edge, Brave or Opera.', ok:false },
+  unknown: { name:'Chrome',  btn:'Add to Chrome â€” Free',  sub:'ZIP downloads automatically with step-by-step install instructions.', ok:true },
 };
 
 function detect() {
@@ -1688,7 +1688,7 @@ function applyBrowser(br) {
   const txtIds = { heroCtaTxt: primaryText, navCtaTxt: navText, installBtnTxt: primaryText, ctaBtnTxt: primaryText };
   Object.entries(txtIds).forEach(([id, txt]) => { const el = document.getElementById(id); if (el) el.textContent = txt; });
   document.getElementById('bclBrowser').textContent = info.name + ' detected';
-  document.getElementById('bclH').textContent = info.ok ? (lockedOneTime ? `Unlock on ${info.name}` : (unlockedOneTime ? `Download on ${info.name}` : `Install on ${info.name} — Free`)) : `${info.name} — Coming Soon`;
+  document.getElementById('bclH').textContent = info.ok ? (lockedOneTime ? `Unlock on ${info.name}` : (unlockedOneTime ? `Download on ${info.name}` : `Install on ${info.name} â€” Free`)) : `${info.name} â€” Coming Soon`;
   document.getElementById('bclS').textContent = lockedOneTime
     ? 'Complete the lifetime purchase first. After payment confirmation, the ZIP unlocks for direct download.'
     : (unlockedOneTime ? 'Your purchase is verified. The extension ZIP downloads directly with the install guide.' : info.sub);
@@ -1736,11 +1736,11 @@ document.querySelectorAll('.b-card').forEach(card => {
   });
 });
 
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  INSTALL MODAL
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 const DOWNLOAD_ENDPOINT = '/api/download-extension';
-const BACKEND_BASE = 'https://map-scraper-paddle-backend.vercel.app';
+const BACKEND_BASE = 'https://leadgenx-api.vercel.app';
 
 function applyPricingMode(mode, pricing) {
   activePricingMode = mode || 'credit_based';
@@ -1758,8 +1758,8 @@ function applyPricingMode(mode, pricing) {
   const enterpriseCard = document.getElementById('enterprisePlanCard');
 
   if (isOneTime) {
-    setText('heroKickerText', 'ONE-TIME PURCHASE AVAILABLE — NO MONTHLY FEES');
-    setText('heroNoteText', '<strong>Pay once</strong> for lifetime access · No recurring billing');
+    setText('heroKickerText', 'ONE-TIME PURCHASE AVAILABLE â€” NO MONTHLY FEES');
+    setText('heroNoteText', '<strong>Pay once</strong> for lifetime access Â· No recurring billing');
     setText('pricingHeading', 'One-Time Purchase.<br><em>Lifetime access.</em>');
     setText('pricingSubtitle', 'Single payment. No subscription. No recurring charges.');
 
@@ -1773,12 +1773,12 @@ function applyPricingMode(mode, pricing) {
     setText('proCardPer', 'One-time payment');
     setText('proFeat1', 'Unlimited scraping access');
     setText('proFeat5', 'Lifetime updates included');
-    setText('proCardButton', 'Buy Lifetime →');
+    setText('proCardButton', 'Buy Lifetime â†’');
   } else {
-    setText('heroKickerText', '3 FREE CREDITS ON INSTALL — NO SIGN-UP REQUIRED');
-    setText('heroNoteText', '<strong>3 free credits</strong> on install · 1 credit = 1 lead · Bought credits never expire');
+    setText('heroKickerText', '3 FREE CREDITS ON INSTALL â€” NO SIGN-UP REQUIRED');
+    setText('heroNoteText', '<strong>3 free credits</strong> on install Â· 1 credit = 1 lead Â· Bought credits never expire');
     setText('pricingHeading', 'Pay per lead.<br><em>Not per month.</em>');
-    setText('pricingSubtitle', 'Buy credits once — they never expire. No subscription. No monthly fees.');
+    setText('pricingSubtitle', 'Buy credits once â€” they never expire. No subscription. No monthly fees.');
 
     if (freeStrip) freeStrip.style.display = '';
     if (freeCard) freeCard.style.display = '';
@@ -1787,10 +1787,10 @@ function applyPricingMode(mode, pricing) {
     setText('proCardCredits', '500 <span>cr</span>');
     setText('proCardLabel', 'Pro Pack');
     setText('proCardPrice', '$5');
-    setText('proCardPer', '1¢ per lead');
+    setText('proCardPer', '1Â¢ per lead');
     setText('proFeat1', '500 scraping credits');
     setText('proFeat5', 'Credits never expire');
-    setText('proCardButton', 'Buy Pro →');
+    setText('proCardButton', 'Buy Pro â†’');
   }
 
   applyBrowser(detected);
@@ -1976,7 +1976,7 @@ document.getElementById('dlEmailSubmit').addEventListener('click', () => {
   }
   const btn = document.getElementById('dlEmailSubmit');
   btn.disabled = true;
-  btn.textContent = 'Saving…';
+  btn.textContent = 'Savingâ€¦';
   msg.textContent = '';
   fetch(`${BACKEND_BASE}/api/credits`, {
     method: 'POST',
@@ -1986,7 +1986,7 @@ document.getElementById('dlEmailSubmit').addEventListener('click', () => {
   .then(r => r.json())
   .then(() => { proceedToInstall(); })
   .catch(() => { proceedToInstall(); })
-  .finally(() => { btn.disabled = false; btn.textContent = 'Continue to Download →'; });
+  .finally(() => { btn.disabled = false; btn.textContent = 'Continue to Download â†’'; });
 });
 
 document.getElementById('emailModal').addEventListener('click', e => {
@@ -2007,8 +2007,8 @@ bindClickIfPresent('modalClose', closeInstallModal);
 bindClickIfPresent('reDownload', () => {
   triggerDownload()
     .then(() => {
-      document.getElementById('reDownload').textContent = '✓ Downloading…';
-      setTimeout(() => { document.getElementById('reDownload').textContent = '↓ Re-download ZIP'; }, 2500);
+      document.getElementById('reDownload').textContent = 'âœ“ Downloadingâ€¦';
+      setTimeout(() => { document.getElementById('reDownload').textContent = 'â†“ Re-download ZIP'; }, 2500);
     })
     .catch(err => window.alert(err.message || 'Download unavailable.'));
 });
@@ -2049,9 +2049,9 @@ function startPendingZipAutoDownloadPolling() {
   }, 5000);
 }
 
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  NAV + MISC
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 Promise.all([loadPricingMode(), loadAuthState()]).then(() => {
   applyBrowser(detected);
   maybeAutoDownloadPurchasedZip();
@@ -2112,9 +2112,9 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 
 document.getElementById('yr').textContent = new Date().getFullYear();
 
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  ANIMATED COUNTER (stats on scroll)
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function animCounter(el, target, duration=1400) {
   let start = null;
   const step = ts => {
@@ -2127,9 +2127,9 @@ function animCounter(el, target, duration=1400) {
   requestAnimationFrame(step);
 }
 
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  HERO COUNTDOWN TIMER
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 (function(){
   var END_KEY = 'mls_sale_end_v2';
   localStorage.removeItem('mls_sale_end'); // clear old key
@@ -2154,11 +2154,11 @@ function animCounter(el, target, duration=1400) {
   var iv=setInterval(tick,1000);
 })();
 
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  SCARCITY + LIVE PURCHASE SOCIAL PROOF
-// ══════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 (function(){
-  /* ── data pools grouped by country ── */
+  /* â”€â”€ data pools grouped by country â”€â”€ */
   var BUYERS_BY_COUNTRY = {
     US:[
       {name:'Alex M.',city:'New York',flag:'US'},{name:'Lisa W.',city:'Chicago',flag:'US'},
@@ -2185,7 +2185,7 @@ function animCounter(el, target, duration=1400) {
       {name:'Lena B.',city:'Berlin',flag:'DE'},{name:'Maximilian S.',city:'Munich',flag:'DE'},
       {name:'Hannah K.',city:'Hamburg',flag:'DE'},{name:'Felix W.',city:'Frankfurt',flag:'DE'},
       {name:'Marie L.',city:'Cologne',flag:'DE'},{name:'Jonas M.',city:'Stuttgart',flag:'DE'},
-      {name:'Sophia R.',city:'Düsseldorf',flag:'DE'},{name:'Paul H.',city:'Leipzig',flag:'DE'},
+      {name:'Sophia R.',city:'DÃ¼sseldorf',flag:'DE'},{name:'Paul H.',city:'Leipzig',flag:'DE'},
       {name:'Luisa T.',city:'Dresden',flag:'DE'},{name:'Tim K.',city:'Hannover',flag:'DE'},
     ],
     AU:[
@@ -2205,9 +2205,9 @@ function animCounter(el, target, duration=1400) {
     FR:[
       {name:'Nina P.',city:'Paris',flag:'FR'},{name:'Lucas M.',city:'Lyon',flag:'FR'},
       {name:'Camille D.',city:'Marseille',flag:'FR'},{name:'Hugo R.',city:'Toulouse',flag:'FR'},
-      {name:'Léa B.',city:'Nice',flag:'FR'},{name:'Gabriel T.',city:'Nantes',flag:'FR'},
-      {name:'Manon S.',city:'Strasbourg',flag:'FR'},{name:'Raphaël L.',city:'Bordeaux',flag:'FR'},
-      {name:'Chloé K.',city:'Lille',flag:'FR'},{name:'Emma V.',city:'Rennes',flag:'FR'},
+      {name:'LÃ©a B.',city:'Nice',flag:'FR'},{name:'Gabriel T.',city:'Nantes',flag:'FR'},
+      {name:'Manon S.',city:'Strasbourg',flag:'FR'},{name:'RaphaÃ«l L.',city:'Bordeaux',flag:'FR'},
+      {name:'ChloÃ© K.',city:'Lille',flag:'FR'},{name:'Emma V.',city:'Rennes',flag:'FR'},
     ],
     IT:[
       {name:'Marco R.',city:'Milan',flag:'IT'},{name:'Giulia B.',city:'Rome',flag:'IT'},
@@ -2217,8 +2217,8 @@ function animCounter(el, target, duration=1400) {
       {name:'Andrea G.',city:'Palermo',flag:'IT'},{name:'Elena R.',city:'Verona',flag:'IT'},
     ],
     ES:[
-      {name:'Carlos G.',city:'Madrid',flag:'ES'},{name:'María L.',city:'Barcelona',flag:'ES'},
-      {name:'Pablo R.',city:'Valencia',flag:'ES'},{name:'Lucía M.',city:'Seville',flag:'ES'},
+      {name:'Carlos G.',city:'Madrid',flag:'ES'},{name:'MarÃ­a L.',city:'Barcelona',flag:'ES'},
+      {name:'Pablo R.',city:'Valencia',flag:'ES'},{name:'LucÃ­a M.',city:'Seville',flag:'ES'},
       {name:'Daniel S.',city:'Bilbao',flag:'ES'},{name:'Ana P.',city:'Malaga',flag:'ES'},
       {name:'Javier T.',city:'Zaragoza',flag:'ES'},{name:'Carmen B.',city:'Granada',flag:'ES'},
       {name:'Diego H.',city:'Alicante',flag:'ES'},{name:'Laura V.',city:'Murcia',flag:'ES'},
@@ -2245,8 +2245,8 @@ function animCounter(el, target, duration=1400) {
       {name:'Hassan L.',city:'Cairo',flag:'EG'},{name:'Mona A.',city:'Port Said',flag:'EG'},
     ],
     BR:[
-      {name:'Sofia R.',city:'São Paulo',flag:'BR'},{name:'Lucas M.',city:'Rio de Janeiro',flag:'BR'},
-      {name:'Maria S.',city:'Brasília',flag:'BR'},{name:'Pedro T.',city:'Salvador',flag:'BR'},
+      {name:'Sofia R.',city:'SÃ£o Paulo',flag:'BR'},{name:'Lucas M.',city:'Rio de Janeiro',flag:'BR'},
+      {name:'Maria S.',city:'BrasÃ­lia',flag:'BR'},{name:'Pedro T.',city:'Salvador',flag:'BR'},
       {name:'Ana B.',city:'Curitiba',flag:'BR'},{name:'Matheus K.',city:'Belo Horizonte',flag:'BR'},
       {name:'Julia L.',city:'Porto Alegre',flag:'BR'},{name:'Gabriel D.',city:'Fortaleza',flag:'BR'},
       {name:'Beatriz F.',city:'Recife',flag:'BR'},{name:'Rafael H.',city:'Manaus',flag:'BR'},
@@ -2254,9 +2254,9 @@ function animCounter(el, target, duration=1400) {
     MX:[
       {name:'Oscar F.',city:'Mexico City',flag:'MX'},{name:'Valentina R.',city:'Guadalajara',flag:'MX'},
       {name:'Diego M.',city:'Monterrey',flag:'MX'},{name:'Camila S.',city:'Puebla',flag:'MX'},
-      {name:'Santiago T.',city:'Cancún',flag:'MX'},{name:'Fernanda L.',city:'Tijuana',flag:'MX'},
-      {name:'Emiliano B.',city:'León',flag:'MX'},{name:'Renata K.',city:'Mérida',flag:'MX'},
-      {name:'Mateo D.',city:'Querétaro',flag:'MX'},{name:'Andrea P.',city:'Oaxaca',flag:'MX'},
+      {name:'Santiago T.',city:'CancÃºn',flag:'MX'},{name:'Fernanda L.',city:'Tijuana',flag:'MX'},
+      {name:'Emiliano B.',city:'LeÃ³n',flag:'MX'},{name:'Renata K.',city:'MÃ©rida',flag:'MX'},
+      {name:'Mateo D.',city:'QuerÃ©taro',flag:'MX'},{name:'Andrea P.',city:'Oaxaca',flag:'MX'},
     ],
     KR:[
       {name:'Leo K.',city:'Seoul',flag:'KR'},{name:'Jimin P.',city:'Busan',flag:'KR'},
@@ -2274,17 +2274,17 @@ function animCounter(el, target, duration=1400) {
     ],
     SE:[
       {name:'Mia S.',city:'Stockholm',flag:'SE'},{name:'Erik L.',city:'Gothenburg',flag:'SE'},
-      {name:'Elsa K.',city:'Malmö',flag:'SE'},{name:'Oscar B.',city:'Uppsala',flag:'SE'},
-      {name:'Saga M.',city:'Västerås',flag:'SE'},{name:'Axel R.',city:'Örebro',flag:'SE'},
-      {name:'Freja T.',city:'Linköping',flag:'SE'},{name:'Hugo S.',city:'Helsingborg',flag:'SE'},
-      {name:'Wilma D.',city:'Jönköping',flag:'SE'},{name:'Nils H.',city:'Norrköping',flag:'SE'},
+      {name:'Elsa K.',city:'MalmÃ¶',flag:'SE'},{name:'Oscar B.',city:'Uppsala',flag:'SE'},
+      {name:'Saga M.',city:'VÃ¤sterÃ¥s',flag:'SE'},{name:'Axel R.',city:'Ã–rebro',flag:'SE'},
+      {name:'Freja T.',city:'LinkÃ¶ping',flag:'SE'},{name:'Hugo S.',city:'Helsingborg',flag:'SE'},
+      {name:'Wilma D.',city:'JÃ¶nkÃ¶ping',flag:'SE'},{name:'Nils H.',city:'NorrkÃ¶ping',flag:'SE'},
     ],
     PL:[
-      {name:'Anna V.',city:'Warsaw',flag:'PL'},{name:'Jakub K.',city:'Kraków',flag:'PL'},
-      {name:'Zofia M.',city:'Wrocław',flag:'PL'},{name:'Mateusz S.',city:'Poznań',flag:'PL'},
-      {name:'Alicja R.',city:'Gdańsk',flag:'PL'},{name:'Kacper T.',city:'Łódź',flag:'PL'},
+      {name:'Anna V.',city:'Warsaw',flag:'PL'},{name:'Jakub K.',city:'KrakÃ³w',flag:'PL'},
+      {name:'Zofia M.',city:'WrocÅ‚aw',flag:'PL'},{name:'Mateusz S.',city:'PoznaÅ„',flag:'PL'},
+      {name:'Alicja R.',city:'GdaÅ„sk',flag:'PL'},{name:'Kacper T.',city:'ÅÃ³dÅº',flag:'PL'},
       {name:'Maja B.',city:'Szczecin',flag:'PL'},{name:'Filip L.',city:'Lublin',flag:'PL'},
-      {name:'Lena D.',city:'Katowice',flag:'PL'},{name:'Szymon H.',city:'Białystok',flag:'PL'},
+      {name:'Lena D.',city:'Katowice',flag:'PL'},{name:'Szymon H.',city:'BiaÅ‚ystok',flag:'PL'},
     ],
     SG:[
       {name:'Chen W.',city:'Singapore',flag:'SG'},{name:'Wei Lin T.',city:'Singapore',flag:'SG'},
@@ -2305,7 +2305,7 @@ function animCounter(el, target, duration=1400) {
       {name:'Emre B.',city:'Izmir',flag:'TR'},{name:'Zeynep M.',city:'Bursa',flag:'TR'},
       {name:'Can S.',city:'Antalya',flag:'TR'},{name:'Defne T.',city:'Adana',flag:'TR'},
       {name:'Burak R.',city:'Konya',flag:'TR'},{name:'Esra D.',city:'Gaziantep',flag:'TR'},
-      {name:'Oğuz L.',city:'Mersin',flag:'TR'},{name:'Ayşe H.',city:'Trabzon',flag:'TR'},
+      {name:'OÄŸuz L.',city:'Mersin',flag:'TR'},{name:'AyÅŸe H.',city:'Trabzon',flag:'TR'},
     ],
     PH:[
       {name:'Maria S.',city:'Manila',flag:'PH'},{name:'John R.',city:'Cebu City',flag:'PH'},
@@ -2344,8 +2344,8 @@ function animCounter(el, target, duration=1400) {
     ],
   };
 
-  /* ── international fallback (used for mixing) ── */
-  /* Weighted toward AE, IN, PK, US, CA — with a few others for variety */
+  /* â”€â”€ international fallback (used for mixing) â”€â”€ */
+  /* Weighted toward AE, IN, PK, US, CA â€” with a few others for variety */
   var INTL_BUYERS = [
     {name:'Fatima Z.',city:'Dubai',flag:'AE'},{name:'Omar K.',city:'Abu Dhabi',flag:'AE'},
     {name:'Layla H.',city:'Dubai',flag:'AE'},{name:'Rashid T.',city:'Sharjah',flag:'AE'},
@@ -2362,11 +2362,11 @@ function animCounter(el, target, duration=1400) {
     {name:'Lena B.',city:'Berlin',flag:'DE'},{name:'Yuki N.',city:'Tokyo',flag:'JP'},
   ];
 
-  /* ── country code → flag emoji mapping ── */
-  var FLAG_MAP={US:'🇺🇸',GB:'🇬🇧',IN:'🇮🇳',DE:'🇩🇪',AU:'🇦🇺',CA:'🇨🇦',FR:'🇫🇷',IT:'🇮🇹',ES:'🇪🇸',JP:'🇯🇵',AE:'🇦🇪',EG:'🇪🇬',BR:'🇧🇷',MX:'🇲🇽',KR:'🇰🇷',NL:'🇳🇱',SE:'🇸🇪',PL:'🇵🇱',SG:'🇸🇬',IE:'🇮🇪',TR:'🇹🇷',PH:'🇵🇭',PK:'🇵🇰',NG:'🇳🇬',SA:'🇸🇦',ID:'🇮🇩'};
-  function getFlag(code){return FLAG_MAP[code]||('🏳️');}
+  /* â”€â”€ country code â†’ flag emoji mapping â”€â”€ */
+  var FLAG_MAP={US:'ðŸ‡ºðŸ‡¸',GB:'ðŸ‡¬ðŸ‡§',IN:'ðŸ‡®ðŸ‡³',DE:'ðŸ‡©ðŸ‡ª',AU:'ðŸ‡¦ðŸ‡º',CA:'ðŸ‡¨ðŸ‡¦',FR:'ðŸ‡«ðŸ‡·',IT:'ðŸ‡®ðŸ‡¹',ES:'ðŸ‡ªðŸ‡¸',JP:'ðŸ‡¯ðŸ‡µ',AE:'ðŸ‡¦ðŸ‡ª',EG:'ðŸ‡ªðŸ‡¬',BR:'ðŸ‡§ðŸ‡·',MX:'ðŸ‡²ðŸ‡½',KR:'ðŸ‡°ðŸ‡·',NL:'ðŸ‡³ðŸ‡±',SE:'ðŸ‡¸ðŸ‡ª',PL:'ðŸ‡µðŸ‡±',SG:'ðŸ‡¸ðŸ‡¬',IE:'ðŸ‡®ðŸ‡ª',TR:'ðŸ‡¹ðŸ‡·',PH:'ðŸ‡µðŸ‡­',PK:'ðŸ‡µðŸ‡°',NG:'ðŸ‡³ðŸ‡¬',SA:'ðŸ‡¸ðŸ‡¦',ID:'ðŸ‡®ðŸ‡©'};
+  function getFlag(code){return FLAG_MAP[code]||('ðŸ³ï¸');}
 
-  /* ── detect user country & build BUYERS pool ── */
+  /* â”€â”€ detect user country & build BUYERS pool â”€â”€ */
   var userCountry = null;
   var BUYERS = INTL_BUYERS; // default until geo resolves
 
@@ -2404,7 +2404,7 @@ function animCounter(el, target, duration=1400) {
   function pick(arr){return arr[Math.floor(Math.random()*arr.length)];}
   function pickUnique(arr,n){const s=[...arr];for(let i=s.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[s[i],s[j]]=[s[j],s[i]];}return s.slice(0,n);}
 
-  /* ── packs-left counter ── */
+  /* â”€â”€ packs-left counter â”€â”€ */
   var STORAGE_KEY = 'mls_packs_left';
   var STORAGE_TS  = 'mls_packs_ts';
   var packsLeft = 100;
@@ -2439,7 +2439,7 @@ function animCounter(el, target, duration=1400) {
   var PACKS_DISPLAY = [{name:'Pro Pack',color:'#22c55e'},{name:'Enterprise Pack',color:'#a78bfa'}];
   function pickPack(){return pick(PACKS_DISPLAY);}
 
-  /* ── recent purchases list (static on load) ── */
+  /* â”€â”€ recent purchases list (static on load) â”€â”€ */
   var rbList = document.getElementById('rbList');
   if(rbList){
     var initBuyers = pickUnique(BUYERS, 5);
@@ -2447,14 +2447,14 @@ function animCounter(el, target, duration=1400) {
       var b = resolveBuyer(raw);
       var t = TIMES[i+2] || TIMES[i];
       var pk = pickPack();
-      rbList.innerHTML += '<div class="rb-item"><div class="rb-avatar">'+b.flag+'</div><div class="rb-info"><div class="rb-name">'+b.name+' bought <span class="rb-pack" style="color:'+pk.color+'">'+pk.name+'</span></div><div class="rb-meta">'+b.city+' · '+t+'</div></div></div>';
+      rbList.innerHTML += '<div class="rb-item"><div class="rb-avatar">'+b.flag+'</div><div class="rb-info"><div class="rb-name">'+b.name+' bought <span class="rb-pack" style="color:'+pk.color+'">'+pk.name+'</span></div><div class="rb-meta">'+b.city+' Â· '+t+'</div></div></div>';
     });
   }
 
-  /* ── floating toast (pops in every 15-35s) ── */
+  /* â”€â”€ floating toast (pops in every 15-35s) â”€â”€ */
   var toast = document.createElement('div');
   toast.className = 'purchase-toast';
-  toast.innerHTML = '<div class="pt-ico">🎉</div><div class="pt-body"><div class="pt-title"></div><div class="pt-sub"></div></div><button class="pt-close" aria-label="Close">×</button>';
+  toast.innerHTML = '<div class="pt-ico">ðŸŽ‰</div><div class="pt-body"><div class="pt-title"></div><div class="pt-sub"></div></div><button class="pt-close" aria-label="Close">Ã—</button>';
   document.body.appendChild(toast);
   toast.querySelector('.pt-close').addEventListener('click',function(){ toast.classList.remove('show'); });
 
@@ -2468,7 +2468,7 @@ function animCounter(el, target, duration=1400) {
     var b = resolveBuyer(raw);
     var pk = pickPack();
     toast.querySelector('.pt-title').innerHTML = b.flag + ' <strong>' + b.name + '</strong> bought <span style="color:'+pk.color+'">' + pk.name + '</span>';
-    toast.querySelector('.pt-sub').textContent = b.city + ' · just now';
+    toast.querySelector('.pt-sub').textContent = b.city + ' Â· just now';
     toast.classList.add('show');
     decrementPack();
     // Also prepend to the list
@@ -2476,7 +2476,7 @@ function animCounter(el, target, duration=1400) {
       var div = document.createElement('div');
       div.className = 'rb-item';
       div.style.opacity = '0'; div.style.transform = 'translateY(-8px)';
-      div.innerHTML = '<div class="rb-avatar">'+b.flag+'</div><div class="rb-info"><div class="rb-name">'+b.name+' bought <span class="rb-pack" style="color:'+pk.color+'">'+pk.name+'</span></div><div class="rb-meta">'+b.city+' · just now</div></div>';
+      div.innerHTML = '<div class="rb-avatar">'+b.flag+'</div><div class="rb-info"><div class="rb-name">'+b.name+' bought <span class="rb-pack" style="color:'+pk.color+'">'+pk.name+'</span></div><div class="rb-meta">'+b.city+' Â· just now</div></div>';
       rbList.insertBefore(div, rbList.firstChild);
       requestAnimationFrame(function(){ div.style.transition='opacity .4s,transform .4s'; div.style.opacity='1'; div.style.transform='translateY(0)'; });
       // keep max 6 items

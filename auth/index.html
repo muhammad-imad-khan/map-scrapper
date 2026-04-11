@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Account — LEAD GEN x AI Powered Tool</title>
+<title>Account â€” LEAD GEN x AI Powered Tool</title>
 <meta name="description" content="Sign in or create an account to purchase credits for LEAD GEN x AI Powered Tool.">
 <meta name="theme-color" content="#06060c">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -106,7 +106,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
 .f-logo-sm{display:flex;align-items:center;gap:10px;text-decoration:none}.f-logo-txt{font-family:var(--display);font-size:14px;font-weight:800;color:var(--heading)}.f-logo-txt em{color:var(--g);font-style:normal}.f-logo-ic{width:28px;height:28px;background:var(--gd);border:1px solid var(--gb);border-radius:8px;display:flex;align-items:center;justify-content:center}
 @media(max-width:720px){.nav-links-wrap{display:none;position:fixed;top:64px;left:0;right:0;background:var(--bg);border-bottom:1px solid var(--b);padding:20px 24px;flex-direction:column;align-items:flex-start;gap:16px;margin-left:0}.nav-links-wrap.open{display:flex}.nav-burger{display:flex;align-items:center}.panel{padding:22px}.page-sub{font-size:15px}}
 @media(max-width:520px){.container{padding:0 18px}.panel{border-radius:18px;padding:20px}.footer-inner{flex-direction:column;text-align:center}.footer-links{justify-content:center}}
-/* ── theme toggle ── */
+/* â”€â”€ theme toggle â”€â”€ */
 .theme-toggle{background:none;border:1px solid var(--b);border-radius:10px;padding:6px 8px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--heading);transition:border-color .25s}
 .theme-toggle:hover{border-color:var(--accent,#22c55e)}
 .theme-toggle svg{width:18px;height:18px}
@@ -123,7 +123,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
 [data-theme="light"] .btn-danger{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.25)}
 [data-theme="light"] .btn-danger:hover{background:rgba(248,113,113,.18);border-color:rgba(248,113,113,.4)}
 
-/* ═══ COMPREHENSIVE RESPONSIVE ═══ */
+/* â•â•â• COMPREHENSIVE RESPONSIVE â•â•â• */
 @supports(padding:env(safe-area-inset-top)){
   nav .nav-inner{padding-left:max(24px,env(safe-area-inset-left));padding-right:max(24px,env(safe-area-inset-right))}
   .container{padding-left:max(24px,env(safe-area-inset-left));padding-right:max(24px,env(safe-area-inset-right))}
@@ -225,10 +225,10 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
   <div class="container">
     <div class="breadcrumb">
       <a href="../index.html">Home</a>
-      <span>›</span>
+      <span>â€º</span>
       <span>Account</span>
     </div>
-    <div class="page-kicker">🔐 Account</div>
+    <div class="page-kicker">ðŸ” Account</div>
     <h1 class="page-h" id="pageTitle">Sign in to <em>continue.</em></h1>
     <p class="page-sub" id="pageSub">Create an account or log in to purchase credits and manage your scraping packs.</p>
   </div>
@@ -255,7 +255,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
             <label for="loginPassword">Password</label>
             <div class="password-field">
               <input class="input" type="password" id="loginPassword" name="password" placeholder="Enter your password" required autocomplete="current-password">
-              <button type="button" class="toggle-pw" tabindex="-1" aria-label="Toggle password visibility">👁</button>
+              <button type="button" class="toggle-pw" tabindex="-1" aria-label="Toggle password visibility">ðŸ‘</button>
             </div>
           </div>
           <button type="submit" class="btn-main" id="loginBtn">
@@ -279,7 +279,7 @@ footer{border-top:1px solid var(--b);padding:44px 0 24px;position:relative;z-ind
             <label for="regPassword">Password</label>
             <div class="password-field">
               <input class="input" type="password" id="regPassword" name="new-password" placeholder="At least 6 characters" required minlength="6" autocomplete="new-password">
-              <button type="button" class="toggle-pw" tabindex="-1" aria-label="Toggle password visibility">👁</button>
+              <button type="button" class="toggle-pw" tabindex="-1" aria-label="Toggle password visibility">ðŸ‘</button>
             </div>
           </div>
           <button type="submit" class="btn-main" id="registerBtn">
@@ -363,7 +363,7 @@ function applyTheme(theme) {
   if (meta) meta.setAttribute('content', next === 'light' ? '#f4f6fb' : '#06060c');
 }
 
-/* ── theme ── */
+/* â”€â”€ theme â”€â”€ */
 (function(){
   const saved = localStorage.getItem('mls_theme');
   const preferred = matchMedia('(prefers-color-scheme:light)').matches ? 'light' : 'dark';
@@ -378,7 +378,7 @@ function applyTheme(theme) {
   });
 })();
 
-/* ── Strip sensitive query params if present ── */
+/* â”€â”€ Strip sensitive query params if present â”€â”€ */
 (function(){
   const params = new URLSearchParams(window.location.search);
   let changed = false;
@@ -397,12 +397,12 @@ function applyTheme(theme) {
 
 const API = window.location.hostname === 'localhost'
   ? 'http://localhost:3000/api/auth'
-  : 'https://map-scraper-paddle-backend.vercel.app/api/auth';
+  : 'https://leadgenx-api.vercel.app/api/auth';
 
 const TOKEN_KEY = 'mls_auth_token';
 const USER_KEY  = 'mls_auth_user';
 
-// ── DOM refs ──
+// â”€â”€ DOM refs â”€â”€
 const authPanel = document.getElementById('authPanel');
 const loggedInPanel = document.getElementById('loggedInPanel');
 const tabLogin = document.getElementById('tabLogin');
@@ -412,7 +412,7 @@ const registerForm = document.getElementById('registerForm');
 const loginMsg = document.getElementById('loginMsg');
 const registerMsg = document.getElementById('registerMsg');
 
-// ── Tab switching ──
+// â”€â”€ Tab switching â”€â”€
 tabLogin.addEventListener('click', () => switchTab('login'));
 tabRegister.addEventListener('click', () => switchTab('register'));
 
@@ -425,17 +425,17 @@ function switchTab(tab) {
   registerMsg.className = 'auth-msg';
 }
 
-// ── Password toggle ──
+// â”€â”€ Password toggle â”€â”€
 document.querySelectorAll('.toggle-pw').forEach(btn => {
   btn.addEventListener('click', () => {
     const input = btn.previousElementSibling;
     const isPassword = input.type === 'password';
     input.type = isPassword ? 'text' : 'password';
-    btn.textContent = isPassword ? '🔒' : '👁';
+    btn.textContent = isPassword ? 'ðŸ”’' : 'ðŸ‘';
   });
 });
 
-// ── Login ──
+// â”€â”€ Login â”€â”€
 loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   const email = document.getElementById('loginEmail').value.trim();
@@ -445,7 +445,7 @@ loginForm.addEventListener('submit', async (e) => {
   if (!email || !password) { showMsg(loginMsg, 'Please fill in all fields.', 'error'); return; }
 
   btn.disabled = true;
-  btn.textContent = 'Logging in…';
+  btn.textContent = 'Logging inâ€¦';
 
   try {
     const clientId = getClientId();
@@ -460,7 +460,7 @@ loginForm.addEventListener('submit', async (e) => {
       if (data.clientId) localStorage.setItem(CLIENT_KEY, data.clientId);
       localStorage.setItem(TOKEN_KEY, data.token);
       localStorage.setItem(USER_KEY, JSON.stringify(data.user));
-      showMsg(loginMsg, 'Logged in! Redirecting…', 'success');
+      showMsg(loginMsg, 'Logged in! Redirectingâ€¦', 'success');
       setTimeout(() => redirectAfterAuth(), 600);
     } else {
       showMsg(loginMsg, data.error || 'Login failed.', 'error');
@@ -473,7 +473,7 @@ loginForm.addEventListener('submit', async (e) => {
   }
 });
 
-// ── Register ──
+// â”€â”€ Register â”€â”€
 registerForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   const name = document.getElementById('regName').value.trim();
@@ -485,7 +485,7 @@ registerForm.addEventListener('submit', async (e) => {
   if (password.length < 6) { showMsg(registerMsg, 'Password must be at least 6 characters.', 'error'); return; }
 
   btn.disabled = true;
-  btn.textContent = 'Creating account…';
+  btn.textContent = 'Creating accountâ€¦';
 
   try {
     const clientId = getClientId();
@@ -500,7 +500,7 @@ registerForm.addEventListener('submit', async (e) => {
       if (data.clientId) localStorage.setItem(CLIENT_KEY, data.clientId);
       localStorage.setItem(TOKEN_KEY, data.token);
       localStorage.setItem(USER_KEY, JSON.stringify(data.user));
-      showMsg(registerMsg, 'Account created! Redirecting…', 'success');
+      showMsg(registerMsg, 'Account created! Redirectingâ€¦', 'success');
       setTimeout(() => redirectAfterAuth(), 600);
     } else {
       showMsg(registerMsg, data.error || 'Registration failed.', 'error');
@@ -513,7 +513,7 @@ registerForm.addEventListener('submit', async (e) => {
   }
 });
 
-// ── Logout ──
+// â”€â”€ Logout â”€â”€
 document.getElementById('logoutBtn').addEventListener('click', async () => {
   const token = localStorage.getItem(TOKEN_KEY);
   const clientId = getClientId();
@@ -529,7 +529,7 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
   showLoggedOut();
 });
 
-// ── Helpers ──
+// â”€â”€ Helpers â”€â”€
 function showMsg(el, text, type) {
   el.textContent = text;
   el.className = 'auth-msg ' + type;
@@ -599,14 +599,14 @@ function escapeHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ── Nav burger ──
+// â”€â”€ Nav burger â”€â”€
 document.getElementById('navBurger').addEventListener('click', () => {
   document.getElementById('navLinks').classList.toggle('open');
 });
 
 document.getElementById('year').textContent = new Date().getFullYear();
 
-// ── Init ──
+// â”€â”€ Init â”€â”€
 checkAuth();
 </script>
 </body>

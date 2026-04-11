@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const BACKEND_BASE = 'https://map-scraper-paddle-backend.vercel.app';
+const BACKEND_BASE = 'https://leadgenx-api.vercel.app';
 const ZIP_NAME = 'maps-scraper-extension-v1.0.zip';
 const ZIP_PATH = path.join(__dirname, '_assets', ZIP_NAME);
 

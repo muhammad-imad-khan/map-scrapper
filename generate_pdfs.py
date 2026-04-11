@@ -8,9 +8,9 @@ import os
 
 OUTPUT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# ═══════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  HELPERS
-# ═══════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 class StyledPDF(FPDF):
     """Base PDF with consistent branding."""
@@ -50,7 +50,7 @@ class StyledPDF(FPDF):
         self.cell(0, 8, 'LEAD GEN x AI Powered Tool', align='C', new_x='LMARGIN', new_y='NEXT')
         self.set_font('Helvetica', '', 9)
         self.set_text_color(*self.GRAY)
-        self.cell(0, 6, 'https://map-scrapper-five.vercel.app', align='C')
+        self.cell(0, 6, 'https://lead-genx.vercel.app', align='C')
 
     def new_page(self):
         self.add_page()
@@ -183,9 +183,9 @@ class StyledPDF(FPDF):
         self.ln()
 
 
-# ═══════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  PDF 1: AI PROMPTS & PITCH TEMPLATES
-# ═══════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 def generate_prompts_pdf():
     pdf = StyledPDF()
@@ -194,7 +194,7 @@ def generate_prompts_pdf():
         'LEAD GEN x AI Powered Tool Course\nComplete prompt library for building websites,\npitching clients, and closing deals - all for free.'
     )
 
-    # ── PAGE: System Prompt ──
+    # â”€â”€ PAGE: System Prompt â”€â”€
     pdf.new_page()
     pdf.section_title('1. AI Course System Prompt')
     pdf.body_text(
@@ -262,7 +262,7 @@ def generate_prompts_pdf():
         '- Monthly retainer: $50-150/mo'
     )
 
-    # ── PAGE: Prompt 1 - Full Website Build ──
+    # â”€â”€ PAGE: Prompt 1 - Full Website Build â”€â”€
     pdf.new_page()
     pdf.section_title('2. Full Website Build Prompt')
     pdf.body_text('Use this after you\'ve identified a HOT lead. Fill in the placeholders from your CSV export.')
@@ -295,7 +295,7 @@ def generate_prompts_pdf():
         'Output: Complete index.html, styles.css, and any JS.'
     )
 
-    # ── PAGE: Prompt 2 - Website Audit + Emails ──
+    # â”€â”€ PAGE: Prompt 2 - Website Audit + Emails â”€â”€
     pdf.new_page()
     pdf.section_title('3. Website Audit & Pitch Emails')
     pdf.body_text('This prompt audits their current site and generates 3 ready-to-send cold emails plus follow-ups.')
@@ -335,7 +335,7 @@ def generate_prompts_pdf():
         'Use their business name + niche throughout.'
     )
 
-    # ── PAGE: Prompt 3 - Landing Page ──
+    # â”€â”€ PAGE: Prompt 3 - Landing Page â”€â”€
     pdf.new_page()
     pdf.section_title('4. Niche-Specific Landing Page')
     pdf.body_text('For leads that need a focused, high-converting single page.')
@@ -359,7 +359,7 @@ def generate_prompts_pdf():
         '- Clean HTML + CSS, deployable to Vercel'
     )
 
-    # ── PAGE: Prompt 4 - Bulk Qualification ──
+    # â”€â”€ PAGE: Prompt 4 - Bulk Qualification â”€â”€
     pdf.section_title('5. Bulk Lead Qualification')
     pdf.body_text('Paste your entire CSV export to prioritize which businesses to pitch first.')
     pdf.code_block(
@@ -378,7 +378,7 @@ def generate_prompts_pdf():
         'List top 5 to pitch first with one-line angle.'
     )
 
-    # ── PAGE: Prompt 5 - Pitch Deck ──
+    # â”€â”€ PAGE: Prompt 5 - Pitch Deck â”€â”€
     pdf.new_page()
     pdf.section_title('6. Full Pitch Deck')
     pdf.body_text('For high-value leads - generates a complete personalized pitch document.')
@@ -406,7 +406,7 @@ def generate_prompts_pdf():
         'Format as clean HTML for sharing as link or PDF.'
     )
 
-    # ── PAGE: Placeholder Reference ──
+    # â”€â”€ PAGE: Placeholder Reference â”€â”€
     pdf.new_page()
     pdf.section_title('7. Placeholder Quick Reference')
     pdf.body_text('Map these placeholders to columns in your LEAD GEN x AI Powered Tool CSV export:')
@@ -447,9 +447,9 @@ def generate_prompts_pdf():
     print(f'[OK] {path}')
 
 
-# ═══════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 #  PDF 2: BEGINNER SETUP TUTORIAL
-# ═══════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 def generate_tutorial_pdf():
     pdf = StyledPDF()
@@ -458,7 +458,7 @@ def generate_tutorial_pdf():
         'LEAD GEN x AI Powered Tool Course\n\nComplete guide to install VS Code, Git, Node.js,\nGitHub, and deploy websites to Vercel for FREE.'
     )
 
-    # ── Table of Contents ──
+    # â”€â”€ Table of Contents â”€â”€
     pdf.new_page()
     pdf.section_title('Table of Contents')
     toc = [
@@ -478,7 +478,7 @@ def generate_tutorial_pdf():
         pdf.set_text_color(*pdf.LIGHT_TEXT)
         pdf.cell(0, 8, f'  {title}', new_x='LMARGIN', new_y='NEXT')
 
-    # ── Section 1: Requirements ──
+    # â”€â”€ Section 1: Requirements â”€â”€
     pdf.new_page()
     pdf.section_title('1. Software Requirements Overview')
     pdf.body_text(
@@ -505,7 +505,7 @@ def generate_tutorial_pdf():
     pdf.bullet('2 GB free disk space')
     pdf.bullet('Internet connection')
 
-    # ── Section 2: VS Code ──
+    # â”€â”€ Section 2: VS Code â”€â”€
     pdf.new_page()
     pdf.section_title('2. Install VS Code')
     pdf.body_text('VS Code is a free code editor by Microsoft. It\'s where you\'ll write all your HTML, CSS, and JavaScript.')
@@ -540,7 +540,7 @@ def generate_tutorial_pdf():
         '[SCREENSHOT: VS Code Extensions marketplace with Live Server]',
     ])
 
-    # ── Section 3: Git ──
+    # â”€â”€ Section 3: Git â”€â”€
     pdf.new_page()
     pdf.section_title('3. Install Git')
     pdf.body_text('Git tracks changes to your code. You need it to push code to GitHub and deploy on Vercel.')
@@ -567,7 +567,7 @@ def generate_tutorial_pdf():
         '[SCREENSHOT: Terminal showing git version and config commands]',
     ])
 
-    # ── Section 4: Node.js ──
+    # â”€â”€ Section 4: Node.js â”€â”€
     pdf.new_page()
     pdf.section_title('4. Install Node.js')
     pdf.body_text('Node.js lets you run JavaScript outside the browser. Some tools and Vercel CLI need it.')
@@ -593,7 +593,7 @@ def generate_tutorial_pdf():
         '[SCREENSHOT: Terminal showing node and npm versions]',
     ])
 
-    # ── Section 5: GitHub ──
+    # â”€â”€ Section 5: GitHub â”€â”€
     pdf.new_page()
     pdf.section_title('5. Create a GitHub Account')
     pdf.body_text('GitHub stores your code online for free. Vercel reads from GitHub to deploy your sites.')
@@ -622,7 +622,7 @@ def generate_tutorial_pdf():
         '[SCREENSHOT: VS Code terminal after successful git clone]',
     ])
 
-    # ── Section 6: Vercel ──
+    # â”€â”€ Section 6: Vercel â”€â”€
     pdf.new_page()
     pdf.section_title('6. Create a Vercel Account')
     pdf.body_text('Vercel hosts your websites for free with instant deploys from GitHub. No server setup needed.')
@@ -651,7 +651,7 @@ def generate_tutorial_pdf():
         '[SCREENSHOT: Vercel successful deployment with live URL]',
     ])
 
-    # ── Section 7: Build & Deploy ──
+    # â”€â”€ Section 7: Build & Deploy â”€â”€
     pdf.new_page()
     pdf.section_title('7. Build & Deploy Your First Website')
     pdf.body_text('Now let\'s put it all together. You\'ll create a website for a scraped lead and deploy it live.')
@@ -697,7 +697,7 @@ def generate_tutorial_pdf():
         'When they pay, connect their custom domain in Vercel settings',
     ])
 
-    # ── Section 8: Quick Reference ──
+    # â”€â”€ Section 8: Quick Reference â”€â”€
     pdf.new_page()
     pdf.section_title('8. Quick Reference Commands')
     pdf.body_text('Keep this page handy. These are the only commands you need:')
@@ -770,7 +770,7 @@ def generate_tutorial_pdf():
     print(f'[OK] {path}')
 
 
-# ═══════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 if __name__ == '__main__':
     generate_prompts_pdf()
     generate_tutorial_pdf()

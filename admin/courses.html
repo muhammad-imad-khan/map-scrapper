@@ -164,7 +164,7 @@
       .main, .field-row { grid-template-columns: 1fr; }
     }
 
-    /* ═══ COMPREHENSIVE RESPONSIVE ═══ */
+    /* â•â•â• COMPREHENSIVE RESPONSIVE â•â•â• */
     @media(pointer:coarse){
       button,.btn{min-height:44px}
       .course-pill{min-height:48px}
@@ -214,7 +214,7 @@
       <p class="muted">Use the same admin session as the main dashboard, or authenticate directly.</p>
       <div class="field" style="margin-top:18px;">
         <label for="apiBase">Backend API URL</label>
-        <input id="apiBase" type="url" placeholder="https://map-scraper-paddle-backend.vercel.app" />
+        <input id="apiBase" type="url" placeholder="https://leadgenx-api.vercel.app" />
       </div>
       <div class="field" style="margin-top:14px;">
         <label for="adminKey">Admin API Key</label>
@@ -422,7 +422,7 @@
 
   <script>
     const SESSION_KEY = '__admin_session';
-    const DEFAULT_API_BASE = localStorage.getItem('admin_api_base') || 'https://map-scraper-paddle-backend.vercel.app';
+    const DEFAULT_API_BASE = localStorage.getItem('admin_api_base') || 'https://leadgenx-api.vercel.app';
     const state = { courses: [], selectedCourseId: '', enrollments: [], transfers: [], purchases: [] };
 
     const loginOverlay = document.getElementById('loginOverlay');
@@ -535,7 +535,7 @@
       wrap.innerHTML = state.courses.map((course) => `
         <div class="course-pill ${course.id === state.selectedCourseId ? 'active' : ''}" data-course-id="${esc(course.id)}">
           <strong>${esc(course.title)}</strong>
-          <div class="muted">${esc(course.status)} · ${esc(course.priceId || 'no priceId')}</div>
+          <div class="muted">${esc(course.status)} Â· ${esc(course.priceId || 'no priceId')}</div>
           <div class="muted">${(course.modules || []).length} module(s)</div>
         </div>
       `).join('');
