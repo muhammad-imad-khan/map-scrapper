@@ -746,7 +746,9 @@ btnCard.addEventListener('click', async () => {
     localStorage.setItem('mls_course_buyer_name', inputs.name);
     if (data.txnId) localStorage.setItem('mls_course_txn_id', data.txnId);
     showStatus('Opening Paddle checkout…', 'ready');
-    Paddle.Checkout.open({ transactionId: data.txnId });
+    // Use redirect to hosted checkout while lead-genx.vercel.app domain approval is pending
+    // Once approved, switch back to: Paddle.Checkout.open({ transactionId: data.txnId });
+    window.location.href = data.checkoutUrl;
     btnCard.disabled = false;
     btnCard.textContent = '💳 Credit / Debit';
     return;

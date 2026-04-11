@@ -1117,11 +1117,9 @@ checkoutBtn.addEventListener('click', () => {
     }
     checkoutStatus.className = 'checkout-status ready';
     checkoutStatus.textContent = 'Opening Paddle checkout…';
-    if (data.txnId) {
-      Paddle.Checkout.open({ transactionId: data.txnId });
-    } else {
-      window.location.href = data.checkoutUrl;
-    }
+    // Use redirect to hosted checkout while lead-genx.vercel.app domain approval is pending
+    // Once approved, switch back to: Paddle.Checkout.open({ transactionId: data.txnId });
+    window.location.href = data.checkoutUrl;
     checkoutBtn.disabled = false;
   })
   .catch((err) => {
@@ -1152,10 +1150,10 @@ async function handlePaddleCheckoutError() {
       state.txnId = data.txnId;
       localStorage.setItem(PENDING_TOOL_TXN_KEY, data.txnId);
       syncUrl();
-      Paddle.Checkout.open({ transactionId: data.txnId });
-    } else {
-      window.location.href = data.checkoutUrl;
     }
+    // Use redirect to hosted checkout while lead-genx.vercel.app domain approval is pending
+    // Once approved, switch back to: Paddle.Checkout.open({ transactionId: data.txnId });
+    window.location.href = data.checkoutUrl;
   } catch (err) {
     checkoutStatus.className = 'checkout-status error';
     checkoutStatus.textContent = err.message || 'Checkout failed. Please try again.';
