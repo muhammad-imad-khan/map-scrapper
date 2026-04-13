@@ -84,18 +84,69 @@ nav.scrolled{background:var(--nav-scroll);backdrop-filter:blur(20px);border-bott
 }
 
 /* ── HERO ── */
-.hero{position:relative;z-index:1;padding:140px 0 60px;text-align:center;min-height:100vh;display:flex;flex-direction:column;justify-content:center}
+.hero{position:relative;z-index:1;padding:140px 0 60px;text-align:center;min-height:100vh;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
 .hero-kicker{display:inline-flex;align-items:center;gap:8px;background:var(--gd);border:1px solid var(--gb);border-radius:100px;padding:6px 18px;margin-bottom:28px;animation:fadeUp .7s ease both}
 .kd{width:7px;height:7px;border-radius:50%;background:var(--g);animation:dot-pulse 2s infinite}
 .kt{font-size:12.5px;font-weight:600;color:var(--g);letter-spacing:.4px}
 @keyframes dot-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
 .hero-h1{font-family:var(--display);font-size:clamp(48px,8vw,92px);font-weight:800;line-height:.9;letter-spacing:-2.5px;color:var(--heading);margin-bottom:24px;animation:fadeUp .7s ease .1s both}
-.hero-h1 .acc{color:var(--g)}
+.hero-h1 .acc{color:var(--g);position:relative}
+.hero-h1 .acc::after{content:'';position:absolute;left:-4px;right:-4px;bottom:-2px;height:6px;background:rgba(34,197,94,.22);border-radius:3px;animation:underlineGrow .8s ease .7s both;transform-origin:left}
+@keyframes underlineGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 .hero-h1 .line2{display:block;position:relative}
-.hero-sub{font-size:clamp(16px,2.2vw,20px);color:var(--t2);max-width:540px;margin:0 auto 36px;line-height:1.65;animation:fadeUp .7s ease .2s both}
+.hero-h1 .shimmer{background:linear-gradient(90deg,var(--heading) 0%,var(--heading) 35%,var(--g) 50%,var(--heading) 65%,var(--heading) 100%);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shimmerSlide 4s linear infinite}
+@keyframes shimmerSlide{to{background-position:-200% center}}
+
+/* Hero floating spreadsheet graphic */
+.hero-visual{position:relative;max-width:680px;margin:0 auto 38px;animation:fadeUp .8s ease .2s both}
+.hero-spreadsheet{background:var(--panel);border:1px solid var(--bhi);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-panel),0 0 80px rgba(34,197,94,.08);animation:heroFloat 6s ease-in-out infinite;will-change:transform}
+@keyframes heroFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.hs-bar{display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--panel-hdr);border-bottom:1px solid var(--b)}
+.hs-dot{width:9px;height:9px;border-radius:50%}
+.hs-bar-title{margin-left:8px;font-size:10.5px;font-family:var(--mono);color:var(--t3)}
+.hs-grid{display:grid;grid-template-columns:2fr 1fr 1.5fr 1fr;font-size:11px}
+.hs-hdr{display:contents}
+.hs-hdr span{padding:7px 12px;background:var(--panel-hdr);font-weight:700;font-size:9.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);border-bottom:1px solid var(--b)}
+.hs-row{display:contents}
+.hs-row span{padding:8px 12px;border-bottom:1px solid var(--b);color:var(--t);transition:background .15s}
+.hs-row:hover span{background:rgba(34,197,94,.04)}
+.hs-row .hs-name{color:var(--heading2);font-weight:600}
+.hs-row .hs-rate{color:var(--amber);font-family:var(--mono);font-weight:700}
+.hs-row .hs-email{font-family:var(--mono);font-size:10px;color:var(--g)}
+.hs-row .hs-email.na{color:var(--t3)}
+.hs-row .hs-cat{color:var(--t2);font-size:10.5px}
+.hs-row.hs-anim{animation:hsRowIn .45s ease both}
+@keyframes hsRowIn{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:none}}
+.hs-bottom{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-top:1px solid var(--b);background:var(--panel-hdr)}
+.hs-bottom .hs-status{font-family:var(--mono);font-size:10px;color:var(--g);display:flex;align-items:center;gap:5px}
+.hs-bottom .hs-status .dot{width:5px;height:5px;border-radius:50%;background:var(--g);animation:dot-pulse 1.5s infinite}
+.hs-bottom .hs-dl{font-size:10px;color:var(--t3);font-family:var(--mono)}
+/* Floating badges around the spreadsheet */
+.hero-badge{position:absolute;display:flex;align-items:center;gap:6px;padding:7px 14px;background:var(--panel);border:1px solid var(--bhi);border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.25);font-size:11px;font-weight:600;white-space:nowrap;z-index:2;pointer-events:none}
+.hero-badge.hb-email{top:15%;right:-40px;color:var(--g);animation:badgeFloat1 5s ease-in-out infinite .5s both,fadeUp .7s ease .6s both}
+.hero-badge.hb-speed{bottom:22%;left:-44px;color:var(--amber);animation:badgeFloat2 5.5s ease-in-out infinite .8s both,fadeUp .7s ease .8s both}
+.hero-badge.hb-leads{top:-10px;left:18%;color:var(--blue);animation:badgeFloat3 4.8s ease-in-out infinite 1s both,fadeUp .7s ease 1s both}
+@keyframes badgeFloat1{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-10px) rotate(1deg)}}
+@keyframes badgeFloat2{0%,100%{transform:translateY(0) rotate(1deg)}50%{transform:translateY(-12px) rotate(-1.5deg)}}
+@keyframes badgeFloat3{0%,100%{transform:translateY(0) rotate(.5deg)}50%{transform:translateY(-8px) rotate(-1deg)}}
+@media(max-width:760px){.hero-badge{display:none}}
+
+/* Hero stats counters */
+.hero-stats{display:flex;align-items:center;justify-content:center;gap:32px;margin-bottom:28px;animation:fadeUp .7s ease .3s both}
+@media(max-width:480px){.hero-stats{gap:16px;flex-wrap:wrap}}
+.hero-stat{text-align:center}
+.hero-stat-n{font-family:var(--display);font-size:clamp(28px,4vw,42px);font-weight:800;color:var(--heading);line-height:1}
+.hero-stat-n .hero-count{display:inline}
+.hero-stat-n .unit{color:var(--g);font-size:.7em}
+.hero-stat-l{font-size:11.5px;color:var(--t3);margin-top:2px;font-weight:500}
+.hero-stat-sep{width:1px;height:36px;background:var(--b)}
+
+.hero-sub{font-size:clamp(16px,2.2vw,20px);color:var(--t2);max-width:580px;margin:0 auto 36px;line-height:1.65;animation:fadeUp .7s ease .2s both}
 .hero-sub strong{color:var(--t)}
-.hero-btns{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:18px;animation:fadeUp .7s ease .3s both}
-.btn-main{display:inline-flex;align-items:center;gap:9px;padding:14px 30px;background:var(--g);color:#000;border:none;border-radius:11px;font-size:15.5px;font-weight:700;cursor:pointer;text-decoration:none;font-family:var(--body);transition:background .15s,transform .1s,box-shadow .2s;box-shadow:0 0 50px rgba(34,197,94,.2)}
+.hero-btns{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:18px;animation:fadeUp .7s ease .35s both}
+.btn-main{display:inline-flex;align-items:center;gap:9px;padding:14px 30px;background:var(--g);color:#000;border:none;border-radius:11px;font-size:15.5px;font-weight:700;cursor:pointer;text-decoration:none;font-family:var(--body);transition:background .15s,transform .1s,box-shadow .2s;box-shadow:0 0 50px rgba(34,197,94,.2);position:relative;overflow:hidden}
+.btn-main::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,transparent 40%,rgba(255,255,255,.15) 50%,transparent 60%);animation:btnShine 3.5s ease-in-out infinite;pointer-events:none}
+@keyframes btnShine{0%,100%{transform:translateX(-100%) rotate(45deg)}50%{transform:translateX(100%) rotate(45deg)}}
 .btn-main:hover{background:var(--g2);box-shadow:0 0 90px rgba(34,197,94,.4);transform:translateY(-2px)}
 .btn-main:active{transform:scale(.98)}
 .btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:14px 26px;background:transparent;color:var(--t);border:1px solid var(--bhi);border-radius:11px;font-size:15.5px;font-weight:600;cursor:pointer;text-decoration:none;font-family:var(--body);transition:border-color .15s,background .15s,transform .1s}
@@ -723,9 +774,48 @@ footer{border-top:1px solid var(--b);padding:52px 0 28px;position:relative;z-ind
     <div class="hero-kicker"><span class="kd"></span><span class="kt" id="heroKickerText">3 FREE CREDITS ON INSTALL — NO SIGN-UP REQUIRED</span></div>
     <h1 class="hero-h1">
       <span class="acc">Google Maps</span> Leads<br>
-      <span class="line2">Into Your Spreadsheet.</span>
+      <span class="line2">Into Your <span class="shimmer">Excel in Seconds.</span></span>
     </h1>
-    <p class="hero-sub">Type any search — get business <strong>names, emails, ratings, hours and websites</strong> auto-exported to CSV in under 60 seconds.</p>
+    <p class="hero-sub">Search any niche, any city — get <strong>names, emails, ratings & phone numbers</strong> streamed straight into a spreadsheet. No code. No API keys. Just click and export.</p>
+
+    <!-- Animated Spreadsheet Preview -->
+    <div class="hero-visual">
+      <div class="hero-badge hb-email">📧 Emails auto-found</div>
+      <div class="hero-badge hb-speed">⚡ ~60s per scrape</div>
+      <div class="hero-badge hb-leads">📊 8 data columns</div>
+      <div class="hero-spreadsheet">
+        <div class="hs-bar">
+          <div class="hs-dot" style="background:#f87171"></div>
+          <div class="hs-dot" style="background:#f59e0b"></div>
+          <div class="hs-dot" style="background:#22c55e"></div>
+          <span class="hs-bar-title">leads_export.csv — Lead Gen x</span>
+        </div>
+        <div class="hs-grid">
+          <div class="hs-hdr"><span>Business Name</span><span>Rating</span><span>Email</span><span>Category</span></div>
+          <div class="hs-row hs-anim" style="animation-delay:.4s"><span class="hs-name">The Barber Co.</span><span class="hs-rate">★ 4.9</span><span class="hs-email">info@barberco.pk</span><span class="hs-cat">Barber</span></div>
+          <div class="hs-row hs-anim" style="animation-delay:.6s"><span class="hs-name">Fade Masters DHA</span><span class="hs-rate">★ 4.7</span><span class="hs-email na">scanning…</span><span class="hs-cat">Salon</span></div>
+          <div class="hs-row hs-anim" style="animation-delay:.8s"><span class="hs-name">Crown Cuts</span><span class="hs-rate">★ 4.8</span><span class="hs-email">hello@crown.pk</span><span class="hs-cat">Barber</span></div>
+          <div class="hs-row hs-anim" style="animation-delay:1s"><span class="hs-name">Style Zone</span><span class="hs-rate">★ 4.6</span><span class="hs-email">sz@stylezone.pk</span><span class="hs-cat">Salon</span></div>
+          <div class="hs-row hs-anim" style="animation-delay:1.2s"><span class="hs-name">Royal Blades</span><span class="hs-rate">★ 4.9</span><span class="hs-email na">scanning…</span><span class="hs-cat">Barber</span></div>
+        </div>
+        <div class="hs-bottom">
+          <div class="hs-status"><span class="dot"></span> Scraping 5 of 10…</div>
+          <div class="hs-dl">↓ auto-export ready</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats counters -->
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-n"><span class="hero-count" data-target="60">0</span><span class="unit">s</span></div><div class="hero-stat-l">Average scrape</div></div>
+      <div class="hero-stat-sep"></div>
+      <div class="hero-stat"><div class="hero-stat-n"><span class="hero-count" data-target="8">0</span></div><div class="hero-stat-l">Data columns</div></div>
+      <div class="hero-stat-sep"></div>
+      <div class="hero-stat"><div class="hero-stat-n"><span class="hero-count" data-target="3">0</span></div><div class="hero-stat-l">Free credits</div></div>
+      <div class="hero-stat-sep"></div>
+      <div class="hero-stat"><div class="hero-stat-n"><span class="hero-count" data-target="0">0</span><span class="unit">$</span></div><div class="hero-stat-l">Sign-up cost</div></div>
+    </div>
+
     <div class="hero-countdown">
       <div class="hc-label">🔥 SALE ENDS IN</div>
       <div class="hc-timer">
@@ -1255,6 +1345,84 @@ function animBg() {
 }
 animBg();
 
+// ══════════════════════════════════════════════════════
+//  HERO COUNTER ANIMATION
+// ══════════════════════════════════════════════════════
+(function(){
+  var counters = document.querySelectorAll('.hero-count');
+  var animated = false;
+  function animateCounters(){
+    if(animated) return;
+    animated = true;
+    counters.forEach(function(el){
+      var target = parseInt(el.getAttribute('data-target'),10);
+      if(target === 0){ el.textContent = '0'; return; }
+      var duration = 1800;
+      var start = performance.now();
+      function tick(now){
+        var elapsed = now - start;
+        var progress = Math.min(elapsed / duration, 1);
+        // ease out cubic
+        var ease = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(target * ease);
+        if(progress < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    });
+  }
+  // trigger when hero is visible
+  var heroEl = document.querySelector('.hero');
+  if(heroEl && 'IntersectionObserver' in window){
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if(e.isIntersecting){ animateCounters(); obs.disconnect(); }});
+    }, { threshold: 0.2 });
+    obs.observe(heroEl);
+  } else { setTimeout(animateCounters, 400); }
+})();
+
+// ══════════════════════════════════════════════════════
+//  HERO SPREADSHEET ROW CYCLING
+// ══════════════════════════════════════════════════════
+(function(){
+  var HERO_BIZ = [
+    { n:'The Barber Co.', r:'4.9', e:'info@barberco.pk', c:'Barber' },
+    { n:'Fade Masters DHA', r:'4.7', e:'— scanning', c:'Salon' },
+    { n:'Crown Cuts', r:'4.8', e:'hello@crown.pk', c:'Barber' },
+    { n:'Style Zone', r:'4.6', e:'sz@stylezone.pk', c:'Salon' },
+    { n:'Royal Blades', r:'4.9', e:'— scanning', c:'Barber' },
+    { n:'Prime Dental Care', r:'4.8', e:'prime@dental.ae', c:'Dental' },
+    { n:'Smile Studio', r:'4.9', e:'— scanning', c:'Dental' },
+    { n:'City Dental Clinic', r:'4.7', e:'info@city-dental.ae', c:'Dental' },
+    { n:'The Ivy', r:'4.7', e:'reservations@theivyweststreet.com', c:'Restaurant' },
+    { n:'Dishoom', r:'4.9', e:'— scanning', c:'Restaurant' },
+    { n:'Sketch London', r:'4.6', e:'info@sketch.uk.com', c:'Restaurant' },
+    { n:'Gymkhana', r:'4.8', e:'book@gymkhanalondon.com', c:'Restaurant' },
+  ];
+  var rows = document.querySelectorAll('.hero-spreadsheet .hs-row');
+  if(!rows.length) return;
+  var offset = 0;
+  function cycleRows(){
+    offset = (offset + rows.length) % HERO_BIZ.length;
+    rows.forEach(function(row, i){
+      var biz = HERO_BIZ[(offset + i) % HERO_BIZ.length];
+      var spans = row.querySelectorAll('span');
+      if(spans[0]) spans[0].textContent = biz.n;
+      if(spans[1]) spans[1].textContent = '★ ' + biz.r;
+      if(spans[2]){
+        spans[2].textContent = biz.e;
+        var isScanning = biz.e.indexOf('scanning') !== -1;
+        spans[2].className = 'hs-email' + (isScanning ? ' na' : '');
+      }
+      if(spans[3]) spans[3].textContent = biz.c;
+      // re-trigger animation
+      row.classList.remove('hs-anim');
+      void row.offsetWidth;
+      row.style.animationDelay = (i * 0.12) + 's';
+      row.classList.add('hs-anim');
+    });
+  }
+  setInterval(cycleRows, 5000);
+})();
 
 
 // ══════════════════════════════════════════════════════
